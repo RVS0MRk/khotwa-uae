@@ -5,7 +5,7 @@ function uiText(en,ar){return lang==='ar'?ar:en;}
 function uiNode(tag,className,text){const node=document.createElement(tag);if(className)node.className=className;if(text!=null)node.textContent=text;return node;}
 function polishLanguage(){
   document.documentElement.dir=lang==='ar'?'rtl':'ltr';
-  setTxt('title',uiText('Turn your business idea into evidence.','حوّل فكرة مشروعك إلى دليل.'));
+  setTxt('title',uiText('From idea to first step.','من الفكرة إلى الخطوة الأولى.'));
   setTxt('pitch',uiText('Choose an idea, test real customer demand, and know what to do next — before spending heavily.','اختر فكرة، واختبر طلب العملاء الحقيقي، واعرف خطوتك التالية قبل الإنفاق الكبير.'));
   [['need-idea','Get three ideas matched to your skills, budget and market.','اكتشف ثلاث أفكار وفق مهاراتك وميزانيتك وسوقك.'],['have-idea','Validate demand and build your first action plan.','اختبر الطلب وابنِ خطة خطواتك الأولى.']].forEach(([id,en,ar])=>document.getElementById(id).appendChild(uiNode('small','',uiText(en,ar))));
   const trust=document.getElementById('hero-trust');trust.replaceChildren();
@@ -16,10 +16,10 @@ function polishLanguage(){
   setTxt('bys-l3',uiText('Budget remaining after test','الميزانية المتبقية بعد الاختبار'));
   setTxt('chat-sub',uiText('Ask about your current business plan','اسأل عن خطة مشروعك الحالية'));
   setTxt('cl-text',uiText('Advisor','المستشار'));
-  setTxt('chat-note',uiText('Open StartSmart Advisor for a focused question about your customers, risks, pricing or official requirements.','افتح مستشار ستارت سمارت للسؤال عن العملاء أو المخاطر أو التسعير أو المتطلبات الرسمية.'));
+  setTxt('chat-note',uiText('Open Khotwa Advisor for a focused question about your customers, risks, pricing or official requirements.','افتح مستشار خطوة للسؤال عن العملاء أو المخاطر أو التسعير أو المتطلبات الرسمية.'));
   document.getElementById('entry-choice').setAttribute('aria-label',uiText('Choose how to start','اختر طريقة البدء'));
   document.getElementById('result-nav').setAttribute('aria-label',uiText('Plan sections','أقسام الخطة'));
-  document.getElementById('chatPanel').setAttribute('aria-label',uiText('StartSmart Advisor','مستشار ستارت سمارت'));
+  document.getElementById('chatPanel').setAttribute('aria-label',uiText('Khotwa Advisor','مستشار خطوة'));
   const suggestions=[['Biggest risks','أكبر المخاطر'],['First 3 strong leads','أول ثلاثة عملاء محتملين'],['Pricing test','اختبار التسعير'],['Licences & requirements','التراخيص والمتطلبات']];
   const suggested=document.getElementById('suggested');suggested.replaceChildren();suggestions.forEach(([en,ar])=>{const b=uiNode('button','chip',uiText(en,ar));b.type='button';b.onclick=()=>{document.getElementById('chat-input').value=b.textContent;askQuestion();};suggested.appendChild(b);});
   labelProofRows();renderJourney();renderDashboardSummary();decorateResources();

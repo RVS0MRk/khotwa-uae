@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>StartSmart UAE — From idea to evidence</title>
-<meta name="description" content="Discover a business idea, test real customer demand and plan your next step with StartSmart UAE. Bilingual tools for first-time founders.">
+<title>Khotwa — From idea to first step.</title>
+<meta name="description" content="Khotwa (خطوة) helps UAE founders discover an idea, test real customer demand, and take their first step. Bilingual tools in English and Arabic.">
 <meta name="theme-color" content="#10233e">
 <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -395,8 +395,8 @@ header h1:after{content:"";position:absolute;left:50%;top:50%;transform:translat
 <body id="body">
 <div class="flag-strip"><i class="r"></i><i class="g"></i><i class="w"></i><i class="k"></i></div>
 <header>
-  <nav class="site-nav" aria-label="StartSmart UAE">
-    <a class="brand" href="/"><span class="brand-mark" aria-hidden="true">↗</span>StartSmart <small>UAE / 2.0</small></a>
+  <nav class="site-nav" aria-label="Khotwa">
+    <a class="brand" href="/"><span class="brand-mark" aria-hidden="true">↗</span><span id="brand-name">Khotwa</span><small id="brand-sub">خطوة</small></a>
     <div class="header-controls">
       <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="Toggle theme">☾</button>
       <button class="lang-btn" id="langBtn" onclick="toggleLang()">العربية</button>
@@ -405,7 +405,7 @@ header h1:after{content:"";position:absolute;left:50%;top:50%;transform:translat
   <div class="hero-layout">
     <div class="inner hero-anim">
       <div class="kicker"><span class="dot"></span><span id="kicker-text">Built for first-time founders across the UAE</span></div>
-      <h1 id="title">Turn your business idea into evidence.</h1>
+      <h1 id="title">From idea to first step.</h1>
       <p id="subtitle" hidden></p>
       <p id="pitch">Choose an idea, test real customer demand, and know what to do next — before spending heavily.</p>
     </div>
@@ -650,7 +650,7 @@ header h1:after{content:"";position:absolute;left:50%;top:50%;transform:translat
 
     <div class="local-card">
       <h2 class="sec" id="lbl-why">Your selected market context</h2>
-      <p style="font-size:13px;color:#6b5a30;line-height:1.6" id="why-intro">StartSmart adapts the plan to the market and context you select.</p>
+      <p style="font-size:13px;color:#6b5a30;line-height:1.6" id="why-intro">Khotwa adapts the plan to the market and context you select.</p>
       <div class="local-grid" id="why-grid"></div>
     </div>
 
@@ -663,24 +663,24 @@ header h1:after{content:"";position:absolute;left:50%;top:50%;transform:translat
 
     <div class="card" id="chat-note-card">
       <h2 class="sec" id="lbl-chat">Ask a follow-up question</h2>
-      <p style="font-size:13px;color:var(--muted)" id="chat-note">Use the floating <b>StartSmart Advisor</b> at the bottom-right to ask about customers, risks, pricing, or licenses.</p>
+      <p style="font-size:13px;color:var(--muted)" id="chat-note">Use the floating <b>Khotwa Advisor</b> at the bottom-right to ask about customers, risks, pricing, or licenses.</p>
     </div>
   </div>
 </main>
 
 <!-- Floating AI advisor -->
-<button class="chat-launcher" id="chatLauncher" onclick="toggleChat()" aria-controls="chatPanel" aria-expanded="false" aria-label="Open StartSmart Advisor">
+<button class="chat-launcher" id="chatLauncher" onclick="toggleChat()" aria-controls="chatPanel" aria-expanded="false" aria-label="Open Khotwa Advisor">
   <span class="cl-icon" aria-hidden="true">↗</span>
   <span class="cl-text" id="cl-text">Need help?</span>
   <span class="cl-pulse" aria-hidden="true"></span>
 </button>
 
 <div class="chat-backdrop" id="chat-backdrop" hidden onclick="toggleChat()"></div>
-<div class="chat-panel" inert id="chatPanel" role="dialog" aria-label="StartSmart Advisor" aria-hidden="true">
+<div class="chat-panel" inert id="chatPanel" role="dialog" aria-label="Khotwa Advisor" aria-hidden="true">
   <div class="chat-head">
     <div class="chat-flag" aria-hidden="true"><i class="cr"></i><i class="cg"></i><i class="cw"></i><i class="ck"></i></div>
     <div class="chat-head-txt">
-      <div class="chat-title" id="chat-title">StartSmart Advisor</div>
+      <div class="chat-title" id="chat-title">Khotwa Advisor</div>
       <div class="chat-sub" id="chat-sub">Customers, risks, pricing, or licenses</div>
     </div>
     <button class="chat-close" id="chatClose" onclick="toggleChat()" aria-label="Close advisor">✕</button>
@@ -694,7 +694,7 @@ header h1:after{content:"";position:absolute;left:50%;top:50%;transform:translat
   <div class="chat-foot" id="chat-foot">Guidance only — verify official requirements.</div>
 </div>
 <footer>
-  <div class="foot-title">StartSmart UAE</div>
+  <div class="foot-title" id="foot-title">Khotwa · خطوة</div>
   <div id="foot-text">Built for aspiring founders in the UAE</div>
   <div style="margin-top:.4rem">
     <span class="foot-flag"><span class="fr"></span><span class="fg"></span><span class="fw"></span><span class="fk"></span></span>
@@ -711,8 +711,8 @@ const DEMOS={en:["Mobile car-wash service","Healthy meal-prep for busy professio
 
 const T={
   "en": {
-    "title": "StartSmart UAE",
-    "subtitle": "Test your idea before you spend — your first step assistant",
+    "title": "From idea to first step.",
+    "subtitle": "Khotwa — From idea to first step.",
     "idea": "What is your business idea?",
     "cat": "Category",
     "usertype": "Who are your customers?",
@@ -746,7 +746,7 @@ const T={
     "firstTip": "First customer tip",
     "langBtn": "العربية",
     "kicker": "Built for first-time founders across the UAE",
-    "foot": "Built for aspiring founders in the UAE",
+    "foot": "From idea to first step.",
     "loaderMsgs": [
       "Reading your idea...",
       "Scanning the local market...",
@@ -755,7 +755,7 @@ const T={
       "Almost there..."
     ],
     "nexttest": "Next test action",
-    "shareTpl": "My idea is {idea}. My first step is: {step}. Preliminary score: {score}/25. {verdict}",
+    "shareTpl": "Khotwa — From idea to first step. My idea is {idea}. My first step is: {step}. Preliminary score: {score}/25. {verdict}",
     "dayOut": "Output",
     "daySucc": "Success",
     "lblDecision": "Founder decision",
@@ -770,7 +770,7 @@ const T={
     "risklevel": "Risk level",
     "testbudget": "Estimated test budget (AI ESTIMATE)",
     "lblWhy": "Your selected market context",
-    "whyIntro": "StartSmart adapts the plan to the market and context you select.",
+    "whyIntro": "Khotwa adapts the plan to the market and context you select.",
     "whyItems": [
       "Selected UAE region",
       "Chosen business context",
@@ -804,9 +804,9 @@ const T={
     "heroStart": "Start my first step",
     "heroDemo": "Run demo story",
     "clText": "Need help?",
-    "chatTitle": "StartSmart Advisor",
+    "chatTitle": "Khotwa Advisor",
     "chatSub": "Ask about your current business plan",
-    "chatNote": "Use the floating StartSmart Advisor at the bottom-right to ask about customers, risks, pricing, or licenses.",
+    "chatNote": "Use the floating Khotwa Advisor at the bottom-right to ask about customers, risks, pricing, or licenses.",
     "chatFoot": "Guidance only — verify official requirements.",
     "emptyIdea": "Enter a business idea first — for example: a mobile car-wash service.",
     "localPlan": {
@@ -958,8 +958,8 @@ const T={
     }
   },
   "ar": {
-    "title": "ابدأ بذكاء الإمارات",
-    "subtitle": "اختبر فكرتك قبل أن تنفق — مساعد خطوتك الأولى",
+    "title": "من الفكرة إلى الخطوة الأولى.",
+    "subtitle": "خطوة — من الفكرة إلى الخطوة الأولى.",
     "idea": "ما هي فكرة مشروعك؟",
     "cat": "الفئة",
     "usertype": "من هم عملاؤك؟",
@@ -993,7 +993,7 @@ const T={
     "firstTip": "نصيحة لأول عميل",
     "langBtn": "English",
     "kicker": "مصمم للمؤسسين الجدد في الإمارات",
-    "foot": "مصمم للمؤسسين الطموحين في الإمارات",
+    "foot": "من الفكرة إلى الخطوة الأولى.",
     "loaderMsgs": [
       "نقرأ فكرتك...",
       "نحلل السوق المحلي...",
@@ -1002,7 +1002,7 @@ const T={
       "اقتربنا..."
     ],
     "nexttest": "إجراء الاختبار التالي",
-    "shareTpl": "فكرتي هي {idea}. خطوتي الأولى: {step}. الدرجة المبدئية: {score}/25. {verdict}",
+    "shareTpl": "خطوة — من الفكرة إلى الخطوة الأولى. فكرتي هي {idea}. خطوتي الأولى: {step}. الدرجة المبدئية: {score}/25. {verdict}",
     "dayOut": "الناتج",
     "daySucc": "النجاح",
     "lblDecision": "قرار المؤسس",
@@ -1017,7 +1017,7 @@ const T={
     "risklevel": "مستوى الخطر",
     "testbudget": "ميزانية اختبار مقدرة",
     "lblWhy": "سياق السوق الذي اخترته",
-    "whyIntro": "يكيّف StartSmart الخطة حسب السوق والسياق الذي تختاره.",
+    "whyIntro": "تكيّف خطوة الخطة حسب السوق والسياق الذي تختاره.",
     "whyItems": [
       "المنطقة المختارة",
       "سياق المشروع",
@@ -1051,9 +1051,9 @@ const T={
     "heroStart": "ابدأ خطوتي الأولى",
     "heroDemo": "شغّل العرض التجريبي",
     "clText": "تحتاج مساعدة؟",
-    "chatTitle": "مستشار StartSmart",
+    "chatTitle": "مستشار خطوة",
     "chatSub": "اسأل عن خطة مشروعك الحالية",
-    "chatNote": "استخدم مستشار StartSmart العائم في الأسفل للأسئلة.",
+    "chatNote": "استخدم مستشار خطوة العائم في الأسفل للأسئلة.",
     "chatFoot": "إرشاد فقط — تحقق من المتطلبات الرسمية.",
     "emptyIdea": "أدخل فكرة أولاً — مثال: خدمة غسيل سيارات متنقلة.",
     "localPlan": {
@@ -1229,13 +1229,13 @@ function renderResources(region){
   const box=document.getElementById("regional-resource");if(!box)return;box.replaceChildren();if(region==="Abu Dhabi"||region==="Al Ain")[[lang==="ar"?"تم — خدمات حكومة أبوظبي":"TAMM","https://www.tamm.abudhabi/"],[lang==="ar"?"دائرة التنمية الاقتصادية في أبوظبي":"Abu Dhabi Department of Economic Development","https://www.added.gov.ae/en/set-up/establish-your-business"]].forEach(([name,url])=>{const row=document.createElement("div"),icon=document.createElement("span"),a=document.createElement("a");row.className="res-link";icon.textContent="📍";a.href=url;a.target="_blank";a.rel="noopener noreferrer";a.textContent=name;row.append(icon,a);box.appendChild(row)});
 }
 
-function applyLang(){const t=T[lang];if(currentPlan&&currentPlan._local){const old=currentPlan;currentPlan=localPlan((old.readiness_report||{}).idea||currentIdea(),old._category||"",old._user_type||"",old._budget??10000,old._region||"UAE-wide",old._context||"Not sure");currentPlan.proof_summary=old.proof_summary;currentPlan.state.evidence=(old.state||{}).evidence||currentPlan.state.evidence;}document.getElementById("body").className=lang==="ar"?"rtl":"";document.documentElement.lang=lang;
+function applyLang(){const t=T[lang];document.title=lang==="ar"?"خطوة — من الفكرة إلى الخطوة الأولى.":"Khotwa — From idea to first step.";document.querySelector('meta[name="description"]').content=lang==="ar"?"خطوة تساعد مؤسسي المشاريع في الإمارات على اكتشاف فكرة واختبار طلب العملاء واتخاذ الخطوة الأولى. أدوات بالعربية والإنجليزية.":"Khotwa (خطوة) helps UAE founders discover an idea, test real customer demand, and take their first step. Bilingual tools in English and Arabic.";if(currentPlan&&currentPlan._local){const old=currentPlan;currentPlan=localPlan((old.readiness_report||{}).idea||currentIdea(),old._category||"",old._user_type||"",old._budget??10000,old._region||"UAE-wide",old._context||"Not sure");currentPlan.proof_summary=old.proof_summary;currentPlan.state.evidence=(old.state||{}).evidence||currentPlan.state.evidence;}document.getElementById("body").className=lang==="ar"?"rtl":"";document.documentElement.lang=lang;
 const set=(id,v)=>{document.getElementById(id).textContent=v;};
 set('category-hint',lang==='ar'?'اختر الفئة؛ تظهر الاقتراحات أثناء الكتابة.':'Choose a category; suggestions appear as you type.');
 document.querySelectorAll('.p-freq').forEach(el=>el.placeholder=lang==='ar'?'أسبوعياً':'weekly');
-[['themeBtn','Toggle theme','تغيير المظهر'],['entry-choice','Choose how to start','اختر طريقة البدء'],['result-nav','Plan sections','أقسام الخطة'],['timeline-chart','Timeline per step','مدة كل خطوة'],['cost-chart','Cost breakdown','تفصيل التكلفة'],['chatLauncher','Open StartSmart Advisor','افتح مستشار ستارت سمارت'],['chatPanel','StartSmart Advisor','مستشار ستارت سمارت'],['chatClose','Close advisor','أغلق المستشار'],['chat-input','Type your question','اكتب سؤالك'],['sendBtn','Send','إرسال']].forEach(([id,en,ar])=>document.getElementById(id).setAttribute('aria-label',lang==='ar'?ar:en));
+[['themeBtn','Toggle theme','تغيير المظهر'],['entry-choice','Choose how to start','اختر طريقة البدء'],['result-nav','Plan sections','أقسام الخطة'],['timeline-chart','Timeline per step','مدة كل خطوة'],['cost-chart','Cost breakdown','تفصيل التكلفة'],['chatLauncher','Open Khotwa Advisor','افتح مستشار خطوة'],['chatPanel','Khotwa Advisor','مستشار خطوة'],['chatClose','Close advisor','أغلق المستشار'],['chat-input','Type your question','اكتب سؤالك'],['sendBtn','Send','إرسال']].forEach(([id,en,ar])=>document.getElementById(id).setAttribute('aria-label',lang==='ar'?ar:en));
 
-set("title",t.title);set("subtitle",t.subtitle);set("lbl-idea",t.idea);set("lbl-cat",t.cat);set("lbl-usertype",t.usertype);set("lbl-region",t.regionLabel);set("lbl-context",t.contextLabel);set("genBtn",t.gen);set("pdfBtn",t.pdf);set("newBtn",t.newidea);set("lbl-overview",t.overview);set("lbl-firststep",t.firststep);set("lbl-score",t.score);set("lbl-test",t.testplan);set("lbl-proof",t.proof);set("proof-help",t.proofHelp);set("lbl-7day",t.sevenday);set("lbl-validate",t.validate);set("lbl-questions",t.questions);set("lbl-wa",t.wa);set("waBtn",t.copy);set("lbl-report",t.report);set("lbl-fuller",t.fuller);set("lbl-resources",t.resources);set("lbl-chat",t.chat);set("sendBtn",t.send);set("lbl-timeline",t.timeline);set("lbl-cost",t.cost);set("disclaimer",t.disclaimer);document.getElementById("federal-resource").textContent=lang==="ar"?"حكومة الإمارات — خدمات وإرشادات الأعمال":"UAE Government — business services and guidance";
+set("brand-name",lang==="ar"?"خطوة":"Khotwa");set("brand-sub",lang==="ar"?"Khotwa":"خطوة");set("foot-title",lang==="ar"?"خطوة · Khotwa":"Khotwa · خطوة");document.querySelector(".site-nav").setAttribute("aria-label",lang==="ar"?"خطوة":"Khotwa");set("title",t.title);set("subtitle",t.subtitle);set("lbl-idea",t.idea);set("lbl-cat",t.cat);set("lbl-usertype",t.usertype);set("lbl-region",t.regionLabel);set("lbl-context",t.contextLabel);set("genBtn",t.gen);set("pdfBtn",t.pdf);set("newBtn",t.newidea);set("lbl-overview",t.overview);set("lbl-firststep",t.firststep);set("lbl-score",t.score);set("lbl-test",t.testplan);set("lbl-proof",t.proof);set("proof-help",t.proofHelp);set("lbl-7day",t.sevenday);set("lbl-validate",t.validate);set("lbl-questions",t.questions);set("lbl-wa",t.wa);set("waBtn",t.copy);set("lbl-report",t.report);set("lbl-fuller",t.fuller);set("lbl-resources",t.resources);set("lbl-chat",t.chat);set("sendBtn",t.send);set("lbl-timeline",t.timeline);set("lbl-cost",t.cost);set("disclaimer",t.disclaimer);document.getElementById("federal-resource").textContent=lang==="ar"?"حكومة الإمارات — خدمات وإرشادات الأعمال":"UAE Government — business services and guidance";
 document.getElementById("idea").placeholder=t.placeholder;document.getElementById("chat-input").placeholder=t.chatPlaceholder;document.getElementById("langBtn").textContent=t.langBtn;
 var kt=document.getElementById("kicker-text");if(kt&&t.kicker)kt.textContent=t.kicker;
 var ft=document.getElementById("foot-text");if(ft&&t.foot)ft.textContent=t.foot;
@@ -1382,7 +1382,7 @@ const tp=p.small_test_plan||{};document.getElementById("test-intro").textContent
 const dg=document.getElementById("day-grid");dg.innerHTML="";(p.seven_day_plan||[]).forEach(d=>{var extra="";if(d.output)extra+=`<div class="a" style="margin-top:.3rem"><b>${t.dayOut}:</b> ${d.output}</div>`;if(d.success_check)extra+=`<div class="a" style="color:var(--uae-green)"><b>${t.daySucc}:</b> ${d.success_check}</div>`;var tm=d.time_needed?`<span style="float:right;font-size:10px;color:var(--muted)">${d.time_needed}</span>`:"";dg.innerHTML+=`<div class="day-card"><div class="d">${lang==="ar"?"اليوم":"Day"} ${d.day}</div>${tm}<div class="f">${d.focus}</div><div class="a">${d.action}</div>${extra}</div>`;});
 const vl=document.getElementById("validate-list");vl.innerHTML="";(p.validation_before_spending||[]).forEach(x=>{vl.innerHTML+=`<li>${x}</li>`;});
 const ql=document.getElementById("questions-list");ql.innerHTML="";(p.validation_questions||[]).forEach(q=>{ql.innerHTML+=`<li>${q}</li>`;});
-let waMsg=rawPlan.whatsapp_message||"";const ideaVal=document.getElementById("idea").value.trim();if(ideaVal&&waMsg.includes("[idea]"))waMsg=waMsg.replace("[idea]",ideaVal);else if(ideaVal&&!waMsg.toLowerCase().includes(ideaVal.toLowerCase().slice(0,12)))waMsg=waMsg+" ("+ideaVal+")";document.getElementById("wa-text").textContent=waMsg;
+let waMsg=rawPlan.whatsapp_message||"";const ideaVal=document.getElementById("idea").value.trim();if(ideaVal&&waMsg.includes("[idea]"))waMsg=waMsg.replace("[idea]",ideaVal);else if(ideaVal&&!waMsg.toLowerCase().includes(ideaVal.toLowerCase().slice(0,12)))waMsg=waMsg+" ("+ideaVal+")";document.getElementById("wa-text").textContent=(lang==="ar"?"خطوة — من الفكرة إلى الخطوة الأولى.\n":"Khotwa — From idea to first step.\n")+waMsg;
 const rt=document.getElementById("report-table");rt.innerHTML="";const r=p.readiness_report||{};Object.keys(t.rkeys).forEach(k=>{let val=k==="idea"?escapeHtml(state.idea):r[k];let label=t.rkeys[k];if(k==="target_customer")label+=state.target_customer_source==="user_input"?(lang==="ar"?" · إدخال المستخدم":" · USER INPUT"):(lang==="ar"?" · افتراض ذكاء اصطناعي":" · AI ASSUMPTION");if(k==="main_risk")label+=lang==="ar"?" · افتراض تخطيطي":" · planning assumption";if(k==="next_step")label+=lang==="ar"?" · إجراء موصى به":" · recommended action";if(k==="estimated_first_test_cost_aed"&&val!=null)val=Number(state.estimated_test_cost_aed||val).toLocaleString()+" "+currency()+" · "+(lang==="ar"?"تقدير ذكاء اصطناعي":"AI ESTIMATE");rt.innerHTML+=`<tr><td class="k">${label}</td><td class="v">${val||"-"}</td></tr>`;});
 rt.innerHTML+='<tr id="readiness-evidence"><td class="k">'+(lang==='ar'?'أدلة العملاء':'CUSTOMER EVIDENCE')+'</td><td class="v" id="readiness-evidence-text">'+escapeHtml((rawPlan.idea_overview||{}).evidence||(lang==='ar'?'لم تُجمع أدلة من العملاء بعد.':'No customer evidence collected yet.'))+'</td></tr>';
 const list=document.getElementById("steps-list");list.innerHTML="";(p.steps||[]).forEach(s=>{list.innerHTML+=`<div class="step-card"><div class="step-num">${s.step_number}</div><div class="step-body"><h3>${s.action}</h3><p>${s.description}</p><div class="tags"><span class="tag">${s.location}</span><span class="tag">${s.who_to_contact}</span><span class="tag">${s.estimated_cost_aed==null?(lang==="ar"?"لم تُقدر التكلفة بعد":"Cost not estimated yet"):Number(s.estimated_cost_aed).toLocaleString()+" "+currency()+" · "+(lang==="ar"?"تقدير ذكاء اصطناعي":"AI ESTIMATE")}</span><span class="tag">${s.timeline_days} ${t.days}</span></div></div></div>`;});
@@ -1464,7 +1464,7 @@ function renderExtras(rawPlan,r,st){
 function renderQR(){
   var box=document.getElementById("qr-code");if(!box)return;box.innerHTML="";
   var msg=(document.getElementById("wa-text")||{}).textContent||"";
-  var url="https://wa.me/?text="+encodeURIComponent(msg||"StartSmart UAE validation");
+  var url="https://wa.me/?text="+encodeURIComponent(msg||"Khotwa UAE validation");
   if(typeof QRCode!=="undefined"){new QRCode(box,{text:url,width:140,height:140,correctLevel:QRCode.CorrectLevel.M});}
   else{box.innerHTML='<a href="'+url+'" target="_blank" rel="noopener noreferrer" style="font-size:12px;color:#2f6fed">'+(lang==="ar"?"افتح رابط اختبار واتساب":"Open WhatsApp test link")+'</a>';}
 }
@@ -1549,7 +1549,7 @@ function exportCSV(){
     csv+=cells.join(",")+"\n";
   }
   const blob=new Blob([csv],{type:"text/csv"});const url=URL.createObjectURL(blob);
-  const a=document.createElement("a");a.href=url;a.download="startsmart_validation_data.csv";document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+  const a=document.createElement("a");a.href=url;a.download="Khotwa_UAE_Validation_Data.csv";document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
 }
 
 function copyShare(){const txt=document.getElementById("share-text").textContent||"";
@@ -1568,7 +1568,7 @@ function currentIdea(){var el=document.getElementById("idea");var v=el?(el.value
 
 var _chatBusy=false;
 function advisorFallback(){return lang==="ar"?{title:"الخطوة التالية",summary:"المستشار غير متاح الآن.",points:[],next_action:"اسأل خمسة عملاء محتملين كيف يحلون المشكلة حالياً وسجل إجاباتهم.",caution:"تحقق من المتطلبات الرسمية قبل الدفع أو التشغيل التجاري."}:{title:"Next validation step",summary:"The Advisor is unavailable right now.",points:[],next_action:"Ask five potential customers how they solve this today and record their answers.",caution:"Verify official requirements before payment or commercial operation."};}
-function renderAdvisorCard(node,answer){node.replaceChildren();node.className="advisor-card";const h=document.createElement("h3"),summary=document.createElement("p");h.textContent=answer.title||(lang==="ar"?"مستشار ستارت سمارت":"StartSmart Advisor");summary.textContent=answer.summary||"";node.append(h,summary);(Array.isArray(answer.points)?answer.points:[]).slice(0,5).forEach(point=>{const p=document.createElement("div"),b=document.createElement("b"),body=document.createElement("span");p.className="advisor-point";b.textContent=(point.title||"").replace(/[:：]\s*$/,"")+": ";body.textContent=point.text||"";p.append(b,body);node.appendChild(p)});if(answer.next_action){const next=document.createElement("div"),b=document.createElement("b");next.className="advisor-action";b.textContent=lang==="ar"?"الخطوة التالية: ":"Next action: ";const text=document.createElement("span");text.textContent=answer.next_action;next.append(b,text);node.appendChild(next)}if(answer.caution){const c=document.createElement("div"),b=document.createElement("b");c.className="advisor-caution";b.textContent=lang==="ar"?"تنبيه: ":"Caution: ";const text=document.createElement("span");text.textContent=answer.caution;c.append(b,text);node.appendChild(c)}}
+function renderAdvisorCard(node,answer){node.replaceChildren();node.className="advisor-card";const h=document.createElement("h3"),summary=document.createElement("p");h.textContent=answer.title||(lang==="ar"?"مستشار خطوة":"Khotwa Advisor");summary.textContent=answer.summary||"";node.append(h,summary);(Array.isArray(answer.points)?answer.points:[]).slice(0,5).forEach(point=>{const p=document.createElement("div"),b=document.createElement("b"),body=document.createElement("span");p.className="advisor-point";b.textContent=(point.title||"").replace(/[:：]\s*$/,"")+": ";body.textContent=point.text||"";p.append(b,body);node.appendChild(p)});if(answer.next_action){const next=document.createElement("div"),b=document.createElement("b");next.className="advisor-action";b.textContent=lang==="ar"?"الخطوة التالية: ":"Next action: ";const text=document.createElement("span");text.textContent=answer.next_action;next.append(b,text);node.appendChild(next)}if(answer.caution){const c=document.createElement("div"),b=document.createElement("b");c.className="advisor-caution";b.textContent=lang==="ar"?"تنبيه: ":"Caution: ";const text=document.createElement("span");text.textContent=answer.caution;c.append(b,text);node.appendChild(c)}}
 async function askQuestion(){
   if(_chatBusy)return;
   var input=document.getElementById("chat-input");if(!input)return;
@@ -1600,7 +1600,7 @@ async function exportPDF(){if(!currentPlan)return;
 const btn=document.getElementById("pdfBtn");const orig=btn.textContent;btn.textContent="...";btn.disabled=true;
 const ctrl=new AbortController();const timer=setTimeout(()=>ctrl.abort(),65000);try{const resp=await fetch("/pdf",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(Object.assign({},currentPlan,{_lang:lang})),signal:ctrl.signal});
 if(!resp.ok)throw new Error("pdf failed");
-const blob=await resp.blob();const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="StartSmart_UAE_Founder_Report.pdf";document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);}
+const blob=await resp.blob();const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="Khotwa_UAE_Founder_Report.pdf";document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);}
 catch(e){console.error("PDF error",e);alert(T[lang].error);}
 finally{clearTimeout(timer);btn.textContent=orig;btn.disabled=false;}}
 

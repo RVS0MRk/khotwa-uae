@@ -1,6 +1,6 @@
-# StartSmart UAE 2.0 — Test Your Idea Before You Spend
+# Khotwa (خطوة) — From idea to first step.
 
-StartSmart UAE is a bilingual English/Arabic Flask website for first-time UAE founders. It offers idea discovery, a seven-tab dashboard, Founder Journey, Proof Mode, a Groq Advisor, scoring and charts, and an English/Arabic PDF founder report. Business and regulatory guidance is a starting point; users should verify requirements with the appropriate UAE authority before operating or accepting payment.
+Khotwa is a bilingual English/Arabic Flask website for first-time UAE founders. It offers idea discovery, a seven-tab dashboard, Founder Journey, Proof Mode, the Khotwa Advisor powered by Groq, scoring and charts, and an English/Arabic PDF founder report. Business and regulatory guidance is a starting point; users should verify requirements with the appropriate UAE authority before operating or accepting payment.
 
 ## Requirements and local run
 
@@ -46,16 +46,14 @@ git ls-files -- secret.txt .env
 git log --all --name-only --format= -- secret.txt .env
 ```
 
-The two `git ls-files` / `git log` commands should return no secret files. Inspect any other staged or historical files that might contain credentials or private founder data without printing secrets to public logs. If a real key was ever committed, **rotate it in Groq before publishing** and remove it from repository history. For a new repository, create an empty private or public repository on GitHub, then run:
+The two `git ls-files` / `git log` commands should return no secret files. Inspect any other staged or historical files that might contain credentials or private founder data without printing secrets to public logs. If a real key was ever committed, **rotate it in Groq before publishing** and remove it from repository history. The existing repository is [RVS0MRk/khotwa-uae](https://github.com/RVS0MRk/khotwa-uae). After reviewing a future change, the commands are:
 
 ```powershell
 git add .
 git status --short
 git diff --cached --name-only
-git commit -m "Prepare StartSmart UAE for deployment"
-git branch -M main
-git remote add origin https://github.com/YOUR-USERNAME/YOUR-REPO.git
-git push -u origin main
+git commit -m "Update Khotwa"
+git push origin main
 ```
 
 Review `git status --short` and `git diff --cached --name-only` **before** the commit and push. No GitHub upload or deployment is performed by this project setup.

@@ -19,6 +19,8 @@ class DeploymentTests(unittest.TestCase):
             with self.subTest(path=path):
                 response = self.client.get(path)
                 self.assertEqual(response.status_code, 200)
+                if path.endswith("favicon.svg"):
+                    self.assertIn(b'aria-label="Khotwa"', response.data)
                 response.close()
         self.assertTrue(os.path.isfile(startsmart.AMIRI_PATH))
 

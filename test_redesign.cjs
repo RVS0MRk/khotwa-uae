@@ -59,6 +59,10 @@ async function main(){
       for(const language of ['en','ar'])for(const theme of ['light','dark']){
         const prefix=`${width}-${height}-${language}-${theme}`;
         await page.evaluate(({language,theme})=>{lang=language;document.documentElement.setAttribute('data-theme',theme);applyLang();setEntry('existing');}, {language,theme});
+        assert.equal(await page.locator('#brand-name').innerText(),language==='ar'?'خطوة':'Khotwa');
+        assert.equal(await page.locator('#title').innerText(),language==='ar'?'من الفكرة إلى الخطوة الأولى.':'From idea to first step.');
+        assert.ok((await page.title()).startsWith(language==='ar'?'خطوة':'Khotwa'));
+        assert.ok((await page.locator('#wa-text').innerText()).startsWith(language==='ar'?'خطوة —':'Khotwa —'));
         await page.evaluate(()=>window.scrollTo({top:0,behavior:'instant'}));
         await page.screenshot({path:path.join(output,prefix+'-hero.png')});
         await page.locator('.input-card').screenshot({path:path.join(output,prefix+'-form.png')});

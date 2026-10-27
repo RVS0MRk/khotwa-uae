@@ -57,6 +57,8 @@ class LiveRegressions(unittest.TestCase):
         pdf = startsmart.build_pdf(example_plan(), "en")
         reader = PdfReader(pdf)
         text = "\n".join(page.extract_text() for page in reader.pages)
+        self.assertEqual(reader.metadata.title, "Khotwa - Founder First-Step Report")
+        self.assertIn("Khotwa - From idea to first step", text)
         for bad in ("■", "\ufffd", "\u2011"):
             self.assertNotIn(bad, text)
         for expected in ("Mobile Car-Interior Ergonomic Consulting", "ride-hailing", "face-to-face"):
@@ -76,6 +78,7 @@ class LiveRegressions(unittest.TestCase):
         self.assertEqual(arabic["steps"][0]["estimated_cost_aed"], plan["steps"][0]["estimated_cost_aed"])
         pdf = startsmart.build_pdf(plan, "ar")
         reader = PdfReader(pdf)
+        self.assertEqual(reader.metadata.title, "خطوة — تقرير الخطوة الأولى")
         text = "\n".join(page.extract_text() for page in reader.pages)
         for bad in ("■", "\ufffd", "AI ESTIMATE", "USER INPUT", "Define target customer", "Ready to validate", "Customer Demand"):
             self.assertNotIn(bad, text)

@@ -1,6 +1,6 @@
-# StartSmart UAE correctness checks
+# Khotwa correctness checks
 
-## StartSmart 2.0 visual pass
+## Visual pass
 
 The redesign lives in `static/startsmart.css`, `static/startsmart.js`, and the existing Flask template. Backend routes, Groq requests/prompts, scoring, evidence calculations, PDF logic and deployment configuration were not changed in this pass.
 
