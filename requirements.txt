@@ -1,0 +1,7 @@
+flask
+requests
+gunicorn
+reportlab
+arabic-reshaper
+python-bidi
+matplotlib

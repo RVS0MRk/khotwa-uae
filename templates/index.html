@@ -1,0 +1,1637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StartSmart UAE — From idea to evidence</title>
+<meta name="description" content="Discover a business idea, test real customer demand and plan your next step with StartSmart UAE. Bilingual tools for first-time founders.">
+<meta name="theme-color" content="#10233e">
+<link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<style>
+:root{
+  --night:#0b1020; --night2:#121a33; --ink:#1a1f36; --sand:#e9dcc3; --sand-soft:#f4ecdd;
+  --paper:#f6f4ef; --card:#ffffff; --line:#e7e3d9; --muted:#7c8499; --text:#161a2b;
+  --uae-red:#ce1126; --uae-green:#009639; --uae-black:#0b0b0b; --blue:#2f6fed; --blue-soft:#eaf1ff;
+  --gold:#c8a24a;
+}
+[data-theme="dark"]{
+  --paper:#0a0e1a; --card:#121829; --line:#222b42; --text:#e7ecf7; --muted:#8b93a8;
+  --sand:#1a2238; --sand-soft:#161d30; --blue-soft:#16233f; --ink:#e7ecf7;
+}
+[data-theme="dark"] body{background:var(--paper);color:var(--text)}
+[data-theme="dark"] .card{box-shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35)}
+[data-theme="dark"] textarea,[data-theme="dark"] select,[data-theme="dark"] input[type=text],[data-theme="dark"] input[type=number]{background:#0e1322;border-color:#283150;color:var(--text)}
+
+[data-theme="dark"] .btn-light{background:#1a2138;color:var(--text);border-color:#2a3252}
+[data-theme="dark"] .score-track{background:#222b42}
+[data-theme="dark"] .day-card,[data-theme="dark"] .step-card,[data-theme="dark"] .chart-box{background:#0e1322;border-color:#222b42}
+[data-theme="dark"] .tag{background:#0e1322;border-color:#283150;color:var(--muted)}
+[data-theme="dark"] .gauge .gv b{color:var(--text)}
+[data-theme="dark"] h2.sec{color:var(--text)}
+[data-theme="dark"] .report-table td{border-color:#222b42}
+[data-theme="dark"] .msg-ai{background:#1a2138;color:var(--text)}
+[data-theme="dark"] .stat-card{background:#0e1322;border-color:#222b42}
+[data-theme="dark"] .proof-table th{border-color:#283150}
+[data-theme="dark"] .proof-table td{border-color:#1a2138}
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--paper);color:var(--text);line-height:1.5}
+body.rtl{direction:rtl;font-family:'Tajawal',sans-serif}
+.flag-strip{height:4px;width:100%;display:flex}
+.flag-strip i{flex:1}
+.flag-strip .r{background:var(--uae-red)} .flag-strip .g{background:var(--uae-green)} .flag-strip .w{background:#fff} .flag-strip .k{background:var(--uae-black)}
+header{position:relative;background:radial-gradient(1200px 400px at 70% -10%, #1c2a52 0%, var(--night2) 40%, var(--night) 100%);color:#fff;padding:2.5rem 1rem 2.5rem;text-align:center;overflow:hidden;min-height:440px;display:flex;flex-direction:column;justify-content:center}
+#stars{position:absolute;inset:0;z-index:0;opacity:.7}
+header .inner{position:relative;z-index:2;max-width:680px;margin:0 auto}
+.kicker{display:inline-flex;align-items:center;gap:.5rem;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#cdd6ec;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);padding:.35rem .8rem;border-radius:30px;margin-bottom:1rem}
+.kicker .dot{width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px var(--gold)}
+header h1{font-family:'Sora',sans-serif;font-weight:700;font-size:2.6rem;letter-spacing:-.02em;line-height:1.05}
+body.rtl header h1{font-family:'Tajawal',sans-serif}
+header h1 .accent{background:linear-gradient(90deg,#fff 0%, var(--gold) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+header p{color:#aeb8d4;margin-top:.6rem;font-size:1.05rem}
+.lang-btn{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:14px;padding:.9rem 2rem;font-size:19px;cursor:pointer;font-weight:600;font-family:inherit;backdrop-filter:blur(6px);transition:.2s}
+.lang-btn:hover{background:rgba(255,255,255,.2)}
+.flag-ribbon{position:absolute;top:0;left:0;z-index:3;width:64px;height:64px;overflow:hidden}
+body.rtl .flag-ribbon{left:auto;right:0;transform:scaleX(-1)}
+.flag-ribbon span{position:absolute;top:14px;left:-20px;width:90px;transform:rotate(-45deg);font-size:0;line-height:0}
+.flag-ribbon b{display:block;height:5px}
+main{max-width:780px;margin:0 auto;padding:2rem 1rem 3rem}
+.card{background:var(--card);border-radius:16px;border:1px solid var(--line);padding:1.6rem;margin-bottom:1.25rem;box-shadow:0 1px 2px rgba(20,20,40,.03),0 8px 24px rgba(20,20,40,.04)}
+.input-card{margin-top:-2.5rem;position:relative;z-index:5;box-shadow:0 10px 40px rgba(11,16,32,.18)}
+label{display:block;font-size:12px;font-weight:600;color:#5a6172;margin-bottom:.4rem;letter-spacing:.01em}
+textarea,select,input[type=text],input[type=number]{width:100%;border:1px solid #dcd8cd;border-radius:11px;padding:.7rem .85rem;font-size:14px;font-family:inherit;outline:none;background:#fcfbf8;transition:.15s}
+textarea:focus,select:focus,input:focus{border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px var(--blue-soft)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0}
+#budget-label{font-size:12px;font-weight:600;color:#5a6172;margin-bottom:.4rem}
+input[type=range]{width:100%;accent-color:var(--blue);padding:0;background:transparent}
+.btn{background:var(--ink);color:#fff;border:none;border-radius:11px;padding:.85rem;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;transition:.18s;letter-spacing:.01em}
+.btn:hover{background:#26304f;transform:translateY(-1px)}
+.btn:disabled{background:#9aa0b0;cursor:not-allowed;transform:none}
+.btn-primary{background:linear-gradient(135deg,#1f2a4d,#2f6fed)}
+.btn-primary:hover{background:linear-gradient(135deg,#26304f,#2a63d6)}
+.btn-full{width:100%;margin-top:1rem}
+.btn-light{background:#fff;color:var(--ink);border:1px solid #ddd9ce}
+.btn-light:hover{background:#faf8f3;color:var(--ink)}
+.error{color:var(--uae-red);font-size:13px;margin-top:.5rem}
+.spinner{width:38px;height:38px;border:3px solid #e7e3d9;border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;margin:2rem auto;display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+#results{display:none}
+.action-row{display:flex;gap:.75rem;margin-bottom:1.25rem;flex-wrap:wrap}
+.action-row .btn{flex:1;min-width:140px}
+h2.sec{font-family:'Sora',sans-serif;font-size:1.15rem;font-weight:600;margin-bottom:.7rem;color:var(--ink);letter-spacing:-.01em;display:flex;align-items:center;gap:.5rem}
+body.rtl h2.sec{font-family:'Tajawal',sans-serif}
+h2.sec:before{content:"";width:4px;height:18px;background:linear-gradient(var(--uae-green),var(--blue));border-radius:2px}
+body.rtl h2.sec:before{order:2}
+.section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:.5rem}
+.demo-row{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.75rem}
+.demo-chip{font-size:12px;background:#fbf6ea;color:#8a6d28;border:1px solid #ecdcb8;padding:.45rem .85rem;border-radius:30px;cursor:pointer;font-family:inherit;transition:.15s}
+.demo-chip:hover{background:#f5ecd6;border-color:var(--gold)}
+.overview-card{background:linear-gradient(135deg,#0e1530,#1a2547);color:#fff;border-radius:16px;padding:1.6rem;margin-bottom:1.25rem;border:1px solid #20305c;position:relative;overflow:hidden}
+.overview-card:after{content:"";position:absolute;top:-40px;right:-40px;width:140px;height:140px;background:radial-gradient(circle,rgba(200,162,74,.25),transparent 70%)}
+.overview-card h2{font-family:'Sora',sans-serif;font-size:1.05rem;font-weight:600;margin-bottom:1rem;color:#fff;position:relative;z-index:1}
+.overview-row{display:flex;gap:.75rem;padding:.55rem 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:13px;line-height:1.5;position:relative;z-index:1}
+.overview-row:last-child{border-bottom:none}
+.overview-row .jk{color:var(--gold);font-weight:700;width:90px;flex-shrink:0}
+body.rtl .overview-row .jk{width:110px}
+.overview-row .jv{color:#dfe5f2;flex:1}
+.first-step{background:linear-gradient(135deg,#063,#009639);color:#fff;border-radius:16px;padding:1.6rem;margin-bottom:1.25rem;position:relative;overflow:hidden}
+.first-step:before{content:"\2192";position:absolute;font-size:7rem;opacity:.12;right:1rem;bottom:-1rem;font-weight:700}
+body.rtl .first-step:before{content:"\2190";right:auto;left:1rem}
+.first-step .section-label{color:#bff0d2}
+.first-step p{font-size:1.1rem;line-height:1.5;font-weight:500;position:relative;z-index:1}
+.score-hero{display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap}
+.gauge{position:relative;width:120px;height:120px;flex-shrink:0}
+.gauge svg{transform:rotate(-90deg)}
+.gauge .gv{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.gauge .gv b{font-family:'Sora',sans-serif;font-size:1.9rem;font-weight:700;line-height:1;color:var(--ink)}
+.gauge .gv small{font-size:.7rem;color:var(--muted);margin-top:2px}
+.score-bars{flex:1;min-width:240px}
+.score-row{margin-bottom:.65rem;font-size:12px}
+.score-top{display:flex;align-items:center;gap:.6rem}
+.score-top .name{width:120px;color:var(--ink);font-weight:600;flex-shrink:0}
+.score-track{flex:1;height:8px;background:#edeaf2;border-radius:5px;overflow:hidden}
+.score-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--uae-green),var(--blue));transition:width .6s ease}
+.score-top .val{width:30px;text-align:right;font-weight:700;color:var(--ink)}
+.score-reason{font-size:11px;color:var(--muted);margin-top:.18rem}
+.interp{margin-top:1rem;font-size:13px;padding:.7rem 1rem;border-radius:11px;font-weight:600}
+.interp.strong{background:#e7f8ee;color:#0a7a3c;border:1px solid #bce8cf}
+.interp.medium{background:#fff6e2;color:#8a6516;border:1px solid #f0dcaa}
+.interp.weak{background:#fdeaec;color:#b01024;border:1px solid #f4c4cb}
+.test-plan{background:#fff6e2;border:1px solid #f0dcaa;border-radius:12px;padding:1rem 1.25rem}
+.test-plan .intro{font-size:13px;color:#8a6516;font-weight:700;margin-bottom:.5rem}
+.day-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.7rem}
+.day-card{background:#fbfaf6;border-radius:11px;padding:.85rem .95rem;border:1px solid #ece8dd;position:relative;transition:.15s}
+.day-card:hover{border-color:var(--blue);box-shadow:0 4px 12px rgba(47,111,237,.08)}
+.day-card .d{font-size:10px;font-weight:700;color:#fff;background:var(--ink);display:inline-block;padding:.1rem .5rem;border-radius:20px;margin-bottom:.4rem;letter-spacing:.04em}
+.day-card .f{font-size:13px;font-weight:600;margin-bottom:.2rem;color:var(--ink)}
+.day-card .a{font-size:12px;color:#5e6478;line-height:1.45}
+ul.clean{list-style:none}
+ul.clean li{padding:.45rem 0 .45rem 1.7rem;position:relative;font-size:13px;color:#3f4660;line-height:1.5}
+ul.clean li:before{content:"\2713";position:absolute;left:0;color:var(--uae-green);font-weight:700;background:#e7f8ee;width:18px;height:18px;border-radius:50%;text-align:center;font-size:11px;line-height:18px}
+body.rtl ul.clean li{padding:.45rem 1.7rem .45rem 0}
+body.rtl ul.clean li:before{left:auto;right:0}
+ol.qs{padding-left:1.3rem}
+body.rtl ol.qs{padding-left:0;padding-right:1.3rem}
+ol.qs li{font-size:13px;color:#3f4660;line-height:1.6;margin-bottom:.35rem}
+.wa-box{background:#e8f8ef;border:1px solid #b8e6cb;border-radius:13px;padding:1rem;display:flex;gap:.75rem;align-items:flex-start}
+.wa-box .msg{flex:1;font-size:13px;color:#0a5c3a;line-height:1.5}
+.wa-copy{background:#1f9d57;color:#fff;border:none;border-radius:9px;padding:.5rem .9rem;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;transition:.15s}
+.wa-copy:hover{filter:brightness(1.08)}
+.report-table{width:100%;font-size:13px;border-collapse:collapse}
+.report-table td{padding:.6rem 0;border-bottom:1px solid #f0eee7;vertical-align:top}
+.report-table td.k{color:#7c8194;width:42%;font-weight:600}
+.step-card{display:flex;gap:1rem;background:#fbfaf6;border-radius:12px;padding:1.05rem;margin-bottom:.65rem;border:1px solid #ece8dd}
+.step-num{width:30px;height:30px;background:linear-gradient(135deg,var(--ink),#2f6fed);color:#fff;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.step-body h3{font-size:14px;font-weight:600;margin-bottom:.25rem;color:var(--ink)}
+.step-body p{font-size:12px;color:#5e6478;margin-bottom:.55rem}
+.tags{display:flex;flex-wrap:wrap;gap:.4rem}
+.tag{font-size:11px;background:#fff;border:1px solid #e7e3d9;padding:3px 9px;border-radius:30px;color:#6b7186}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.chart-box{background:#fbfaf6;border-radius:12px;padding:1rem;border:1px solid #ece8dd}
+.chart-box h3{font-size:12px;font-weight:600;color:#5e6478;margin-bottom:.75rem}
+.tip{background:var(--blue-soft);border-radius:11px;padding:1rem 1.25rem;font-size:13px;color:#1d4299;line-height:1.6}
+.meta{display:flex;gap:1.5rem;font-size:13px;font-weight:600;color:var(--blue);flex-wrap:wrap}
+.resources .res-link{display:flex;align-items:center;gap:.6rem;padding:.6rem 0;font-size:13px;border-bottom:1px solid #f0eee7}
+.resources .res-link:last-child{border-bottom:none}
+.resources a{color:var(--blue);text-decoration:none;font-weight:500}
+.resources a:hover{text-decoration:underline}
+.disclaimer{font-size:11px;color:var(--muted);margin-top:.7rem;font-style:italic}
+.chat-messages{display:flex;flex-direction:column;gap:.6rem;margin-bottom:1rem;max-height:300px;overflow-y:auto}
+.msg-b{padding:.65rem .95rem;border-radius:13px;font-size:13px;line-height:1.5;max-width:85%}
+.msg-user{background:var(--ink);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+body.rtl .msg-user{align-self:flex-start;border-bottom-right-radius:13px;border-bottom-left-radius:4px}
+.msg-ai{background:#f1eee7;color:#1a1f36;align-self:flex-start;border-bottom-left-radius:4px}
+body.rtl .msg-ai{align-self:flex-end;border-bottom-left-radius:13px;border-bottom-right-radius:4px}
+.msg-ai p+p,.msg-ai p+ol,.msg-ai p+ul,.msg-ai ol+p,.msg-ai ul+p{margin-top:.65rem}
+.msg-ai ol,.msg-ai ul{padding-inline-start:1.35rem;margin:.4rem 0}
+.msg-ai li+li{margin-top:.35rem}
+.msg-ai strong{font-weight:700}
+.msg-ai{overflow-wrap:anywhere;line-height:1.6;min-width:0}
+.chat-input-row{display:flex;gap:.5rem}
+.chat-input-row input{flex:1}
+.chat-input-row .btn{padding:.65rem 1.2rem}
+.suggested{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.75rem}
+.chip{font-size:12px;background:var(--blue-soft);color:#1d4299;padding:.35rem .75rem;border-radius:30px;cursor:pointer;border:1px solid #d4e2ff;font-family:inherit;transition:.15s}
+.chip:hover{background:#dde9ff}
+.proof-table{width:100%;font-size:12px;border-collapse:collapse;margin-bottom:1rem}
+.proof-table th{text-align:left;font-size:11px;color:#7c8194;font-weight:700;padding:.45rem .3rem;border-bottom:2px solid #eee}
+.proof-table td{padding:.3rem;border-bottom:1px solid #f3f3f3}
+.proof-table select,.proof-table input{padding:.4rem .45rem;font-size:12px;border-radius:8px}
+.proof-table input{width:78px}
+.proof-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.75rem;margin:1rem 0}
+.stat-card{background:linear-gradient(135deg,#fbfaf6,#f3f0e8);border-radius:12px;padding:.9rem;text-align:center;border:1px solid #ece8dd}
+.stat-card .v{font-family:'Sora',sans-serif;font-size:1.5rem;font-weight:700;color:var(--ink)}
+.stat-card .l{font-size:11px;color:#7c8194;margin-top:.2rem}
+.proof-verdict{font-size:14px;font-weight:700;padding:.9rem 1rem;border-radius:12px;text-align:center}
+.pv-go{background:#e7f8ee;color:#0a7a3c;border:1px solid #bce8cf}
+.pv-test{background:#fff6e2;color:#8a6516;border:1px solid #f0dcaa}
+.pv-stop{background:#fdeaec;color:#b01024;border:1px solid #f4c4cb}
+footer{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:12px}
+footer .flag-mini{display:inline-flex;gap:2px;margin:0 .4rem;vertical-align:middle}
+footer .flag-mini i{width:4px;height:11px;border-radius:1px}
+
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}.reveal.in{opacity:1;transform:none}
+.dunes{position:absolute;left:0;right:0;bottom:-1px;z-index:1;width:100%;height:90px;pointer-events:none}
+.header-controls{position:absolute;top:1.5rem;right:1.5rem;z-index:3;display:flex;gap:10px;align-items:center}
+body.rtl .header-controls{right:auto;left:1.5rem}
+.theme-btn{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:14px;width:66px;height:62px;cursor:pointer;font-size:24px;backdrop-filter:blur(6px);transition:.2s}
+body.rtl .theme-btn{right:auto;left:5.4rem}
+.theme-btn:hover{background:rgba(255,255,255,.2)}
+.loader-wrap{display:none;flex-direction:column;align-items:center;padding:2.5rem 1rem;gap:1rem}
+.loader-wrap.show{display:flex}
+.loader-orbit{position:relative;width:64px;height:64px}
+.loader-orbit .core{position:absolute;inset:24px;border-radius:50%;background:radial-gradient(circle,#fff,var(--gold));box-shadow:0 0 18px var(--gold)}
+.loader-orbit .ring{position:absolute;inset:0;border:2px solid transparent;border-top-color:var(--blue);border-right-color:var(--uae-green);border-radius:50%;animation:spin 1s linear infinite}
+.loader-text{font-size:13px;color:var(--muted);font-weight:500;min-height:18px}
+.btn-primary{position:relative;overflow:hidden}
+.btn-primary:after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);transform:skewX(-20deg);animation:sheen 3.2s ease-in-out infinite}
+@keyframes sheen{0%,60%{left:-60%}100%{left:130%}}
+.gauge svg circle.prog{transition:stroke-dashoffset 1.1s cubic-bezier(.2,.8,.2,1)}
+.decision-card{background:linear-gradient(135deg,#11224a,#2f6fed);color:#fff;border-radius:16px;padding:1.6rem;margin-bottom:1.25rem;position:relative;overflow:hidden;box-shadow:0 8px 28px rgba(47,111,237,.2)}
+.decision-card .section-label{color:#bcd3ff}
+.decision-main{font-family:'Sora',sans-serif;font-size:1.5rem;font-weight:700;margin:.2rem 0 .4rem}
+body.rtl .decision-main{font-family:'Tajawal',sans-serif}
+.decision-reason{font-size:.95rem;color:#e3ecff;line-height:1.5}
+.decision-next{font-size:.85rem;color:#bcd3ff;margin-top:.6rem;padding-top:.6rem;border-top:1px solid rgba(255,255,255,.15)}
+.proof-actions{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem}
+.proof-actions .btn{flex:0 1 auto;padding:.55rem .9rem;font-size:13px}
+.donot-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.donot-head{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.6rem;padding-bottom:.4rem;border-bottom:2px solid}
+.donot-bad{color:var(--uae-red);border-color:#f4c4cb}
+.donot-good{color:var(--uae-green);border-color:#bce8cf}
+.donot-list{list-style:none}
+.donot-list li{font-size:13px;line-height:1.5;padding:.35rem 0 .35rem 1.5rem;position:relative;color:#3f4660}
+.donot-list.bad li:before{content:"\2717";position:absolute;left:0;color:var(--uae-red);font-weight:700}
+.donot-list.good li:before{content:"\2713";position:absolute;left:0;color:var(--uae-green);font-weight:700}
+body.rtl .donot-list li{padding:.35rem 1.5rem .35rem 0}
+body.rtl .donot-list li:before{left:auto;right:0}
+.score-improve{font-size:11px;color:var(--blue);margin-top:.1rem;font-style:italic}
+.hero-chips{display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap;margin-top:1.2rem}
+.hero-chip{font-size:12px;font-weight:500;color:#dce4f5;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);padding:.4rem .85rem;border-radius:30px;backdrop-filter:blur(6px)}
+.hero-badge{margin-top:1rem;display:inline-block;font-size:11px;letter-spacing:.04em;color:#9aa6c4;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);padding:.4rem 1rem;border-radius:30px}
+.waving-flag{display:inline-block;width:34px;height:22px;border-radius:3px;overflow:hidden;vertical-align:middle;margin-left:.5rem;box-shadow:0 2px 8px rgba(0,0,0,.3);animation:wave 3s ease-in-out infinite;transform-origin:left center}
+body.rtl .waving-flag{margin-left:0;margin-right:.5rem}
+@keyframes wave{0%,100%{transform:rotate(-1deg) skewX(0deg)}50%{transform:rotate(1deg) skewX(-3deg)}}
+.waving-flag .wf-red{height:33.3%;background:var(--uae-red)}
+.waving-flag .wf-green{height:33.3%;background:var(--uae-green)}
+.waving-flag .wf-white{height:33.4%;background:#fff}
+.waving-flag .wf-black{position:absolute;top:0;left:0;width:30%;height:100%;background:var(--uae-black)}
+.first-step{box-shadow:0 8px 30px rgba(0,150,57,.25)}
+.first-step .badges{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.9rem;position:relative;z-index:1}
+.first-step .fs-badge{font-size:11px;font-weight:600;background:rgba(255,255,255,.18);padding:.3rem .7rem;border-radius:20px;color:#fff}
+.decision-meta{display:flex;gap:1.5rem;flex-wrap:wrap;margin-top:.7rem;font-size:.85rem;color:#bcd3ff}
+.decision-meta b{color:#fff}
+.local-card{background:linear-gradient(135deg,#fbf6ea,#f3ece0);border:1px solid #ecdcb8;border-radius:16px;padding:1.5rem;margin-bottom:1.25rem}
+.local-card h2{color:#8a6d28}
+.local-card h2:before{background:linear-gradient(var(--gold),var(--uae-red))}
+.local-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.6rem;margin-top:.5rem}
+.local-item{font-size:12px;color:#6b5a30;background:rgba(255,255,255,.6);border-radius:9px;padding:.6rem .7rem;border:.5px solid #ecdcb8}
+.trust-row{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;margin-bottom:1.25rem}
+.trust-badge{font-size:11px;font-weight:600;color:#0a7a3c;background:#e7f8ee;border:1px solid #bce8cf;padding:.4rem .8rem;border-radius:30px}
+.proof-stats .v{transition:none}
+footer{background:linear-gradient(180deg,transparent,rgba(26,31,54,.04))}
+footer .foot-flag{display:inline-flex;width:30px;height:20px;border-radius:3px;overflow:hidden;position:relative;vertical-align:middle;margin:0 .5rem;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+footer .foot-flag .fr{height:33.3%;background:var(--uae-red)}footer .foot-flag .fg{height:33.3%;background:var(--uae-green)}footer .foot-flag .fw{height:33.4%;background:#fff}
+footer .foot-flag .fk{position:absolute;top:0;left:0;width:30%;height:100%;background:var(--uae-black)}
+.foot-title{font-family:'Sora',sans-serif;font-weight:700;color:var(--ink);font-size:1rem;margin-bottom:.3rem}
+
+/* ---- Floating advisor ---- */
+.chat-launcher{position:fixed;right:24px;bottom:24px;z-index:9998;display:flex;align-items:center;gap:.5rem;background:linear-gradient(135deg,#11224a,#2f6fed);color:#fff;border:none;border-radius:30px;padding:.7rem 1.1rem;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 8px 24px rgba(47,111,237,.35);transition:transform .2s,box-shadow .2s}
+body.rtl .chat-launcher{right:auto;left:24px}
+.chat-launcher:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(47,111,237,.45)}
+.chat-launcher .cl-icon{font-size:18px;line-height:1}
+.chat-launcher .cl-pulse{position:absolute;inset:0;border-radius:30px;box-shadow:0 0 0 0 rgba(47,111,237,.5);animation:clpulse 2.4s infinite}
+@keyframes clpulse{0%{box-shadow:0 0 0 0 rgba(47,111,237,.45)}70%{box-shadow:0 0 0 14px rgba(47,111,237,0)}100%{box-shadow:0 0 0 0 rgba(47,111,237,0)}}
+.chat-panel{position:fixed;right:24px;bottom:90px;z-index:9999;width:360px;max-width:calc(100vw - 32px);background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:0 20px 60px rgba(11,16,32,.3);display:flex;flex-direction:column;overflow:hidden;opacity:0;transform:translateY(16px) scale(.97);pointer-events:none;transition:opacity .25s,transform .25s}
+body.rtl .chat-panel{right:auto;left:24px}
+.chat-panel.open{opacity:1;transform:none;pointer-events:auto}
+.chat-head{display:flex;align-items:center;gap:.6rem;background:linear-gradient(135deg,#0e1530,#1a2547);color:#fff;padding:.9rem 1rem}
+.chat-flag{display:inline-flex;width:26px;height:18px;border-radius:3px;overflow:hidden;position:relative;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.chat-flag i{display:block}.chat-flag .cr,.chat-flag .cg,.chat-flag .cw{height:6px}.chat-flag .cr{background:var(--uae-red)}.chat-flag .cg{background:var(--uae-green)}.chat-flag .cw{background:#fff}.chat-flag .ck{position:absolute;top:0;left:0;width:30%;height:100%;background:var(--uae-black)}
+.chat-head-txt{flex:1}
+.chat-title{font-family:'Sora',sans-serif;font-weight:600;font-size:14px}
+.chat-sub{font-size:11px;color:#aeb8d4;margin-top:1px}
+.chat-close{background:rgba(255,255,255,.12);border:none;color:#fff;width:26px;height:26px;border-radius:7px;cursor:pointer;font-size:13px}
+.chat-close:hover{background:rgba(255,255,255,.22)}
+.chat-panel .chat-messages{max-height:300px;min-height:90px;padding:.75rem .9rem;margin:0}
+.chat-panel .chat-input-row{padding:.6rem .9rem;border-top:1px solid var(--line);gap:.5rem}
+.chat-foot{font-size:10px;color:var(--muted);text-align:center;padding:0 .9rem .7rem}
+.msg-b{animation:msgIn .3s ease}
+@keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+/* ---- Hero extras ---- */
+.hero-cta{display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap;margin-top:1.4rem}
+.hero-cta .btn{padding:.7rem 1.3rem;font-size:14px}
+.hero-cta .ghost{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.25);color:#fff}
+.hero-cta .ghost:hover{background:rgba(255,255,255,.16)}
+.journey{display:flex;align-items:center;justify-content:center;gap:.4rem;flex-wrap:wrap;margin-top:1.6rem}
+.journey .jstep{display:flex;align-items:center;gap:.45rem;font-size:12px;color:#cdd6ec;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);padding:.4rem .7rem;border-radius:30px;animation:jin .5s ease both}
+.journey .jarrow{color:#5f6f9c;font-size:13px}
+@keyframes jin{from{opacity:0}to{opacity:1}}
+header h1{position:relative}
+header h1:after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:60%;height:120%;background:radial-gradient(ellipse,rgba(47,111,237,.25),transparent 70%);z-index:-1;filter:blur(20px)}
+.hero-anim{animation:heroIn .7s cubic-bezier(.2,.7,.2,1) both}@keyframes heroIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.hero-anim.d1{animation-delay:.05s}.hero-anim.d2{animation-delay:.15s}.hero-anim.d3{animation-delay:.25s}.hero-anim.d4{animation-delay:.35s}.hero-anim.d5{animation-delay:.45s}
+
+@media(max-width:600px){
+  .chat-panel{right:8px;left:8px;bottom:80px;width:auto;max-width:none}
+  body.rtl .chat-panel{right:8px;left:8px}
+  .chat-launcher .cl-text{display:none}
+  .chat-launcher{padding:.8rem;border-radius:50%}
+}
+
+/* ---- Before You Spend ---- */
+.bys-card{background:linear-gradient(135deg,#063,#0a7a3c);color:#fff;border-radius:16px;padding:1.5rem;margin-bottom:1.25rem;position:relative;overflow:hidden}
+.bys-card .section-label{color:#bff0d2}
+.bys-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-top:.5rem}
+.bys-item{text-align:center}
+.bys-l{font-size:11px;color:#bff0d2;margin-bottom:.3rem}
+.bys-v{font-family:'Sora',sans-serif;font-size:1.4rem;font-weight:700}
+.bys-save .bys-v{color:#ffe9a8}
+@media(max-width:600px){.bys-grid{grid-template-columns:1fr}}
+/* ---- Founder Passport ---- */
+.passport-card{background:linear-gradient(135deg,#1a1f36,#2a3358);color:#fff;border-radius:16px;padding:0;margin-bottom:1.25rem;overflow:hidden;border:1px solid #3a4570;box-shadow:0 10px 30px rgba(26,31,54,.25)}
+.passport-head{display:flex;align-items:center;gap:.6rem;padding:1rem 1.4rem;background:rgba(255,255,255,.05);border-bottom:1px dashed rgba(255,255,255,.2)}
+.passport-flag{display:inline-flex;width:30px;height:20px;border-radius:3px;overflow:hidden;position:relative;flex-shrink:0}
+.passport-flag i{display:block}.passport-flag .pr,.passport-flag .pg,.passport-flag .pw{height:6.66px}.passport-flag .pr{background:var(--uae-red)}.passport-flag .pg{background:var(--uae-green)}.passport-flag .pw{background:#fff}.passport-flag .pk{position:absolute;top:0;left:0;width:30%;height:100%;background:var(--uae-black)}
+.passport-title{flex:1;font-family:'Sora',sans-serif;font-weight:700;font-size:1rem;letter-spacing:.02em}
+.passport-copy{background:var(--gold);color:#3a2c08;border:none;border-radius:8px;padding:.4rem .8rem;font-size:12px;font-weight:700;cursor:pointer}
+.passport-table{width:100%;border-collapse:collapse;padding:1rem}
+.passport-table td{padding:.5rem 1.4rem;font-size:13px;border-bottom:1px solid rgba(255,255,255,.08);vertical-align:top}
+.passport-table td.pk2{color:#9db0d8;width:40%;font-weight:500}
+.passport-table td.pv2{color:#fff;font-weight:500}
+/* ---- Personas ---- */
+.persona-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.75rem}
+.persona{background:#fbfaf6;border:1px solid #ece8dd;border-radius:12px;padding:1rem;transition:.15s}
+.persona:hover{border-color:var(--blue);box-shadow:0 4px 14px rgba(47,111,237,.08)}
+.persona .pname{font-family:'Sora',sans-serif;font-weight:600;font-size:14px;color:var(--ink);margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem}
+.persona .pname:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--blue)}
+.persona .prow{font-size:12px;color:#5e6478;line-height:1.5;margin-bottom:.3rem}
+.persona .prow b{color:var(--ink)}
+/* ---- Risk radar ---- */
+.risk-item{display:flex;align-items:center;gap:.75rem;padding:.7rem 0;border-bottom:1px solid #f0eee7}
+.risk-item:last-child{border-bottom:none}
+.risk-name{width:110px;font-size:13px;font-weight:600;color:var(--ink);flex-shrink:0}
+.risk-level{font-size:11px;font-weight:700;padding:.2rem .6rem;border-radius:20px;flex-shrink:0}
+.rl-low{background:#e7f8ee;color:#0a7a3c}.rl-medium{background:#fff6e2;color:#8a6516}.rl-high{background:#fdeaec;color:#b01024}
+.risk-detail{font-size:12px;color:#5e6478;line-height:1.4}
+.risk-detail b{color:var(--ink)}
+@media(max-width:600px){.risk-item{flex-wrap:wrap}.risk-name{width:auto}}
+/* ---- Pitch generator ---- */
+.pitch-item{background:#fbfaf6;border:1px solid #ece8dd;border-radius:11px;padding:.9rem 1rem;margin-bottom:.6rem;display:flex;gap:.75rem;align-items:flex-start}
+.pitch-body{flex:1}
+.pitch-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--gold);margin-bottom:.3rem}
+.pitch-text{font-size:13px;color:#3f4660;line-height:1.5}
+.pitch-copy{background:var(--ink);color:#fff;border:none;border-radius:8px;padding:.4rem .7rem;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap}
+.pitch-copy:hover{background:var(--blue)}
+/* ---- Opportunity map ---- */
+.opp-map{display:flex;flex-direction:column;align-items:center;gap:.1rem}
+.opp-node{background:linear-gradient(135deg,#fbfaf6,#f3f0e8);border:1px solid #e7e3d9;border-radius:11px;padding:.7rem 1.2rem;font-size:13px;font-weight:600;color:var(--ink);text-align:center;min-width:200px}
+.opp-node.start{background:linear-gradient(135deg,#11224a,#2f6fed);color:#fff;border:none}
+.opp-node.end{background:linear-gradient(135deg,#063,#0a7a3c);color:#fff;border:none}
+.opp-arrow{color:var(--blue);font-size:18px;line-height:1.4}
+/* ---- QR ---- */
+.qr-wrap{display:flex;flex-direction:column;align-items:center;gap:.75rem;padding:1rem;background:#fbfaf6;border-radius:12px;border:1px solid #ece8dd}
+#qr-code{background:#fff;padding:12px;border-radius:10px;line-height:0}
+#qr-code img,#qr-code canvas{display:block}
+.qr-cap{font-size:13px;font-weight:600;color:var(--ink)}
+/* ---- Hero mini preview card ---- */
+@media(max-width:600px){.donot-grid{grid-template-columns:1fr}}
+@media(max-width:600px){.row,.charts{grid-template-columns:1fr}.proof-table input{width:56px}header h1{font-size:2rem}}
+@media(prefers-reduced-motion:reduce){ #stars{display:none}.cl-pulse{display:none}*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+.entry-choice{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;margin-top:-2.5rem;position:relative;z-index:6}
+.entry-choice .btn{min-width:190px}.input-card{margin-top:1rem}
+.discovery-card[hidden],.input-card[hidden],.dashboard-panel[hidden]{display:none!important}
+.discovery-card{margin-top:1rem}.discovery-card p{color:var(--muted);font-size:13px;margin:.5rem 0 1rem}
+.discovery-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem;margin-bottom:1rem}
+.discovery-grid label{font-size:12px;color:var(--muted)}.discovery-grid input,.discovery-grid select{display:block;width:100%;margin-top:.35rem}
+.discovery-results{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem;margin-top:1rem}
+.idea-card{border:1px solid var(--line);border-radius:12px;padding:1rem;background:var(--card)}.idea-card h3{margin:0 0 .7rem}.idea-card p{font-size:12px;line-height:1.5;margin:.35rem 0}.idea-card .btn{margin-top:.7rem}
+.result-nav{max-width:100%;min-width:0;scroll-behavior:smooth;overscroll-behavior-x:contain;position:sticky;top:0;z-index:40;display:flex;gap:.35rem;overflow-x:auto;padding:.65rem;background:var(--card);border:1px solid var(--line);border-radius:12px;margin:1rem 0;scrollbar-width:thin}
+.result-nav button{flex:0 0 auto;white-space:nowrap;border:0;border-radius:8px;background:transparent;color:var(--muted);font:inherit;font-size:12px;font-weight:700;padding:.55rem .7rem;cursor:pointer}.result-nav button[aria-selected=true]{background:var(--blue-soft);color:var(--blue)}
+.dashboard-panel{display:grid;gap:1rem}.dashboard-panel>.card,.dashboard-panel>.overview-card,.dashboard-panel>.first-step,.dashboard-panel>.decision-card,.dashboard-panel>.bys-card,.dashboard-panel>.passport-card,.dashboard-panel>.local-card{margin:0}
+.source-legend{display:flex;flex-wrap:wrap;gap:.4rem;margin:.5rem 0}.source-badge{display:inline-flex;border-radius:100px;padding:.18rem .55rem;font-size:10px;font-weight:800;letter-spacing:.03em;background:var(--blue-soft);color:var(--blue)}.source-badge.assumption{background:#fff4da;color:#8c6414}.source-badge.evidence{background:#e4f6e9;color:#08713b}.source-badge.unvalidated{background:#f6edf0;color:#aa4057}
+.score-note{font-size:12px;color:var(--muted);margin:.2rem 0 .8rem}.evidence-strength{font-size:12px;padding:.65rem;border:1px solid var(--line);border-radius:9px;margin:.8rem 0;line-height:1.6}
+.advisor-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.8rem;line-height:1.5}.advisor-card h3{margin:0 0 .3rem;font-size:14px}.advisor-card p{margin:.25rem 0;font-size:13px}.advisor-point{padding:.45rem 0;border-top:1px solid var(--line)}.advisor-action{padding:.6rem;border-radius:8px;background:var(--blue-soft);margin-top:.5rem}.advisor-caution{padding:.55rem;border-radius:8px;background:#fff5e4;margin-top:.5rem}
+.chat-panel{width:410px}.chat-panel .chat-messages{max-height:380px}.chip{white-space:normal}.suggested{display:flex;flex-wrap:wrap;gap:.4rem}
+@media(max-width:700px){.discovery-grid,.discovery-results{grid-template-columns:1fr}.result-nav{border-radius:0}.chat-panel{width:auto}}
+@media(max-width:600px){
+  main{padding-inline-end:calc(76px + env(safe-area-inset-right,0px));padding-bottom:calc(80px + env(safe-area-inset-bottom,0px))}
+  body.rtl main{padding-inline-end:calc(76px + env(safe-area-inset-left,0px))}
+  .chat-launcher{width:44px;height:44px;padding:0;justify-content:center;right:max(12px,env(safe-area-inset-right,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px))}
+  body.rtl .chat-launcher{right:auto;left:max(12px,env(safe-area-inset-left,0px))}
+  .card,.overview-card,.first-step,.decision-card,.passport-card{min-width:0}
+  .score-bars{min-width:0;width:100%}
+  .chat-panel{bottom:calc(68px + env(safe-area-inset-bottom,0px));max-height:calc(100dvh - 90px)}
+  input,select,textarea{scroll-margin-bottom:90px}
+}
+</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='startsmart.css') }}">
+</head>
+<body id="body">
+<div class="flag-strip"><i class="r"></i><i class="g"></i><i class="w"></i><i class="k"></i></div>
+<header>
+  <nav class="site-nav" aria-label="StartSmart UAE">
+    <a class="brand" href="/"><span class="brand-mark" aria-hidden="true">↗</span>StartSmart <small>UAE / 2.0</small></a>
+    <div class="header-controls">
+      <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="Toggle theme">☾</button>
+      <button class="lang-btn" id="langBtn" onclick="toggleLang()">العربية</button>
+    </div>
+  </nav>
+  <div class="hero-layout">
+    <div class="inner hero-anim">
+      <div class="kicker"><span class="dot"></span><span id="kicker-text">Built for first-time founders across the UAE</span></div>
+      <h1 id="title">Turn your business idea into evidence.</h1>
+      <p id="subtitle" hidden></p>
+      <p id="pitch">Choose an idea, test real customer demand, and know what to do next — before spending heavily.</p>
+    </div>
+    <div class="entry-choice card" id="entry-choice" role="group" aria-label="Choose how to start">
+      <button type="button" class="btn btn-light" id="need-idea" onclick="chooseEntry('discover')">I need a business idea</button>
+      <button type="button" class="btn btn-primary" id="have-idea" onclick="chooseEntry('existing')">I already have an idea</button>
+    </div>
+  </div>
+  <div class="hero-trust" id="hero-trust"></div>
+</header>
+<main>
+  <div id="journey-home"><div id="journey-block"><nav class="journey" id="journey" aria-label="Founder journey"></nav><p class="journey-note" id="journey-note"></p></div></div>
+  <div class="card discovery-card" id="discovery-card" hidden>
+    <h2 id="discovery-title">Find three ideas to test</h2>
+    <p id="discovery-caveat">These are unvalidated suggestions. Test customer demand before spending.</p>
+    <div class="discovery-grid">
+      <label><span id="d-skills-label">Skills</span><input id="d-skills" type="text"></label>
+      <label><span id="d-interests-label">Interests</span><input id="d-interests" type="text"></label>
+      <label><span id="d-experience-label">Experience</span><input id="d-experience" type="text"></label>
+      <label><span id="d-budget-label">Approximate budget (AED)</span><input id="d-budget" type="number" min="0"></label>
+      <label><span id="d-region-label">UAE market</span><select id="d-region"></select></label>
+      <label><span id="d-context-label">Preferred business type</span><select id="d-context"></select></label>
+      <label><span id="d-time-label">Time available each week</span><input id="d-time" type="text"></label>
+    </div>
+    <button type="button" class="btn btn-primary" id="discover-btn" onclick="discoverIdeas()">Suggest three ideas</button>
+    <p class="error" id="discover-error" role="status"></p>
+    <div class="discovery-results" id="discovery-results"></div>
+  </div>
+  <div class="card input-card">
+    <label id="lbl-idea" for="idea">What is your business idea?</label>
+    <textarea id="idea" rows="3" placeholder="e.g. I want to start a mobile car-wash service"></textarea>
+    <div class="demo-row" id="demo-row"></div>
+    <div class="row">
+      <div>
+        <label id="lbl-cat" for="category">Category</label>
+        <select id="category" onchange="this.dataset.touched='true'"></select><small id="category-hint">Choose a category; suggestions appear as you type.</small>
+      </div>
+      <div>
+        <label id="lbl-usertype" for="user_type">Who are your customers?</label>
+        <select id="user_type"></select>
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label id="lbl-region" for="region">Which UAE market are you targeting?</label>
+        <select id="region"></select>
+      </div>
+      <div>
+        <label id="lbl-context" for="context">What type of business are you exploring?</label>
+        <select id="context"></select>
+      </div>
+    </div>
+    <div>
+      <div id="budget-label">Budget — 10,000 AED</div>
+      <input type="range" aria-labelledby="budget-label" id="budget" min="1000" max="100000" step="1000" value="10000" oninput="updateBudget(this.value)">
+    </div>
+    <button class="btn btn-primary btn-full" id="genBtn" onclick="generate()">Get my first step</button>
+    <p class="error" id="error"></p>
+  </div>
+  <div class="loader-wrap" id="loader">
+    
+    <div class="loader-text" id="loader-text"></div><div class="generation-steps" id="generation-steps" aria-hidden="true"></div><p class="generation-note" id="generation-note"></p>
+  </div>
+
+  <div id="results">
+    <section class="dashboard-summary" id="dashboard-summary" hidden><div class="summary-heading"></div><div class="summary-stats"></div></section>
+    <div class="action-row">
+      <button class="btn btn-light" id="pdfBtn" onclick="exportPDF()">Download PDF</button>
+      <button class="btn btn-light" id="newBtn" onclick="resetApp()">New idea</button>
+    </div>
+    <div class="trust-row" id="trust-row">
+      <span class="trust-badge" id="tb1">No login</span>
+      <span class="trust-badge" id="tb2">No payment</span>
+      <span class="trust-badge" id="tb3">Test before spending</span>
+      <span class="trust-badge" id="tb4">PDF report included</span>
+    </div>
+    <nav class="result-nav" id="result-nav" role="tablist" aria-label="Plan sections"></nav>
+    <div class="source-legend" id="source-legend"></div>
+
+    <div class="overview-card">
+      <h2 id="lbl-overview">Business snapshot</h2>
+      <div id="overview-body"></div>
+    </div>
+
+    <div class="first-step">
+      <div class="section-label" id="lbl-firststep">Your first step today</div>
+      <p id="first-step-text"></p>
+      <button type="button" class="btn start-validation" id="start-validation" onclick="selectPanel(1);document.getElementById('lbl-proof').scrollIntoView({behavior:motionBehavior(),block:'start'})">Start validation →</button>
+      <div class="badges">
+        <span class="fs-badge" id="fsb1">✓ Can be done today</span>
+        <span class="fs-badge" id="fsb2">✓ Before spending money</span>
+        <span class="fs-badge" id="fsb3">✓ Under 2 hours</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-label" id="lbl-score">Opportunity score</div>
+      <p class="score-note" id="score-note">Based on assumptions — update with real customer evidence.</p>
+      <div class="score-hero">
+        <div class="gauge" id="gauge"></div>
+        <div class="score-bars" id="score-bars"></div>
+      </div>
+      <div class="interp" id="score-interp"></div>
+    </div>
+
+    <div class="decision-card" id="decision-card">
+      <div class="section-label" id="lbl-decision">Founder decision</div>
+      <div class="decision-main" id="decision-main"></div>
+      <div class="decision-reason" id="decision-reason"></div>
+      <div class="decision-meta" id="decision-meta"></div>
+      <div class="decision-next" id="decision-next"></div>
+    </div>
+
+    <div class="bys-card" id="bys-card">
+      <div class="section-label" id="lbl-bys">Before you spend</div>
+      <div class="bys-grid">
+        <div class="bys-item"><div class="bys-l" id="bys-l1">You are planning to spend</div><div class="bys-v" id="bys-spend">—</div></div>
+        <div class="bys-item"><div class="bys-l" id="bys-l2">Recommended first test</div><div class="bys-v" id="bys-test">—</div></div>
+        <div class="bys-item bys-save"><div class="bys-l" id="bys-l3">Potential money protected</div><div class="bys-v" id="bys-protect">—</div></div>
+      </div>
+      <div class="financial-detail" id="financial-detail"></div>
+    </div>
+
+    <div class="passport-card" id="passport-card">
+      <div class="passport-head">
+        <div class="passport-flag" aria-hidden="true"><i class="pr"></i><i class="pg"></i><i class="pw"></i><i class="pk"></i></div>
+        <div class="passport-title" id="lbl-passport">Founder Passport</div>
+        <button class="passport-copy" id="passportCopyBtn" onclick="copyPassport()">Copy</button>
+      </div>
+      <table class="passport-table" id="passport-table"></table>
+    </div>
+
+    <div class="card">
+      <h2 class="sec" id="lbl-test">Small test plan first</h2>
+      <div class="test-plan">
+        <div class="intro" id="test-intro"></div>
+        <ul class="clean" id="test-list"></ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="sec" id="lbl-proof">Proof mode — test with 10 people</h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:1rem" id="proof-help">Fill in feedback from up to 10 potential customers. The verdict updates live.</p>
+      <div class="validation-progress"><div class="progress-label"><strong id="proof-progress-title"></strong><span id="proof-progress-count"></span></div><div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0"><span id="proof-progress" style="width:0%"></span></div></div>
+      <div class="proof-stats" id="proof-stats"></div>
+      <div class="evidence-ladder" id="evidence-ladder"></div><p class="evidence-philosophy" id="evidence-philosophy"></p><div class="evidence-strength" id="evidence-strength"></div>
+      <div class="proof-verdict" id="proof-verdict"></div>
+      <div class="proof-actions">
+        <button class="btn btn-light" id="proofCsvBtn" onclick="exportCSV()">Download data (CSV)</button>
+        <button class="btn btn-light" id="proofClearBtn" onclick="clearProof()">Clear</button>
+      </div>
+      <div class="table-wrap" style="overflow-x:auto">
+        <table class="proof-table" id="proof-table"></table>
+      </div>
+
+    </div>
+
+    <div class="card">
+      <h2 class="sec" id="lbl-7day">Your first 7 days</h2>
+      <div class="day-grid" id="day-grid"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="sec" id="lbl-validate">Validate before you spend</h2>
+      <ul class="clean" id="validate-list"></ul>
+    </div>
+
+    <div class="card">
+      <h2 class="sec" id="lbl-questions">5 questions to ask customers</h2>
+      <ol class="qs" id="questions-list"></ol>
+    </div>
+
+    <div class="card">
+      <div class="section-label" id="lbl-wa">WhatsApp test message</div>
+      <div class="wa-box"><div class="msg" id="wa-text"></div><div style="display:flex;flex-direction:column;gap:.4rem"><button class="wa-copy" id="waBtn" onclick="copyWA()">Copy</button><button class="wa-copy" id="waOpenBtn" style="background:#128c7e" onclick="openWA()">Open WhatsApp</button></div></div>
+    </div>
+
+    <div class="card">
+      <h2 class="sec" id="lbl-donot">What not to do yet</h2>
+      <div class="donot-grid">
+        <div class="donot-col">
+          <div class="donot-head donot-bad" id="lbl-donot-bad">Do not start with</div>
+          <ul class="donot-list bad" id="donot-list"></ul>
+        </div>
+        <div class="donot-col">
+          <div class="donot-head donot-good" id="lbl-donot-good">Instead, do this first</div>
+          <ul class="donot-list good" id="instead-list"></ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="sec" id="lbl-report">Founder readiness report</h2>
+      <table class="report-table" id="report-table"></table>
+    </div>
+
+    <div class="card">
+      <h2 class="sec" id="lbl-share">Shareable founder summary</h2>
+      <div class="wa-box" style="background:var(--blue-soft);border-color:#cfe0ff">
+        <div class="msg" id="share-text" style="color:#1d4299"></div>
+        <button class="wa-copy" id="shareBtn" style="background:var(--blue)" onclick="copyShare()">Copy</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="sec" id="lbl-fuller">The fuller path (when you're ready)</h2>
+      <div id="plan-meta" class="meta" style="margin-bottom:1rem"></div>
+      <div id="steps-list"></div>
+      <div class="charts" style="margin-top:1rem">
+        <div class="chart-box"><h3 id="lbl-timeline">Timeline per step (days)</h3><div style="position:relative;height:200px"><canvas id="timeline-chart" role="img" aria-label="Timeline per step"></canvas></div></div>
+        <div class="chart-box"><h3 id="lbl-cost">Cost breakdown (AED)</h3><div style="position:relative;height:200px"><canvas id="cost-chart" role="img" aria-label="Cost breakdown"></canvas></div></div>
+      </div>
+      <div class="tip" id="tip" style="margin-top:1rem"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="sec" id="lbl-personas">Potential customer segments</h2>
+      <p class="score-note" id="segments-note">Assumed segments to test — AI assumption</p>
+      <div class="persona-grid" id="persona-grid"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="sec" id="lbl-risks">Risk radar</h2>
+      <div id="risk-list"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="sec" id="lbl-pitches">Pitch generator</h2>
+      <div id="pitch-list"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="sec" id="lbl-map">Validation path</h2>
+      <div class="opp-map" id="opp-map"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="sec" id="lbl-qr">Validation QR code</h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:1rem" id="qr-help">Show this to customers — they scan to open your WhatsApp test message.</p>
+      <div class="qr-wrap"><div id="qr-code"></div><div class="qr-cap" id="qr-cap">Scan to open the validation message</div></div>
+    </div>
+
+    <div class="local-card">
+      <h2 class="sec" id="lbl-why">Your selected market context</h2>
+      <p style="font-size:13px;color:#6b5a30;line-height:1.6" id="why-intro">StartSmart adapts the plan to the market and context you select.</p>
+      <div class="local-grid" id="why-grid"></div>
+    </div>
+
+    <div class="card resources">
+      <h2 class="sec" id="lbl-resources">Official UAE Resources</h2>
+      <div class="res-link"><span aria-hidden="true" style="color:var(--uae-green)">●</span><a id="federal-resource" href="https://u.ae/en/information-and-services/business" target="_blank" rel="noopener noreferrer">UAE Government — business services and guidance</a></div>
+      <div id="regional-resource"></div>
+      <p class="disclaimer" id="disclaimer">Requirements vary by activity and emirate. Confirm final licensing and regulatory requirements with the relevant official authority.</p>
+    </div>
+
+    <div class="card" id="chat-note-card">
+      <h2 class="sec" id="lbl-chat">Ask a follow-up question</h2>
+      <p style="font-size:13px;color:var(--muted)" id="chat-note">Use the floating <b>StartSmart Advisor</b> at the bottom-right to ask about customers, risks, pricing, or licenses.</p>
+    </div>
+  </div>
+</main>
+
+<!-- Floating AI advisor -->
+<button class="chat-launcher" id="chatLauncher" onclick="toggleChat()" aria-controls="chatPanel" aria-expanded="false" aria-label="Open StartSmart Advisor">
+  <span class="cl-icon" aria-hidden="true">↗</span>
+  <span class="cl-text" id="cl-text">Need help?</span>
+  <span class="cl-pulse" aria-hidden="true"></span>
+</button>
+
+<div class="chat-backdrop" id="chat-backdrop" hidden onclick="toggleChat()"></div>
+<div class="chat-panel" inert id="chatPanel" role="dialog" aria-label="StartSmart Advisor" aria-hidden="true">
+  <div class="chat-head">
+    <div class="chat-flag" aria-hidden="true"><i class="cr"></i><i class="cg"></i><i class="cw"></i><i class="ck"></i></div>
+    <div class="chat-head-txt">
+      <div class="chat-title" id="chat-title">StartSmart Advisor</div>
+      <div class="chat-sub" id="chat-sub">Customers, risks, pricing, or licenses</div>
+    </div>
+    <button class="chat-close" id="chatClose" onclick="toggleChat()" aria-label="Close advisor">✕</button>
+  </div>
+  <div class="suggested" id="suggested" style="padding:.75rem .9rem 0"></div>
+  <div class="chat-messages" id="chat-messages" aria-live="polite"></div>
+  <div class="chat-input-row">
+    <input type="text" id="chat-input" placeholder="Ask anything about your plan..." onkeydown="if(event.key==='Enter')askQuestion()" aria-label="Type your question">
+    <button class="btn" id="sendBtn" onclick="askQuestion()" aria-label="Send">Send</button>
+  </div>
+  <div class="chat-foot" id="chat-foot">Guidance only — verify official requirements.</div>
+</div>
+<footer>
+  <div class="foot-title">StartSmart UAE</div>
+  <div id="foot-text">Built for aspiring founders in the UAE</div>
+  <div style="margin-top:.4rem">
+    <span class="foot-flag"><span class="fr"></span><span class="fg"></span><span class="fw"></span><span class="fk"></span></span>
+    <span id="foot-collab">Simple guidance · real customer validation · UAE context</span>
+  </div>
+</footer>
+
+<script>
+let lang="en", currentPlan=null, timelineChart, costChart;
+let chatHistory=[];
+function escapeHtml(value){return String(value==null?"":value).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));}
+function escapePlan(value){if(Array.isArray(value))return value.map(escapePlan);if(value&&typeof value==="object"){const out=Object.create(null);Object.keys(value).forEach(k=>out[k]=escapePlan(value[k]));return out;}return typeof value==="string"?escapeHtml(value):value;}
+const DEMOS={en:["Mobile car-wash service","Healthy meal-prep for busy professionals","Social media content service for small businesses"],ar:["خدمة غسيل سيارات متنقلة","وجبات صحية جاهزة للموظفين المشغولين","خدمة محتوى وسائل التواصل للمشاريع الصغيرة"]};
+
+const T={
+  "en": {
+    "title": "StartSmart UAE",
+    "subtitle": "Test your idea before you spend — your first step assistant",
+    "idea": "What is your business idea?",
+    "cat": "Category",
+    "usertype": "Who are your customers?",
+    "gen": "Get my first step",
+    "building": "Finding your first step...",
+    "placeholder": "e.g. I want to start a mobile car-wash service",
+    "pdf": "Download PDF",
+    "newidea": "New idea",
+    "overview": "Business snapshot",
+    "firststep": "Your first step today",
+    "score": "Preliminary score",
+    "testplan": "Small test plan first",
+    "proof": "Proof mode — test with 10 people",
+    "proofHelp": "Fill in feedback from up to 10 potential customers. The verdict updates live.",
+    "sevenday": "Your first 7 days",
+    "validate": "Validate before you spend",
+    "questions": "5 questions to ask customers",
+    "wa": "WhatsApp test message",
+    "report": "Founder readiness report",
+    "fuller": "The fuller path (when you're ready)",
+    "resources": "Official UAE Resources",
+    "chat": "Ask a follow-up question",
+    "send": "Send",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "timeline": "Timeline per step (days)",
+    "cost": "Estimated cost breakdown (AED)",
+    "totalCost": "Total cost",
+    "timelineLabel": "Timeline",
+    "days": "days",
+    "firstTip": "First customer tip",
+    "langBtn": "العربية",
+    "kicker": "Built for first-time founders across the UAE",
+    "foot": "Built for aspiring founders in the UAE",
+    "loaderMsgs": [
+      "Reading your idea...",
+      "Scanning the local market...",
+      "Scoring the opportunity...",
+      "Building your first step...",
+      "Almost there..."
+    ],
+    "nexttest": "Next test action",
+    "shareTpl": "My idea is {idea}. My first step is: {step}. Preliminary score: {score}/25. {verdict}",
+    "dayOut": "Output",
+    "daySucc": "Success",
+    "lblDecision": "Founder decision",
+    "lblDonot": "What not to do yet",
+    "lblDonotBad": "Do not start with",
+    "lblDonotGood": "Instead, do this first",
+    "lblShare": "Shareable founder summary",
+    "pitch": "Turn any business idea into a first action, validation plan, opportunity score, and customer test in under 5 minutes.",
+    "proofDemo": "Fill demo feedback",
+    "proofCsv": "Download data (CSV)",
+    "proofClear": "Clear",
+    "risklevel": "Risk level",
+    "testbudget": "Estimated test budget (AI ESTIMATE)",
+    "lblWhy": "Your selected market context",
+    "whyIntro": "StartSmart adapts the plan to the market and context you select.",
+    "whyItems": [
+      "Selected UAE region",
+      "Chosen business context",
+      "Target-customer fit",
+      "Low-cost validation before spending",
+      "Relevant local channels",
+      "Official resources to verify"
+    ],
+    "hchip1": "First action today",
+    "hchip2": "Test with 10 people",
+    "hchip3": "Founder report PDF",
+    "heroBadge": "Personalized guidance for your UAE market",
+    "fsb1": "✓ Can be done today",
+    "fsb2": "✓ Before spending money",
+    "fsb3": "✓ Under 2 hours",
+    "tb1": "No login",
+    "tb2": "No payment",
+    "tb3": "Test before spending",
+    "tb4": "PDF report included",
+    "footCollab": "Simple guidance · real customer validation · UAE context",
+    "journey": [
+      "Idea",
+      "First step",
+      "10 customers",
+      "Proof",
+      "PDF report"
+    ],
+    "chatGreetPlan": "Ask me about your plan — customers, risks, pricing, or licenses.",
+    "chatGreetNoPlan": "Generate a plan first for specific advice, or ask a general startup question.",
+    "chatFail": "The AI is unavailable right now. Here is a basic plan you can use to start customer validation.",
+    "heroStart": "Start my first step",
+    "heroDemo": "Run demo story",
+    "clText": "Need help?",
+    "chatTitle": "StartSmart Advisor",
+    "chatSub": "Ask about your current business plan",
+    "chatNote": "Use the floating StartSmart Advisor at the bottom-right to ask about customers, risks, pricing, or licenses.",
+    "chatFoot": "Guidance only — verify official requirements.",
+    "emptyIdea": "Enter a business idea first — for example: a mobile car-wash service.",
+    "localPlan": {
+      "summary": "A first-step validation plan for: {idea}.",
+      "sr": "Preliminary rating based on assumptions.",
+      "si": "Make the customer group and offer more specific.",
+      "channel": "Direct outreach and interviews with potential customers"
+    },
+    "ppIdea": "Idea",
+    "ppStatus": "Status",
+    "ppFirst": "First action",
+    "ppScore": "Preliminary score",
+    "ppDecision": "Decision",
+    "ppChannel": "First customer channel",
+    "ppCost": "Estimated first-test cost",
+    "ppNext": "Next step",
+    "cares": "Cares about",
+    "reach": "Reach through",
+    "askp": "Ask",
+    "lblBys": "Before you spend",
+    "bysL1": "Your budget",
+    "bysL2": "Estimated first-test cost · AI ESTIMATE",
+    "bysL3": "Budget remaining after the test",
+    "lblPassport": "Founder Passport",
+    "lblPersonas": "Potential customer segments",
+    "lblRisks": "Risk radar",
+    "lblPitches": "Pitch generator",
+    "lblMap": "Validation path",
+    "lblQr": "Validation QR code",
+    "qrHelp": "Show this to customers — they scan to open your WhatsApp test message.",
+    "qrCap": "Scan to open the validation message",
+    "heroStartL": "Start my first step",
+    "mapNodes": [
+      "Selected UAE market",
+      "Assumed customer segment",
+      "Business context",
+      "Validation test",
+      "Evidence pending",
+      "Decision"
+    ],
+    "hpL1": "Preliminary score",
+    "hpL2": "Decision",
+    "hpL3": "Next action",
+    "thinking": "Advisor is thinking…",
+    "error": "Something went wrong. Please try again.",
+    "chatPlaceholder": "Ask anything about your plan...",
+    "disclaimer": "Requirements vary by activity and emirate. Confirm final licensing and regulatory requirements with the relevant official authority.",
+    "strong": "Based mainly on assumptions — customer evidence is still required.",
+    "medium": "Based mainly on assumptions — customer evidence is still required.",
+    "weak": "Based mainly on assumptions — customer evidence is still required.",
+    "jk": {
+      "problem": "Problem",
+      "target_user": "Target user",
+      "solution": "Solution",
+      "impact": "Potential benefit",
+      "evidence": "Evidence"
+    },
+    "proofCols": [
+      "#",
+      "Interested?",
+      "Stated price (AED)",
+      "Frequency",
+      "Concern",
+      "Evidence strength"
+    ],
+    "interested": "Interested",
+    "maybe": "Maybe",
+    "no": "No",
+    "yes": "Yes",
+    "stInterested": "Interested",
+    "stMaybe": "Maybe interested",
+    "stAvg": "Avg stated price (AED)",
+    "stPre": "No-payment reservations",
+    "vGo": "Review actual evidence before deciding. Interest alone does not validate demand.",
+    "vTest": "Review actual evidence before deciding. Interest alone does not validate demand.",
+    "vStop": "Review actual evidence before deciding. Interest alone does not validate demand.",
+    "rkeys": {
+      "idea": "Idea",
+      "target_customer": "Target customer",
+      "best_first_action": "Best first action",
+      "estimated_first_test_cost_aed": "First test cost",
+      "what_not_to_start_with": "What not to start with",
+      "main_risk": "Main risk",
+      "first_customer_channel": "First customer channel",
+      "next_step": "Next step"
+    },
+    "snames": {
+      "local_fit": "Personal / Idea Fit",
+      "clear_customer": "Customer Need",
+      "low_starting_cost": "Starting Cost",
+      "easy_first_step": "Ease of Testing",
+      "growth_potential": "Growth Potential"
+    },
+    "suggested": [
+      "Biggest risks",
+      "First 3 strong leads",
+      "Pricing test",
+      "Licences & requirements"
+    ],
+    "regionLabel": "Which UAE market are you targeting?",
+    "contextLabel": "What type of business are you exploring?",
+    "regions": {
+      "UAE-wide": "UAE-wide / Not sure",
+      "Abu Dhabi": "Abu Dhabi",
+      "Al Ain": "Al Ain",
+      "Dubai": "Dubai",
+      "Sharjah": "Sharjah",
+      "Ajman": "Ajman",
+      "Ras Al Khaimah": "Ras Al Khaimah",
+      "Fujairah": "Fujairah",
+      "Umm Al Quwain": "Umm Al Quwain",
+      "Other UAE": "Other UAE"
+    },
+    "contexts": {
+      "Not sure": "Not sure",
+      "Online": "Online / digital",
+      "Local service": "Local service",
+      "Local service or digital": "Local service or digital",
+      "Retail": "Retail / shop",
+      "Food & beverage": "Food & beverage",
+      "Tourism": "Tourism / hospitality",
+      "B2B": "B2B / businesses",
+      "Campus": "Campus / students",
+      "Residential": "Residential / families",
+      "Rural": "Rural / farming",
+      "Other": "Other"
+    },
+    "categories": [
+      "Food & Catering",
+      "Agriculture & Farming",
+      "Retail & Trading",
+      "Tourism & Hospitality",
+      "Services & Maintenance",
+      "Technology & Digital",
+      "Handicrafts & Arts",
+      "Health & Wellness",
+      "Education & Tutoring",
+      "Other"
+    ],
+    "userTypes": {
+      "": "Any / not sure",
+      "students": "Students",
+      "families": "Families / households",
+      "tourists": "Tourists / visitors",
+      "professionals": "Professionals",
+      "small_businesses": "Small businesses",
+      "residents": "Residents",
+      "online_customers": "Online customers"
+    }
+  },
+  "ar": {
+    "title": "ابدأ بذكاء الإمارات",
+    "subtitle": "اختبر فكرتك قبل أن تنفق — مساعد خطوتك الأولى",
+    "idea": "ما هي فكرة مشروعك؟",
+    "cat": "الفئة",
+    "usertype": "من هم عملاؤك؟",
+    "gen": "احصل على خطوتي الأولى",
+    "building": "جاري إيجاد خطوتك الأولى...",
+    "placeholder": "مثال: أريد بدء خدمة غسيل سيارات متنقلة",
+    "pdf": "تحميل PDF",
+    "newidea": "فكرة جديدة",
+    "overview": "ملخص المشروع",
+    "firststep": "خطوتك الأولى اليوم",
+    "score": "الدرجة المبدئية",
+    "testplan": "خطة اختبار صغيرة أولاً",
+    "proof": "وضع الإثبات — اختبر مع 10 أشخاص",
+    "proofHelp": "أدخل ملاحظات من حتى 10 عملاء محتملين. تتحدث النتيجة مباشرة.",
+    "sevenday": "أيامك السبعة الأولى",
+    "validate": "تحقق قبل أن تنفق",
+    "questions": "5 أسئلة لتسألها للعملاء",
+    "wa": "رسالة واتساب للاختبار",
+    "report": "تقرير جاهزية المؤسس",
+    "fuller": "المسار الكامل (عندما تكون جاهزاً)",
+    "resources": "مصادر إماراتية رسمية",
+    "chat": "اسأل سؤالاً إضافياً",
+    "send": "إرسال",
+    "copy": "نسخ",
+    "copied": "تم النسخ!",
+    "timeline": "المدة لكل خطوة (أيام)",
+    "cost": "توزيع التكاليف المقدرة (درهم)",
+    "totalCost": "التكلفة الإجمالية",
+    "timelineLabel": "المدة",
+    "days": "يوم",
+    "firstTip": "نصيحة لأول عميل",
+    "langBtn": "English",
+    "kicker": "مصمم للمؤسسين الجدد في الإمارات",
+    "foot": "مصمم للمؤسسين الطموحين في الإمارات",
+    "loaderMsgs": [
+      "نقرأ فكرتك...",
+      "نحلل السوق المحلي...",
+      "نقيّم الفرصة...",
+      "نبني خطوتك الأولى...",
+      "اقتربنا..."
+    ],
+    "nexttest": "إجراء الاختبار التالي",
+    "shareTpl": "فكرتي هي {idea}. خطوتي الأولى: {step}. الدرجة المبدئية: {score}/25. {verdict}",
+    "dayOut": "الناتج",
+    "daySucc": "النجاح",
+    "lblDecision": "قرار المؤسس",
+    "lblDonot": "ما لا تفعله بعد",
+    "lblDonotBad": "لا تبدأ بـ",
+    "lblDonotGood": "بدلاً من ذلك، ابدأ بـ",
+    "lblShare": "ملخص قابل للمشاركة",
+    "pitch": "حوّل أي فكرة إلى خطوة أولى وخطة تحقق ودرجة فرصة واختبار عملاء في أقل من 5 دقائق.",
+    "proofDemo": "ملء بيانات تجريبية",
+    "proofCsv": "تنزيل البيانات (CSV)",
+    "proofClear": "مسح",
+    "risklevel": "مستوى الخطر",
+    "testbudget": "ميزانية اختبار مقدرة",
+    "lblWhy": "سياق السوق الذي اخترته",
+    "whyIntro": "يكيّف StartSmart الخطة حسب السوق والسياق الذي تختاره.",
+    "whyItems": [
+      "المنطقة المختارة",
+      "سياق المشروع",
+      "ملاءمة العميل المستهدف",
+      "تحقق منخفض التكلفة قبل الإنفاق",
+      "قنوات محلية مناسبة",
+      "مصادر رسمية للتحقق"
+    ],
+    "hchip1": "إجراء أول اليوم",
+    "hchip2": "اختبر مع 10 أشخاص",
+    "hchip3": "تقرير المؤسس PDF",
+    "heroBadge": "إرشاد مخصص لسوقك في الإمارات",
+    "fsb1": "✓ يمكن فعله اليوم",
+    "fsb2": "✓ قبل إنفاق المال",
+    "fsb3": "✓ أقل من ساعتين",
+    "tb1": "بدون تسجيل",
+    "tb2": "بدون دفع",
+    "tb3": "اختبر قبل الإنفاق",
+    "tb4": "يتضمن تقرير PDF",
+    "footCollab": "إرشاد بسيط · تحقق حقيقي من العملاء · سياق إماراتي",
+    "journey": [
+      "فكرة",
+      "خطوة أولى",
+      "10 عملاء",
+      "إثبات",
+      "تقرير PDF"
+    ],
+    "chatGreetPlan": "اسألني عن خطتك — العملاء، المخاطر، التسعير، أو التراخيص.",
+    "chatGreetNoPlan": "أنشئ خطة أولاً لنصيحة محددة، أو اسأل سؤالاً عاماً.",
+    "chatFail": "خدمة الذكاء الاصطناعي غير متاحة الآن. هذه خطة أساسية لبدء التحقق مع العملاء.",
+    "heroStart": "ابدأ خطوتي الأولى",
+    "heroDemo": "شغّل العرض التجريبي",
+    "clText": "تحتاج مساعدة؟",
+    "chatTitle": "مستشار StartSmart",
+    "chatSub": "اسأل عن خطة مشروعك الحالية",
+    "chatNote": "استخدم مستشار StartSmart العائم في الأسفل للأسئلة.",
+    "chatFoot": "إرشاد فقط — تحقق من المتطلبات الرسمية.",
+    "emptyIdea": "أدخل فكرة أولاً — مثال: خدمة غسيل سيارات متنقلة.",
+    "localPlan": {
+      "summary": "خطة تحقق أولى لـ: {idea}.",
+      "sr": "تقييم مبدئي قائم على افتراضات.",
+      "si": "اجعل فئة العملاء والعرض أكثر تحديداً.",
+      "channel": "تواصل مباشر ومقابلات مع العملاء المحتملين"
+    },
+    "ppIdea": "الفكرة",
+    "ppStatus": "الحالة",
+    "ppFirst": "أول إجراء",
+    "ppScore": "الدرجة المبدئية",
+    "ppDecision": "القرار",
+    "ppChannel": "قناة أول عميل",
+    "ppCost": "تكلفة الاختبار المقدرة",
+    "ppNext": "الخطوة التالية",
+    "cares": "يهتم بـ",
+    "reach": "الوصول عبر",
+    "askp": "اسأل",
+    "lblBys": "قبل أن تنفق",
+    "bysL1": "ميزانيتك",
+    "bysL2": "تكلفة الاختبار الأولى المقدرة · تقدير ذكاء اصطناعي",
+    "bysL3": "الميزانية المتبقية بعد الاختبار",
+    "lblPassport": "جواز المؤسس",
+    "lblPersonas": "شرائح العملاء المحتملين",
+    "lblRisks": "رادار المخاطر",
+    "lblPitches": "مولد العرض",
+    "lblMap": "مسار التحقق",
+    "lblQr": "رمز QR للتحقق",
+    "qrHelp": "أظهره للعملاء — يمسحونه لفتح رسالة الواتساب.",
+    "qrCap": "امسح لفتح رسالة التحقق",
+    "heroStartL": "ابدأ خطوتي",
+    "mapNodes": [
+      "السوق المختار",
+      "شريحة مفترضة",
+      "سياق المشروع",
+      "اختبار التحقق",
+      "الأدلة قيد الانتظار",
+      "القرار"
+    ],
+    "hpL1": "الدرجة المبدئية",
+    "hpL2": "القرار",
+    "hpL3": "الإجراء التالي",
+    "thinking": "المستشار يفكر…",
+    "error": "حدث خطأ ما. حاول مرة أخرى.",
+    "chatPlaceholder": "اسأل أي شيء عن خطتك...",
+    "disclaimer": "تختلف المتطلبات حسب النشاط والإمارة. تأكد من متطلبات الترخيص والتنظيم النهائية لدى الجهة الرسمية المختصة.",
+    "strong": "تعتمد أساساً على افتراضات — ما زلنا بحاجة إلى أدلة العملاء.",
+    "medium": "تعتمد أساساً على افتراضات — ما زلنا بحاجة إلى أدلة العملاء.",
+    "weak": "تعتمد أساساً على افتراضات — ما زلنا بحاجة إلى أدلة العملاء.",
+    "jk": {
+      "problem": "المشكلة",
+      "target_user": "المستخدم المستهدف",
+      "solution": "الحل",
+      "impact": "المنفعة المحتملة",
+      "evidence": "الدليل"
+    },
+    "proofCols": [
+      "#",
+      "مهتم؟",
+      "السعر المعلن (درهم)",
+      "التكرار",
+      "القلق",
+      "قوة الدليل"
+    ],
+    "interested": "مهتم",
+    "maybe": "ربما",
+    "no": "لا",
+    "yes": "نعم",
+    "stInterested": "مهتم",
+    "stMaybe": "ربما مهتم",
+    "stAvg": "متوسط السعر المعلن (درهم)",
+    "stPre": "حجوزات بلا دفع",
+    "vGo": "راجع الأدلة الفعلية قبل القرار. الاهتمام وحده لا يثبت الطلب.",
+    "vTest": "راجع الأدلة الفعلية قبل القرار. الاهتمام وحده لا يثبت الطلب.",
+    "vStop": "راجع الأدلة الفعلية قبل القرار. الاهتمام وحده لا يثبت الطلب.",
+    "rkeys": {
+      "idea": "الفكرة",
+      "target_customer": "العميل المستهدف",
+      "best_first_action": "أفضل إجراء أول",
+      "estimated_first_test_cost_aed": "تكلفة الاختبار الأول",
+      "what_not_to_start_with": "ما لا تبدأ به",
+      "main_risk": "الخطر الرئيسي",
+      "first_customer_channel": "قناة أول عميل",
+      "next_step": "الخطوة التالية"
+    },
+    "snames": {
+      "local_fit": "ملاءمة الفكرة للمؤسس",
+      "clear_customer": "حاجة العملاء",
+      "low_starting_cost": "تكلفة البداية",
+      "easy_first_step": "سهولة الاختبار",
+      "growth_potential": "إمكانات النمو"
+    },
+    "suggested": [
+      "أكبر المخاطر",
+      "ثلاثة عملاء محتملين",
+      "اختبار السعر",
+      "التراخيص والمتطلبات"
+    ],
+    "regionLabel": "أي سوق في الإمارات تستهدف؟",
+    "contextLabel": "ما نوع المشروع الذي تستكشفه؟",
+    "regions": {
+      "UAE-wide": "كل الإمارات / غير متأكد",
+      "Abu Dhabi": "أبوظبي",
+      "Al Ain": "العين",
+      "Dubai": "دبي",
+      "Sharjah": "الشارقة",
+      "Ajman": "عجمان",
+      "Ras Al Khaimah": "رأس الخيمة",
+      "Fujairah": "الفجيرة",
+      "Umm Al Quwain": "أم القيوين",
+      "Other UAE": "منطقة أخرى في الإمارات"
+    },
+    "contexts": {
+      "Not sure": "غير متأكد",
+      "Online": "أونلاين / رقمي",
+      "Local service": "خدمة محلية",
+      "Local service or digital": "خدمة محلية أو رقمية",
+      "Retail": "تجزئة / متجر",
+      "Food & beverage": "طعام ومشروبات",
+      "Tourism": "سياحة / ضيافة",
+      "B2B": "أعمال لشركات",
+      "Campus": "جامعة / طلاب",
+      "Residential": "سكني / عائلات",
+      "Rural": "ريفي / زراعي",
+      "Other": "أخرى"
+    },
+    "categories": [
+      "الطعام والتموين",
+      "الزراعة",
+      "التجارة والبيع",
+      "السياحة والضيافة",
+      "الخدمات والصيانة",
+      "التقنية والرقمية",
+      "الحرف والفنون",
+      "الصحة",
+      "التعليم",
+      "أخرى"
+    ],
+    "userTypes": {
+      "": "أي / غير متأكد",
+      "students": "الطلاب",
+      "families": "العائلات / الأسر",
+      "tourists": "السياح / الزوار",
+      "professionals": "المهنيون",
+      "small_businesses": "المشاريع الصغيرة",
+      "residents": "السكان",
+      "online_customers": "عملاء أونلاين"
+    }
+  }
+};
+
+function setEntry(mode){document.getElementById("need-idea").setAttribute("aria-pressed",String(mode==="discover"));document.getElementById("have-idea").setAttribute("aria-pressed",String(mode==="existing"));document.getElementById("discovery-card").hidden=mode!=="discover";document.querySelector(".input-card").hidden=mode==="discover";document.getElementById("need-idea").className="btn "+(mode==="discover"?"btn-primary":"btn-light");document.getElementById("have-idea").className="btn "+(mode==="existing"?"btn-primary":"btn-light");}
+function discoveryFields(){return {skills:document.getElementById("d-skills").value.trim(),interests:document.getElementById("d-interests").value.trim(),experience:document.getElementById("d-experience").value.trim(),budget:document.getElementById("d-budget").value,region:document.getElementById("d-region").value,context:document.getElementById("d-context").value,time_available:document.getElementById("d-time").value.trim(),lang};}
+async function discoverIdeas(){const btn=document.getElementById("discover-btn"),error=document.getElementById("discover-error"),box=document.getElementById("discovery-results"),profile=discoveryFields();error.textContent="";if([profile.skills,profile.interests,profile.experience,profile.budget,profile.time_available].some(v=>!String(v).trim())){error.textContent=lang==="ar"?"أكمل جميع حقول ملفك أولاً.":"Complete all founder profile fields first.";return;}btn.disabled=true;box.replaceChildren();startLoader(true);const ctrl=new AbortController();const timer=setTimeout(()=>ctrl.abort(),45000);try{const resp=await fetch("/discover",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(profile),signal:ctrl.signal});const data=await resp.json();if(!resp.ok||!Array.isArray(data.ideas)||data.ideas.length!==3)throw Error("unavailable");data.ideas.forEach(idea=>{const card=document.createElement("article");card.className="idea-card";const h=document.createElement("h3");h.textContent=idea.name;card.appendChild(h);if(profile.region&&profile.region!=="UAE-wide"){const marketBadge=document.createElement("span");marketBadge.className="source-badge input profile-match";marketBadge.textContent=(lang==="ar"?"سوقك المختار: ":"Your selected market: ")+(T[lang].regions[profile.region]||profile.region);card.appendChild(marketBadge);}[[lang==="ar"?"لماذا تناسبك":"Why it fits",idea.fit],[lang==="ar"?"عميل محتمل":"Likely customer",idea.customer],[lang==="ar"?"اختبار أول منخفض التكلفة":"Low-cost first test",idea.first_test],[lang==="ar"?"فرضية للتحقق":"Main assumption",idea.assumption]].forEach(([label,value])=>{const p=document.createElement("p"),b=document.createElement("b");b.textContent=label+": ";p.append(b,document.createTextNode(value));card.appendChild(p)});const badge=document.createElement("span");badge.className="source-badge assumption";badge.textContent=lang==="ar"?"فرضية ذكاء اصطناعي":"AI ASSUMPTION";card.appendChild(badge);const go=document.createElement("button");go.className="btn btn-primary";go.textContent=lang==="ar"?"استكشف هذه الفكرة":"Explore this idea";go.onclick=()=>{setEntry("existing");document.getElementById("idea").value=idea.name;document.getElementById("region").value=profile.region;document.getElementById("context").value=profile.context;const budget=Number(profile.budget);if(Number.isFinite(budget)&&budget>=0){const range=document.getElementById("budget");range.min=Math.min(Number(range.min),budget);range.max=Math.max(Number(range.max),budget);range.step="1";range.value=budget;updateBudget(range.value)}const category=document.getElementById("category");const idx=T.en.categories.findIndex(c=>c.toLowerCase()===String(idea.category||"").toLowerCase());if(idx>=0){category.selectedIndex=idx+1;category.dataset.touched="true";}else suggestCategory();generate()};card.appendChild(go);box.appendChild(card)});}catch(e){error.textContent=lang==="ar"?"تعذر اقتراح أفكار الآن. حاول مجدداً.":"Idea suggestions are unavailable right now. Please try again.";}finally{clearTimeout(timer);btn.disabled=false;stopLoader();}}
+
+const PANEL_ORDER=["Overview","Validate","Customers","7-Day Plan","Risks","Pitch","Resources"];
+const PANEL_IDS={Overview:["lbl-overview","lbl-firststep","lbl-score","lbl-decision"],Validate:["lbl-bys","lbl-test","lbl-proof","lbl-validate","lbl-questions","lbl-wa","lbl-qr"],Customers:["lbl-personas","lbl-map","lbl-why"],"7-Day Plan":["lbl-7day","lbl-fuller"],Risks:["lbl-risks","lbl-donot"],Pitch:["lbl-passport","lbl-share","lbl-pitches"],Resources:["lbl-report","lbl-resources","lbl-chat"]};
+function setupDashboard(){const root=document.getElementById("results"),nav=document.getElementById("result-nav");if(root.dataset.dashboard)return;root.dataset.dashboard="1";PANEL_ORDER.forEach((name,index)=>{const panel=document.createElement("section");panel.className="dashboard-panel";panel.id="panel-"+index;panel.hidden=index!==0;panel.setAttribute("role","tabpanel");panel.setAttribute("aria-labelledby","result-tab-"+index);PANEL_IDS[name].forEach(id=>{const node=document.getElementById(id);if(node){let parent=node;while(parent.parentElement!==root&&parent.parentElement)parent=parent.parentElement;if(parent.parentElement===root)panel.appendChild(parent);}});root.appendChild(panel);const btn=document.createElement("button");btn.type="button";btn.id="result-tab-"+index;btn.setAttribute("role","tab");btn.setAttribute("aria-controls",panel.id);btn.setAttribute("aria-selected",index===0?"true":"false");btn.tabIndex=index===0?0:-1;btn.textContent=name;btn.onclick=()=>selectPanel(index);btn.onkeydown=e=>{if(["ArrowRight","ArrowLeft","Home","End"].includes(e.key)){e.preventDefault();const dir=lang==="ar"?-1:1;const next=e.key==="Home"?0:e.key==="End"?PANEL_ORDER.length-1:(index+(e.key==="ArrowRight"?dir:-dir)+PANEL_ORDER.length)%PANEL_ORDER.length;selectPanel(next);nav.children[next].focus()}};nav.appendChild(btn)});}
+function updateDashboardLabels(){const names=lang==="ar"?["نظرة عامة","التحقق","العملاء","خطة ٧ أيام","المخاطر","العرض","المصادر"]:PANEL_ORDER;document.querySelectorAll("#result-nav button").forEach((b,i)=>b.textContent=names[i]);document.querySelectorAll(".dashboard-panel").forEach((p,i)=>p.setAttribute("aria-label",names[i]));}
+function selectPanel(index){document.querySelectorAll(".dashboard-panel").forEach((p,i)=>p.hidden=i!==index);document.querySelectorAll("#result-nav button").forEach((b,i)=>{b.setAttribute("aria-selected",i===index?"true":"false");b.tabIndex=i===index?0:-1});document.getElementById("result-tab-"+index).scrollIntoView({block:"nearest",inline:"nearest",behavior:motionBehavior()});renderJourney();}
+function ensurePlanState(plan,inputs){const r=plan.readiness_report||{},s=plan.state||{};plan.state={idea:inputs.idea,category:inputs.category,target_customer:(inputs.user_type&&T[lang].userTypes[inputs.user_type])||r.target_customer||s.target_customer||"",target_customer_source:inputs.user_type?"user_input":"ai_assumption",region:inputs.region,context:inputs.context,customer_type:inputs.user_type,user_budget_aed:Number(inputs.budget)||0,suggested_test_price_aed:Number(s.suggested_test_price_aed)||0,estimated_test_cost_aed:Number(s.estimated_test_cost_aed||r.estimated_first_test_cost_aed)||0,opportunity_score:plan.opportunity_score||{},decision:(plan.decision_engine||{}).decision||"",first_action:plan.first_step_today||"",evidence:s.evidence||{status:"not_validated",responses:0}};plan._category=inputs.category;plan._region=inputs.region;plan._context=inputs.context;plan._budget=inputs.budget;plan._user_type=inputs.user_type;if(r){r.idea=inputs.idea;r.target_customer=plan.state.target_customer;r.best_first_action=plan.state.first_action}if(plan.founder_passport)plan.founder_passport.first_action=plan.state.first_action;return plan;}
+
+function fillSelects(){const t=T[lang];const selected={categoryIndex:document.getElementById("category").selectedIndex,category:document.getElementById("category").value,user_type:document.getElementById("user_type").value,region:document.getElementById("region").value,context:document.getElementById("context").value};const c=document.getElementById("category");c.innerHTML="";const blank=document.createElement("option");blank.value="";blank.textContent=lang==="ar"?"اختر الفئة":"Choose a category";c.appendChild(blank);t.categories.forEach(x=>{const o=document.createElement("option");o.textContent=x;c.appendChild(o)});
+const u=document.getElementById("user_type");u.innerHTML="";Object.keys(t.userTypes).forEach(k=>{const o=document.createElement("option");o.value=k;o.textContent=t.userTypes[k];u.appendChild(o)});
+const rg=document.getElementById("region");rg.innerHTML="";Object.keys(t.regions).forEach(k=>{const o=document.createElement("option");o.value=k;o.textContent=t.regions[k];rg.appendChild(o)});
+const cx=document.getElementById("context");cx.innerHTML="";Object.keys(t.contexts).forEach(k=>{const o=document.createElement("option");o.value=k;o.textContent=t.contexts[k];cx.appendChild(o)});if(selected.categoryIndex>0)c.selectedIndex=selected.categoryIndex;u.value=selected.user_type;rg.value=selected.region;cx.value=selected.context;["region","context"].forEach((name)=>{const target=document.getElementById("d-"+name),source=document.getElementById(name),previous=target.value;target.replaceChildren(...[...source.options].map(o=>o.cloneNode(true)));target.value=previous||source.value;});}
+function suggestCategory(){const c=document.getElementById("category");if(c.dataset.touched)return;const idea=document.getElementById("idea").value.toLowerCase(),context=document.getElementById("context").value;let key="";if(/wash|clean|repair|maintenance|غسيل|تنظيف|صيانة/.test(idea)||context==="Local service")key="Services & Maintenance";else if(context==="Food & beverage")key="Food & Catering";else if(context==="Online")key="Technology & Digital";else if(context==="Retail")key="Retail & Trading";const i=T.en.categories.indexOf(key);if(i>=0)c.selectedIndex=i+1;document.getElementById("category-hint").textContent=key?(lang==="ar"?"اقتراح تلقائي — يمكنك تغييره.":"Suggested from your idea — you can change it."):(lang==="ar"?"اختر الفئة المناسبة.":"Choose the category that fits your idea.");}
+document.getElementById("idea").addEventListener("input",suggestCategory);document.getElementById("context").addEventListener("change",suggestCategory);
+function fillDemos(){const d=document.getElementById("demo-row");d.innerHTML="";DEMOS[lang].forEach(ex=>{const b=document.createElement("button");b.className="demo-chip";b.textContent=ex;b.onclick=()=>{document.getElementById("idea").value=ex;suggestCategory();};d.appendChild(b)});}
+function fillSuggested(){const b=document.getElementById("suggested");b.innerHTML="";T[lang].suggested.forEach(q=>{const x=document.createElement("button");x.className="chip";x.textContent=q;x.onclick=()=>{document.getElementById("chat-input").value=q;askQuestion()};b.appendChild(x)})}
+function renderResources(region){
+  const box=document.getElementById("regional-resource");if(!box)return;box.replaceChildren();if(region==="Abu Dhabi"||region==="Al Ain")[[lang==="ar"?"تم — خدمات حكومة أبوظبي":"TAMM","https://www.tamm.abudhabi/"],[lang==="ar"?"دائرة التنمية الاقتصادية في أبوظبي":"Abu Dhabi Department of Economic Development","https://www.added.gov.ae/en/set-up/establish-your-business"]].forEach(([name,url])=>{const row=document.createElement("div"),icon=document.createElement("span"),a=document.createElement("a");row.className="res-link";icon.textContent="📍";a.href=url;a.target="_blank";a.rel="noopener noreferrer";a.textContent=name;row.append(icon,a);box.appendChild(row)});
+}
+
+function applyLang(){const t=T[lang];if(currentPlan&&currentPlan._local){const old=currentPlan;currentPlan=localPlan((old.readiness_report||{}).idea||currentIdea(),old._category||"",old._user_type||"",old._budget??10000,old._region||"UAE-wide",old._context||"Not sure");currentPlan.proof_summary=old.proof_summary;currentPlan.state.evidence=(old.state||{}).evidence||currentPlan.state.evidence;}document.getElementById("body").className=lang==="ar"?"rtl":"";document.documentElement.lang=lang;
+const set=(id,v)=>{document.getElementById(id).textContent=v;};
+set('category-hint',lang==='ar'?'اختر الفئة؛ تظهر الاقتراحات أثناء الكتابة.':'Choose a category; suggestions appear as you type.');
+document.querySelectorAll('.p-freq').forEach(el=>el.placeholder=lang==='ar'?'أسبوعياً':'weekly');
+[['themeBtn','Toggle theme','تغيير المظهر'],['entry-choice','Choose how to start','اختر طريقة البدء'],['result-nav','Plan sections','أقسام الخطة'],['timeline-chart','Timeline per step','مدة كل خطوة'],['cost-chart','Cost breakdown','تفصيل التكلفة'],['chatLauncher','Open StartSmart Advisor','افتح مستشار ستارت سمارت'],['chatPanel','StartSmart Advisor','مستشار ستارت سمارت'],['chatClose','Close advisor','أغلق المستشار'],['chat-input','Type your question','اكتب سؤالك'],['sendBtn','Send','إرسال']].forEach(([id,en,ar])=>document.getElementById(id).setAttribute('aria-label',lang==='ar'?ar:en));
+
+set("title",t.title);set("subtitle",t.subtitle);set("lbl-idea",t.idea);set("lbl-cat",t.cat);set("lbl-usertype",t.usertype);set("lbl-region",t.regionLabel);set("lbl-context",t.contextLabel);set("genBtn",t.gen);set("pdfBtn",t.pdf);set("newBtn",t.newidea);set("lbl-overview",t.overview);set("lbl-firststep",t.firststep);set("lbl-score",t.score);set("lbl-test",t.testplan);set("lbl-proof",t.proof);set("proof-help",t.proofHelp);set("lbl-7day",t.sevenday);set("lbl-validate",t.validate);set("lbl-questions",t.questions);set("lbl-wa",t.wa);set("waBtn",t.copy);set("lbl-report",t.report);set("lbl-fuller",t.fuller);set("lbl-resources",t.resources);set("lbl-chat",t.chat);set("sendBtn",t.send);set("lbl-timeline",t.timeline);set("lbl-cost",t.cost);set("disclaimer",t.disclaimer);document.getElementById("federal-resource").textContent=lang==="ar"?"حكومة الإمارات — خدمات وإرشادات الأعمال":"UAE Government — business services and guidance";
+document.getElementById("idea").placeholder=t.placeholder;document.getElementById("chat-input").placeholder=t.chatPlaceholder;document.getElementById("langBtn").textContent=t.langBtn;
+var kt=document.getElementById("kicker-text");if(kt&&t.kicker)kt.textContent=t.kicker;
+var ft=document.getElementById("foot-text");if(ft&&t.foot)ft.textContent=t.foot;
+var setIf=function(id,v){var el=document.getElementById(id);if(el&&v!=null)el.textContent=v;};
+setIf("pitch",t.pitch);setIf("lbl-decision",t.lblDecision);setIf("lbl-donot",t.lblDonot);setIf("lbl-donot-bad",t.lblDonotBad);setIf("lbl-donot-good",t.lblDonotGood);setIf("lbl-share",t.lblShare);setIf("proofDemoBtn",t.proofDemo);setIf("proofCsvBtn",t.proofCsv);setIf("proofClearBtn",t.proofClear);setIf("shareBtn",t.copy);
+setIf("hchip1",t.hchip1);setIf("hchip2",t.hchip2);setIf("hchip3",t.hchip3);setIf("hero-badge",t.heroBadge);setIf("fsb1",t.fsb1);setIf("fsb2",t.fsb2);setIf("fsb3",t.fsb3);setIf("tb1",t.tb1);setIf("tb2",t.tb2);setIf("tb3",t.tb3);setIf("tb4",t.tb4);setIf("lbl-why",t.lblWhy);setIf("why-intro",t.whyIntro);setIf("foot-collab",t.footCollab);setIf("hero-start",t.heroStart);setIf("hero-demo",t.heroDemo);setIf("cl-text",t.clText);setIf("chat-title",t.chatTitle);setIf("chat-sub",t.chatSub);setIf("chat-note",t.chatNote);setIf("chat-foot",t.chatFoot);document.getElementById("chat-input").placeholder=t.chatPlaceholder;setIf("lbl-bys",t.lblBys);setIf("bys-l1",t.bysL1);setIf("bys-l2",t.bysL2);setIf("bys-l3",t.bysL3);setIf("lbl-passport",t.lblPassport);setIf("lbl-personas",t.lblPersonas);setIf("lbl-risks",t.lblRisks);setIf("lbl-pitches",t.lblPitches);setIf("lbl-map",t.lblMap);setIf("lbl-qr",t.lblQr);setIf("qr-help",t.qrHelp);setIf("qr-cap",t.qrCap);
+fillSelects();fillDemos();fillSuggested();renderJourney();updateBudget(document.getElementById("budget").value);setIf("waOpenBtn",lang==="ar"?"افتح واتساب":"Open WhatsApp");setIf("passportCopyBtn",t.copy);setIf("score-note",lang==="ar"?"مبنية على افتراضات — حدّثها بأدلة حقيقية من العملاء.":"Based on assumptions — update with real customer evidence.");setIf("segments-note",lang==="ar"?"أمثلة لشرائح تحتاج إلى اختبار — فرضية ذكاء اصطناعي":"Assumed segments to test — AI assumption");setIf("need-idea",lang==="ar"?"أحتاج فكرة مشروع":"I need a business idea");setIf("have-idea",lang==="ar"?"لدي فكرة بالفعل":"I already have an idea");setIf("discovery-title",lang==="ar"?"ثلاث أفكار للاختبار":"Find three ideas to test");setIf("discovery-caveat",lang==="ar"?"هذه اقتراحات غير مثبتة. اختبر الطلب قبل الإنفاق.":"These are unvalidated suggestions. Test customer demand before spending.");setIf("discover-btn",lang==="ar"?"اقترح ثلاث أفكار":"Suggest three ideas");[["d-skills-label","Skills","المهارات"],["d-interests-label","Interests","الاهتمامات"],["d-experience-label","Experience","الخبرة"],["d-budget-label","Approximate budget (AED)","الميزانية التقريبية (درهم)"],["d-region-label","UAE market","سوق الإمارات"],["d-context-label","Preferred business type","نوع المشروع المفضل"],["d-time-label","Time available each week","الوقت المتاح أسبوعياً"]].forEach(([id,en,ar])=>setIf(id,lang==="ar"?ar:en));const proof=document.getElementById("proof-table");if(proof&&proof.rows.length){proof.querySelectorAll("th").forEach((el,i)=>el.textContent=i===5?(lang==="ar"?"قوة الدليل":"Evidence strength"):(t.proofCols[i]||""));proof.querySelectorAll(".p-int").forEach(el=>{el.querySelector("[value=yes]").textContent=t.interested;el.querySelector("[value=maybe]").textContent=t.maybe;el.querySelector("[value=no]").textContent=t.no;});proof.querySelectorAll(".p-pre").forEach(el=>{[["interest","اهتمام فقط","Sounds interesting"],["intent","نية شراء معلنة","Stated intent to buy"],["reservation","حجز بلا دفع","No-payment reservation"],["payment","دفع فعلي","Actual payment"],["repeat","عميل متكرر","Repeat customer"]].forEach(([value,ar,en])=>el.querySelector('[value="'+value+'"').textContent=lang==="ar"?ar:en)});calcProof();}if(currentPlan){showPlan(currentPlan);if(currentPlan._local)document.getElementById("error").textContent=t.chatFail;}else renderResources(document.getElementById("region").value);polishLanguage();}
+
+function toggleLang(){lang=lang==="en"?"ar":"en";applyLang()}
+function updateBudget(v){const l=lang==="ar"?"الميزانية — ":"Budget — ";const u=lang==="ar"?" درهم":" AED";document.getElementById("budget-label").textContent=l+Number(v).toLocaleString()+u}
+
+async function generate(){const idea=document.getElementById("idea").value.trim();if(!idea){document.getElementById("error").textContent=T[lang].emptyIdea||"";return;}
+if(!document.getElementById("category").value){document.getElementById("error").textContent=lang==="ar"?"اختر فئة المشروع أولاً.":"Choose a category first.";return;}
+document.getElementById("genBtn").disabled=true;document.getElementById("genBtn").textContent=T[lang].building;document.getElementById("error").textContent="";document.getElementById("results").style.display="none";startLoader();
+var category=document.getElementById("category").value,user_type=document.getElementById("user_type").value,budget=document.getElementById("budget").value,region=document.getElementById("region").value,context=document.getElementById("context").value;
+try{
+  var ctrl=new AbortController();var to=setTimeout(function(){ctrl.abort();},45000);
+  var resp=await fetch("/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({idea,lang,category,user_type,budget,region,context}),signal:ctrl.signal});
+  clearTimeout(to);
+  var plan=null;try{plan=await resp.json();}catch(pe){plan=null;}
+  if(!plan||plan.error||!plan.opportunity_score){plan=localPlan(idea,category,user_type,budget,region,context);}
+  ensurePlanState(plan,{idea,category,user_type,budget,region,context});chatHistory=[];document.getElementById("chat-messages").replaceChildren();currentPlan=plan;showPlan(plan);selectPanel(0);buildProof();if(plan._local)document.getElementById("error").textContent=T[lang].chatFail;
+}catch(e){
+  console.warn("generate failed, using local plan:",e&&e.name);
+  try{currentPlan=ensurePlanState(localPlan(idea,category,user_type,budget,region,context),{idea,category,user_type,budget,region,context});chatHistory=[];document.getElementById("chat-messages").replaceChildren();showPlan(currentPlan);selectPanel(0);buildProof();document.getElementById("error").textContent=T[lang].chatFail;}
+  catch(e2){console.error("local plan failed",e2);document.getElementById("error").textContent=T[lang].error;}
+}
+finally{document.getElementById("genBtn").disabled=false;document.getElementById("genBtn").textContent=T[lang].gen;stopLoader();}}
+
+function currency(){return lang==="ar"?"درهم":"AED";}
+function pathMoney(value){
+  if(value==null||typeof value==='boolean')return null;
+  const text=String(value).replace(/\bAED\b|,|\s/gi,"");
+  if(!/^\d+(?:\.\d+)?$/.test(text))return null;
+  const number=Number(text);return Number.isFinite(number)&&number<=1e12?Math.round(number*100)/100:null;
+}
+function syncPathCosts(plan){
+  const steps=Array.isArray(plan.steps)?plan.steps:[],costs=steps.map(step=>pathMoney(step.estimated_cost_aed));
+  steps.forEach((step,i)=>step.estimated_cost_aed=costs[i]);
+  const total=costs.length&&costs.every(c=>c!==null)?Math.round(costs.reduce((a,b)=>a+b,0)*100)/100:null;
+  const budget=pathMoney((plan.state||{}).user_budget_aed??plan._budget)??0;
+  plan.total_estimated_cost_aed=total;plan.estimated_budget_gap_aed=total===null?null:Math.round(Math.max(0,total-budget)*100)/100;
+  Object.assign(plan.readiness_report||={}, {estimated_setup_cost_aed:total,estimated_budget_gap_aed:plan.estimated_budget_gap_aed});
+}
+function renderPathCosts(plan){
+  const ar=lang==='ar',total=plan.total_estimated_cost_aed,gap=plan.estimated_budget_gap_aed;
+  const amount=v=>v.toLocaleString('en-US',{maximumFractionDigits:2})+' '+currency();
+  const costText=total===null?(ar?'لم تُقدّر بعد':'Not estimated yet'):amount(total)+' · '+(ar?'تقدير ذكاء اصطناعي':'AI ESTIMATE');
+  const gapText=gap===null?(ar?'غير متاحة':'Not available'):amount(gap);
+  const rows=[[ar?'ميزانيتك':'Your budget',amount(Number((plan.state||{}).user_budget_aed)||0)+' · '+(ar?'إدخال المستخدم':'USER INPUT')],
+    [ar?'تكلفة الإعداد المقدرة':'Estimated setup cost',costText],[ar?'الفجوة المقدرة':'Estimated gap',gapText],
+    [ar?'المدة المقدرة':'Estimated timeline',plan.total_timeline_days+' '+T[lang].days]];
+  const box=document.getElementById('plan-meta');box.replaceChildren();
+  rows.forEach(([label,text])=>{const span=document.createElement('span');span.textContent=label+': '+text;box.appendChild(span)});
+  if(gap>0){const span=document.createElement('span');span.textContent=ar?'تحقق من الطلب قبل زيادة إنفاقك.':'Validate demand before increasing your spending.';box.appendChild(span)}
+  const note=document.createElement('span');note.textContent=ar?'تقدير تخطيطي — تحقق من التكاليف والمتطلبات قبل الإنفاق.':'Planning estimate — verify costs and requirements before spending.';box.appendChild(note);
+  const table=document.getElementById('report-table');
+  rows.slice(1,3).forEach(([label,text])=>{const row=table.insertRow();row.insertCell().textContent=label;row.cells[0].className='k';row.insertCell().textContent=text;});
+  const chart=document.getElementById('cost-chart');let chartNote=document.getElementById('cost-chart-note');
+  if(!chartNote){chartNote=document.createElement('p');chartNote.id='cost-chart-note';chart.parentElement.appendChild(chartNote)}
+  chart.hidden=total===null||total===0;chartNote.hidden=!chart.hidden;
+  chartNote.textContent=total===null?(ar?'لم تُقدّر بعد':'Not estimated yet'):amount(total);
+}
+function executionRisk(idea,category,ar){
+  const c=idea+' '+category;
+  if(/social.?media|content|marketing|محتوى|تواصل اجتماعي|تسويق/i.test(c))return ar?['تحتاج قدرة إنتاج المحتوى وتأخر موافقات العملاء واتساق التسليم إلى اختبار.','اختبر نموذج جدول محتوى ومسار الموافقات مع عملاء محتملين.']:['Content-production capacity, client approval delays and delivery consistency need testing.','Test a sample content calendar and approval workflow with prospective clients.'];
+  if(/app\b|software|digital|platform|tool|رقمي|تطبيق|برمج|منصة/i.test(c))return ar?['تحتاج جهود التطوير وتهيئة المستخدمين والدعم والموثوقية إلى اختبار.','اختبر شرحاً لنموذج أولي وسجّل صعوبات البدء والدعم.']:['Development effort, onboarding, support capacity and reliability need testing.','Test a prototype walkthrough and record onboarding and support difficulties.'];
+  if(/mobile|car.?wash|delivery|clean|متنقل|غسيل|توصيل|تنظيف/i.test(c))return ar?['تحتاج أوقات التنقل والمواعيد ولوجستيات الخدمة إلى اختبار.','اختبر مساراً وجدول مواعيد افتراضيين دون تشغيل.']:['Travel time, scheduling and service logistics need testing.','Test a mock route and appointment schedule without operating.'];
+  return ar?[`تحتاج القدرة على تقديم ${idea} واتساق الجودة إلى اختبار.`,'حدد نموذجاً لمسار تقديم العرض قبل التشغيل.']:[`Delivery capacity and quality consistency for ${idea} need testing.`,'Map one sample delivery workflow before operating.'];
+}
+function fixedLabel(value){if(lang!=='ar')return value;return ({'Customer Demand':'طلب العملاء','Cost / Financial':'التكلفة / المال','Trust / Adoption':'الثقة / التبني',Execution:'التنفيذ','Regulation / Compliance':'الأنظمة / الامتثال',Medium:'متوسط',High:'مرتفع',Low:'منخفض','Ready to validate':'جاهز للتحقق','Ready to validate, not operate':'جاهز للتحقق، لا للتشغيل','Validate more':'تحقق أكثر','Review pilot evidence':'راجع أدلة التجربة'}[value]||value);}
+
+function localPlan(idea,category,user_type,budget,region,context){
+  const L=T[lang].localPlan,ar=lang==='ar';
+  const plan={business_name_suggestion:idea,summary:L.summary.replace('{idea}',idea),
+    idea_overview:{problem:ar?'حاجة العملاء غير مؤكدة.':'Customer need remains unverified.',target_user:ar?'شريحة محتملة للاختبار':'Potential segment to test',solution:idea,impact:ar?'منفعة محتملة للاختبار.':'Potential benefit to test.',evidence:ar?'لم تُجمع أدلة من العملاء بعد.':'No customer evidence collected yet.',why_market:region+' · '+context},
+    first_step_today:ar?'قابل خمسة عملاء محتملين واسأل عن البدائل الحالية بلا دفع.':'Interview five potential customers about current alternatives without taking payment.',
+    opportunity_score:Object.fromEntries(['local_fit','clear_customer','low_starting_cost','easy_first_step','growth_potential'].map(k=>[k,{score:3,source:"fallback",reason:idea+": "+L.sr,improve:L.si}])),
+    readiness_report:{idea,target_customer:'',estimated_first_test_cost_aed:null,first_customer_channel:L.channel},
+    validation_questions:ar?['كيف تحل المشكلة الآن؟','متى استخدمت بديلاً؟','ما الذي يجعلك تجرب عرضاً جديداً؟','ما مخاوف السعر أو الثقة؟','هل تنضم لقائمة انتظار بلا دفع؟']:['How do you solve this today?','When did you last use an alternative?','What would make you consider a new offer?','What price or trust concern would stop you?','Would you join a no-payment waitlist?'],
+    whatsapp_message:ar?'مرحباً، أختبر فكرة '+idea+'. كيف تحل المشكلة الآن؟':'Hi, I am testing '+idea+'. How do you solve this today?',_local:true};
+  plan.opportunity_score.total=15;plan.opportunity_score.source="fallback_or_mixed";
+  ensurePlanState(plan,{idea,category,user_type,budget,region,context});
+  normalizeLocalPlan(plan,idea,region,context);
+  return ensurePlanState(plan,{idea,category,user_type,budget,region,context});
+}
+
+function contextSegmentNames(idea,target,category,ar){
+  const context=[idea,target,category].join(" ");
+  const groups=[
+    [/car|vehicle|driv|commut|ergonom|سيار|مركب|قياد/i,["Daily commuters","Ride-hailing drivers","Fleet / company vehicle managers"],["المتنقلون يومياً","سائقو خدمات نقل الركاب","مديرو الأساطيل وسيارات الشركات"]],
+    [/food|cater|meal|طعام|وجبات/i,["Busy households","Office lunch buyers","Small event organisers"],["الأسر المشغولة","مشترو وجبات المكاتب","منظمو الفعاليات الصغيرة"]],
+    [/tutor|educat|learn|تعليم|دروس/i,["Students needing subject support","Parents choosing learning support","Adults learning new skills"],["طلاب يحتاجون دعماً دراسياً","أولياء أمور يبحثون عن دعم تعليمي","بالغون يتعلمون مهارات جديدة"]],
+    [/digital|software|technolog|تقني|رقمي/i,["Independent professionals","Small business operators","Teams managing recurring workflows"],["المهنيون المستقلون","مشغلو الشركات الصغيرة","فرق تدير أعمالاً متكررة"]],
+    [/touris|hospitality|travel|سياح|سفر/i,["First-time visitors","Families planning short trips","Local accommodation operators"],["زوار للمرة الأولى","عائلات تخطط لرحلات قصيرة","مشغلو أماكن الإقامة المحلية"]]
+  ];
+  for(const [pattern,en,arabic] of groups)if(pattern.test(context))return ar?arabic:en;
+  const subject=idea||category||(ar?"الفكرة المقترحة":"the proposed service");
+  return ar?[`أفراد يبحثون عن ${subject}`,`أصحاب أعمال يحتاجون إلى ${subject}`,`جهات تشتري ${subject} لفرقها`]:[`Individuals seeking ${subject}`,`Business owners needing ${subject}`,`Teams purchasing ${subject} together`];
+}
+
+function normalizeLocalPlan(p,idea,region,context){
+  const ar=lang==="ar",car=/car.?wash|غسيل سيارات/i.test(idea);
+  const names=car?(ar?["مالكو السيارات السكنية","مديرو المكاتب والمرافق","مشغلو الأساطيل"]:["Residential car owners","Office and facility managers","Fleet operators"]):contextSegmentNames(idea,(p.readiness_report||{}).target_customer,p._category,ar);
+  p.small_test_plan={intro:ar?"اختبر الطلب دون تشغيل أو دفع قبل التحقق الرسمي.":"Test demand without operating or taking payment before official checks.",points:ar?["حدد شريحة عميل واحدة","قابل خمسة عملاء محتملين","اختبر العرض برسالة أو صفحة بسيطة","اجمع نوايا أو حجوزات بلا دفع","راجع النتائج قبل الإنفاق"]:["Choose one customer segment","Interview five potential customers","Test the offer with a message or landing page","Collect intent or no-payment waitlist signups","Review results before spending"]};
+  const days=ar?[["حدد العميل المستهدف","اختر شريحة ومشكلة محددة","شريحة واضحة واحدة"],["مقابلات العملاء","اسأل عن البدائل الحالية","خمس مقابلات فعلية"],["اختبر العرض","اعرض رسالة بسيطة","عرض اختُبر مع مستخدمين"],["اجمع نوايا بلا دفع","اطلب قائمة انتظار أو حجزاً بلا دفع","ثلاث تسجيلات أو نوايا واضحة"],["راجع الأدلة","وثّق الاعتراضات ومخاوف السعر","أبرز الاعتراضات موثقة"],["تحقق من المتطلبات","تحقق رسمياً من النشاط والموافقات ثم جهز خطة تجربة قانونية إذا بررت الأدلة","الفحوص الرسمية مكتملة قبل التشغيل"],["اتخذ القرار","استمر أو عدّل أو توقف حسب الأدلة","قرار يستند إلى الأدلة"]]:[["Define target customer","Select one segment and problem","One clear segment selected"],["Customer interviews","Ask about current alternatives","At least five real interviews"],["Test the offer","Show one simple message","One offer tested with target users"],["Collect no-payment intent","Invite waitlist signups or reservations","At least three signups or clear intent responses"],["Review evidence","Record objections and price concerns","Top objections documented"],["Verify requirements","Check official activity and approvals; prepare a lawful pilot plan only if justified","Official checks complete before operation"],["Decide","Continue, adjust, or stop from evidence","Evidence-based decision"]];
+  p.seven_day_plan=days.map((d,i)=>({day:i+1,focus:d[0],action:d[1],output:d[2],time_needed:"1–2h",success_check:d[2]}));
+  p.customer_personas=names.map(name=>({name,cares_about:ar?"حل المشكلة الحالية":"Solving the current problem",reach_through:ar?"تواصل مباشر ومقابلات":"Direct outreach and interviews",ask:ar?"كيف تحل المشكلة الآن؟":"How do you solve this problem today?"}));
+  const riskNames=ar?["طلب العملاء","التكلفة / المال","الثقة / التبني","التنفيذ","الأنظمة / الامتثال"]:["Customer Demand","Cost / Financial","Trust / Adoption","Execution","Regulation / Compliance"];
+  const reasons=ar?["لم تُجمع أدلة من العملاء بعد.","التكاليف المقدرة غير مؤكدة.","يجب اختبار مخاوف الثقة المحتملة.","يجب اختبار تعقيدات المسارات والمواعيد.","المتطلبات الدقيقة غير مؤكدة وتعتمد على النشاط والإمارة."]:["No customer evidence has been collected yet.","Estimated costs are unverified.","Potential trust concerns should be tested.","Routing and scheduling complexity should be tested.","Exact requirements are unverified and depend on the activity and emirate."];
+  const fixes=ar?["قابل العملاء وسجّل نوايا بلا دفع.","تحقق من عروض الأسعار المحلية.","اسأل عن أسباب التردد.","اختبر جدولاً افتراضياً بلا تشغيل.","تحقق من تصنيف النشاط والموافقات لدى الجهة الرسمية المختصة."]:["Interview customers and record no-payment intent.","Verify local supplier quotes.","Ask why customers hesitate.","Test a mock schedule without operating.","Verify activity classification and approvals with the relevant official authority."];
+  [reasons[3],fixes[3]]=executionRisk(idea,p._category,ar);
+  p.risk_radar=riskNames.map((name,i)=>({name,level:"Medium",reason:reasons[i],fix:fixes[i]}));
+  p.decision_engine={decision:ar?"تحقق أكثر":"Validate more",reason:ar?"قرار قبل جمع الأدلة: تحقق من الطلب والمتطلبات الرسمية.":"Pre-evidence decision: customer demand and official requirements need verification.",next_test_action:ar?"قابل خمسة عملاء محتملين واجمع نوايا بلا دفع.":"Interview five potential customers and collect no-payment intent.",risk_level:"Medium",recommended_test_budget_aed:""};
+  p.do_not_start_with=ar?["لا تشغّل الخدمة أو تقبل الدفع قبل التحقق الرسمي.","لا تشترِ معدات كبيرة قبل وجود أدلة طلب."]:["Do not operate or accept payment before official checks.","Do not buy major equipment before demand evidence."];
+  p.instead_do=ar?["قابل عملاء محتملين.","اجمع حجوزات بلا دفع.","تحقق من تصنيف النشاط والموافقات رسمياً."]:["Interview potential customers.","Collect no-payment reservations.","Verify activity classification and approvals officially."];
+  p.readiness_report.target_customer=names[0];p.state.target_customer=names[0];p.readiness_report.main_risk=ar?"الإنفاق قبل وجود أدلة عملاء أو تحقق رسمي.":"Spending before customer evidence or official checks.";p.readiness_report.what_not_to_start_with=ar?"التشغيل أو الدفع قبل التحقق الرسمي.":"Operation or payment before official checks.";p.readiness_report.next_step=ar?"قابل العملاء وسجّل نوايا بلا دفع؛ هذه توصية وليست متطلباً مثبتاً.":"Interview leads and record no-payment intent; this is a recommendation, not a proven requirement.";
+  p.founder_passport={status:ar?"جاهز للتحقق، لا للتشغيل":"Ready to validate, not operate",first_action:p.first_step_today,next_step:p.readiness_report.next_step};
+  const actions=ar?[["مقابلات العملاء","قابل العملاء المستهدفين.",3],["اختبار الاهتمام","أنشئ قائمة انتظار بلا دفع.",2],["مراجعة الأدلة","قارن النوايا والاعتراضات.",1],["تحقق رسمي","تحقق من تصنيف النشاط والموافقات لدى الجهة الرسمية.",1],["جهز تجربة قانونية","جهز خطة بعد التحقق؛ لا تشغّل بعد.",2],["نفذ تجربة إذا سُمح","بعد تأكيد التراخيص والموافقات المطلوبة، نفذ أصغر تجربة عملية مناسبة.",2],["راجع وقرر","راجع الأدلة وقرر المرحلة التالية.",1]]:[["Conduct targeted interviews","Ask target users about current alternatives.",3],["Create interest test","Use a no-payment waitlist.",2],["Review evidence","Compare intent and objections.",1],["Verify official requirements","Check activity classification and required approvals.",1],["Prepare lawful pilot","Plan only after official checks; do not operate yet.",2],["Run pilot if permitted","After confirming that required licences and approvals are in place, run the smallest practical pilot.",2],["Review and decide","Review evidence before the next phase.",1]];
+  p.steps=actions.map((a,i)=>({step_number:i+1,action:a[0],description:a[1],estimated_cost_aed:null,timeline_days:a[2],who_to_contact:ar?"الجهة المعنية":"Relevant people",location:region}));p.total_timeline_days=p.steps.reduce((n,s)=>n+s.timeline_days,0);p.total_estimated_cost_aed=null;p.estimated_budget_gap_aed=0;
+  p.validation_before_spending=ar?["ميّز الاهتمام عن نية الشراء والحجز والدفع.","استخدم إدخالات وضع الإثبات فقط كدليل.","تحقق من التكاليف والمتطلبات قبل الإنفاق."]:["Separate interest, intent, reservations, and payments.","Use only Proof Mode entries as evidence.","Verify costs and requirements before spending."];
+  p.pitches={ten_sec:ar?`أختبر فكرة ${idea} في ${region}.`:`I am testing ${idea} in ${region}.`,thirty_sec:ar?"أجري مقابلات وأختبر قائمة انتظار بلا دفع قبل التشغيل.":"I am interviewing leads and testing a no-payment waitlist before operating.",whatsapp:ar?`مرحباً، أختبر فكرة ${idea}. كيف تحل المشكلة الآن؟`:`Hi, I am testing ${idea}. How do you solve this today?`,instagram:ar?`نختبر فكرة ${idea}. ما البديل الحالي؟`:`Testing ${idea}. What alternative do you use now?`};
+  p.first_customer_tip=ar?"ابحث عن ثلاثة عملاء محتملين لديهم نية واضحة؛ لا تعتبرهم دافعين قبل حدوث دفع فعلي وبعد التحقق الرسمي.":"Find three strong leads; do not call them paying customers before actual payment after official checks.";
+  return p;
+}
+
+function showPlan(rawPlan){syncPathCosts(rawPlan);setupDashboard();updateDashboardLabels();const p=escapePlan(rawPlan);const t=T[lang];const state=rawPlan.state||{};
+const legend=document.getElementById("source-legend");legend.replaceChildren();[["FACT","fact"],["USER INPUT","input"],["AI ASSUMPTION","assumption"],["CUSTOMER EVIDENCE","evidence"]].forEach(([label,cls])=>{const b=document.createElement("span");b.className="source-badge "+cls;b.textContent=lang==="ar"?({FACT:"حقيقة", "USER INPUT":"إدخال المستخدم","AI ASSUMPTION":"افتراض الذكاء الاصطناعي","CUSTOMER EVIDENCE":"دليل العملاء"}[label]):label;legend.appendChild(b)});
+const jb=document.getElementById("overview-body");jb.innerHTML="";const js=p.idea_overview||{};
+[[lang==="ar"?"الفكرة":"Idea",state.idea],[lang==="ar"?"الفئة":"Category",(T[lang].categories[T.en.categories.indexOf(state.category)]||state.category)],[lang==="ar"?"السوق":"Selected market",(T[lang].regions[state.region]||state.region)],[lang==="ar"?"نوع المشروع":"Business type",(T[lang].contexts[state.context]||state.context)],[lang==="ar"?"ميزانيتك":"Your budget",(Number(state.user_budget_aed)||0).toLocaleString()+" "+currency()],[state.target_customer_source==="user_input"?(lang==="ar"?"العميل المختار":"Selected customer"):(lang==="ar"?"العميل المستهدف (افتراض)":"Target customer (assumption)"),state.target_customer]].forEach(([key,value])=>{const row=document.createElement("div"),k=document.createElement("span"),v=document.createElement("span"),b=document.createElement("span");row.className="overview-row";k.className="jk";v.className="jv";k.textContent=key;v.textContent=value||"—";b.className="source-badge "+(key.includes("assumption")||key.includes("افتراض")?"assumption":"input");b.textContent=key.includes("assumption")||key.includes("افتراض")?(lang==="ar"?"افتراض":"AI ASSUMPTION"):(lang==="ar"?"إدخال المستخدم":"USER INPUT");v.append(" ",b);row.append(k,v);jb.appendChild(row)});
+{const row=document.createElement("div"),k=document.createElement("span"),v=document.createElement("span"),b=document.createElement("span"),priced=Number(state.suggested_test_price_aed)>0;row.className="overview-row";k.className="jk";v.className="jv";k.textContent=lang==="ar"?"سعر اختبار مقترح":"Suggested test price";v.textContent=priced?Number(state.suggested_test_price_aed).toLocaleString()+" "+currency()+" ":(lang==="ar"?"لم يُقترح بعد ":"Not proposed yet ");b.className="source-badge "+(priced?"assumption":"unvalidated");b.textContent=priced?(lang==="ar"?"افتراض":"AI ASSUMPTION"):(lang==="ar"?"غير مُتحقق":"UNVALIDATED");v.appendChild(b);row.append(k,v);jb.appendChild(row)}
+Object.keys(t.jk).forEach(k=>{if(js[k])jb.innerHTML+=`<div class="overview-row"><span class="jk">${t.jk[k]}</span><span class="jv" ${k==="evidence"?'id="overview-evidence"':""}>${js[k]}</span></div>`;});
+document.getElementById("first-step-text").textContent=rawPlan.first_step_today||"";
+const sc=p.opportunity_score||{};const total=sc.total||0;
+const gcol=total>=20?"#009639":total>=15?"#c8a24a":"#ce1126";
+const pct=Math.max(0,Math.min(1,total/25)),R=52,CC=2*Math.PI*R,off=CC*(1-pct);
+document.getElementById("gauge").innerHTML='<svg width="120" height="120" viewBox="0 0 120 120"><circle cx="60" cy="60" r="'+R+'" fill="none" stroke="var(--line)" stroke-width="10"/><circle class="prog" cx="60" cy="60" r="'+R+'" fill="none" stroke="'+gcol+'" stroke-width="10" stroke-linecap="round" stroke-dasharray="'+CC+'" stroke-dashoffset="'+CC+'"/></svg><div class="gv"><b id="gauge-num">0</b><small>/ 25</small></div>';
+setTimeout(function(){var pc=document.querySelector(".gauge circle.prog");if(pc)pc.style.strokeDashoffset=off;countUp("gauge-num",Number(currentPlan?.opportunity_score?.total)||total,800);},motionPreference.matches?0:60);
+const bars=document.getElementById("score-bars");bars.innerHTML="";
+["local_fit","clear_customer","low_starting_cost","easy_first_step","growth_potential"].forEach(k=>{const item=sc[k]||{};const v=item.score||0;const reason=item.reason||"";
+const improve=item.improve||"";bars.innerHTML+=`<div class="score-row"><div class="score-top"><span class="name">${t.snames[k]}</span><div class="score-track"><div class="score-fill" style="width:${v*20}%"></div></div><span class="val">${v}/5</span></div><div class="score-reason">${reason}</div>${improve?`<div class="score-improve">\u2192 ${improve}</div>`:""}</div>`;});
+const interp=document.getElementById("score-interp");interp.className="interp medium";interp.textContent=t.medium;if(sc.source&&sc.source!=="ai_assumption")interp.textContent+=" "+(lang==="ar"?"تتضمن الدرجة تقديرات احتياطية لعدم كفاية المعلومات.":"Includes fallback estimates where information is insufficient.");
+const tp=p.small_test_plan||{};document.getElementById("test-intro").textContent=(rawPlan.small_test_plan||{}).intro||"";const tl=document.getElementById("test-list");tl.innerHTML="";(tp.points||[]).forEach(x=>{tl.innerHTML+=`<li>${x}</li>`;});
+const dg=document.getElementById("day-grid");dg.innerHTML="";(p.seven_day_plan||[]).forEach(d=>{var extra="";if(d.output)extra+=`<div class="a" style="margin-top:.3rem"><b>${t.dayOut}:</b> ${d.output}</div>`;if(d.success_check)extra+=`<div class="a" style="color:var(--uae-green)"><b>${t.daySucc}:</b> ${d.success_check}</div>`;var tm=d.time_needed?`<span style="float:right;font-size:10px;color:var(--muted)">${d.time_needed}</span>`:"";dg.innerHTML+=`<div class="day-card"><div class="d">${lang==="ar"?"اليوم":"Day"} ${d.day}</div>${tm}<div class="f">${d.focus}</div><div class="a">${d.action}</div>${extra}</div>`;});
+const vl=document.getElementById("validate-list");vl.innerHTML="";(p.validation_before_spending||[]).forEach(x=>{vl.innerHTML+=`<li>${x}</li>`;});
+const ql=document.getElementById("questions-list");ql.innerHTML="";(p.validation_questions||[]).forEach(q=>{ql.innerHTML+=`<li>${q}</li>`;});
+let waMsg=rawPlan.whatsapp_message||"";const ideaVal=document.getElementById("idea").value.trim();if(ideaVal&&waMsg.includes("[idea]"))waMsg=waMsg.replace("[idea]",ideaVal);else if(ideaVal&&!waMsg.toLowerCase().includes(ideaVal.toLowerCase().slice(0,12)))waMsg=waMsg+" ("+ideaVal+")";document.getElementById("wa-text").textContent=waMsg;
+const rt=document.getElementById("report-table");rt.innerHTML="";const r=p.readiness_report||{};Object.keys(t.rkeys).forEach(k=>{let val=k==="idea"?escapeHtml(state.idea):r[k];let label=t.rkeys[k];if(k==="target_customer")label+=state.target_customer_source==="user_input"?(lang==="ar"?" · إدخال المستخدم":" · USER INPUT"):(lang==="ar"?" · افتراض ذكاء اصطناعي":" · AI ASSUMPTION");if(k==="main_risk")label+=lang==="ar"?" · افتراض تخطيطي":" · planning assumption";if(k==="next_step")label+=lang==="ar"?" · إجراء موصى به":" · recommended action";if(k==="estimated_first_test_cost_aed"&&val!=null)val=Number(state.estimated_test_cost_aed||val).toLocaleString()+" "+currency()+" · "+(lang==="ar"?"تقدير ذكاء اصطناعي":"AI ESTIMATE");rt.innerHTML+=`<tr><td class="k">${label}</td><td class="v">${val||"-"}</td></tr>`;});
+rt.innerHTML+='<tr id="readiness-evidence"><td class="k">'+(lang==='ar'?'أدلة العملاء':'CUSTOMER EVIDENCE')+'</td><td class="v" id="readiness-evidence-text">'+escapeHtml((rawPlan.idea_overview||{}).evidence||(lang==='ar'?'لم تُجمع أدلة من العملاء بعد.':'No customer evidence collected yet.'))+'</td></tr>';
+const list=document.getElementById("steps-list");list.innerHTML="";(p.steps||[]).forEach(s=>{list.innerHTML+=`<div class="step-card"><div class="step-num">${s.step_number}</div><div class="step-body"><h3>${s.action}</h3><p>${s.description}</p><div class="tags"><span class="tag">${s.location}</span><span class="tag">${s.who_to_contact}</span><span class="tag">${s.estimated_cost_aed==null?(lang==="ar"?"لم تُقدر التكلفة بعد":"Cost not estimated yet"):Number(s.estimated_cost_aed).toLocaleString()+" "+currency()+" · "+(lang==="ar"?"تقدير ذكاء اصطناعي":"AI ESTIMATE")}</span><span class="tag">${s.timeline_days} ${t.days}</span></div></div></div>`;});
+renderPathCosts(rawPlan);
+document.getElementById("tip").innerHTML=`<strong>${t.firstTip}:</strong> ${p.first_customer_tip}`;
+if(timelineChart){timelineChart.destroy();timelineChart=null;}if(costChart){costChart.destroy();costChart=null;}
+if(typeof Chart!=="undefined"){timelineChart=new Chart(document.getElementById("timeline-chart"),{type:"bar",data:{labels:p.steps.map(s=>(lang==="ar"?"خطوة ":"Step ")+s.step_number),datasets:[{data:p.steps.map(s=>s.timeline_days),backgroundColor:"#378ADD",borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
+if(rawPlan.total_estimated_cost_aed!==null&&rawPlan.total_estimated_cost_aed>0)costChart=new Chart(document.getElementById("cost-chart"),{type:"doughnut",data:{labels:p.steps.map(s=>s.action),datasets:[{data:p.steps.map(s=>s.estimated_cost_aed),backgroundColor:["#534AB7","#1D9E75","#D85A30","#378ADD","#BA7517"],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom",labels:{font:{size:9}}}}}});
+}
+// decision engine
+var de=p.decision_engine||{};var dm=document.getElementById("decision-main");
+if(de.decision){document.getElementById("decision-card").style.display="block";dm.textContent=fixedLabel((rawPlan.decision_engine||{}).decision||"");document.getElementById("decision-reason").textContent=(rawPlan.decision_engine||{}).reason||"";document.getElementById("decision-next").textContent=((rawPlan.decision_engine||{}).next_test_action?t.nexttest+": "+rawPlan.decision_engine.next_test_action:"");
+var dmeta="";if(de.risk_level)dmeta+=`<span><b>${t.risklevel}:</b> ${fixedLabel(de.risk_level)}</span>`;if(de.recommended_test_budget_aed)dmeta+=`<span><b>${t.testbudget} · ${lang==="ar"?"تقدير ذكاء اصطناعي":"AI ESTIMATE"}:</b> ${de.recommended_test_budget_aed} ${currency()}</span>`;document.getElementById("decision-meta").innerHTML=dmeta;}
+else{document.getElementById("decision-card").style.display="none";}
+// do not start / instead
+var dnl=document.getElementById("donot-list");dnl.innerHTML="";(p.do_not_start_with||[]).forEach(x=>{dnl.innerHTML+=`<li>${x}</li>`;});
+var inl=document.getElementById("instead-list");inl.innerHTML="";(p.instead_do||[]).forEach(x=>{inl.innerHTML+=`<li>${x}</li>`;});
+// shareable summary
+var sc2=p.opportunity_score||{};var st=(sc2.total||0);
+var verdict=st>=20?t.strong:(st>=15?t.medium:t.weak);
+var shareTxt=t.shareTpl.replace("{idea}",((rawPlan.readiness_report||{}).idea||rawPlan.summary||"")).replace("{step}",(rawPlan.first_step_today||"")).replace("{score}",st).replace("{verdict}",verdict);
+document.getElementById("share-text").textContent=shareTxt;
+var wg=document.getElementById("why-grid");if(wg){wg.replaceChildren();const values=[[lang==="ar"?"السوق المختار":"Selected market",(T[lang].regions[state.region]||state.region)],[lang==="ar"?"نوع المشروع":"Business type",(T[lang].contexts[state.context]||state.context)],[lang==="ar"?"قناة أولى محتملة":"Likely first channel",(rawPlan.readiness_report||{}).first_customer_channel||"—"],[lang==="ar"?"طريقة التحقق":"Validation approach",lang==="ar"?"مقابلات وحجوزات بلا دفع":"Interviews and no-payment reservations"],[lang==="ar"?"تحقق رسمي":"Official checks",["Abu Dhabi","Al Ain"].includes(state.region)?(lang==="ar"?"تم / دائرة التنمية الاقتصادية في أبوظبي":"TAMM / ADDED"):(lang==="ar"?"الجهة الرسمية المختصة":"Relevant official authority")]];values.forEach(([k,v])=>{const card=document.createElement("div"),b=document.createElement("b"),line=document.createElement("div");card.className="local-item";b.textContent=k;line.textContent=v;card.append(b,line);wg.appendChild(card)})}
+renderExtras(rawPlan,(rawPlan.readiness_report||{}),st);renderResources(rawPlan._region||document.getElementById("region").value);
+document.getElementById("results").style.display="block";
+revealInit();renderDashboardSummary();decorateResources();
+document.getElementById("results").scrollIntoView({behavior:motionBehavior()});}
+
+function renderExtras(rawPlan,r,st){
+  var p=escapePlan(rawPlan);r=p.readiness_report||{};
+  var t=T[lang];
+  // Before You Spend
+  try{
+    var budget=Number((rawPlan.state||{}).user_budget_aed)||0;
+    var testCost=Number((rawPlan.state||{}).estimated_test_cost_aed)||0;
+    var protect=Math.max(0,budget-testCost);
+    setTxt("bys-spend",budget.toLocaleString()+" "+currency());
+    setTxt("bys-test",testCost?testCost.toLocaleString()+" "+currency()+" · "+(lang==="ar"?"تقدير ذكاء اصطناعي":"AI ESTIMATE"):(lang==="ar"?"لم يُقدّر بعد":"Not estimated yet"));
+    setTxt("bys-protect",testCost?protect.toLocaleString()+" "+currency():(lang==="ar"?"لم تُقدّر بعد":"Not estimated yet"));
+  }catch(e){console.warn("bys",e);}
+  // Founder Passport
+  try{
+    var pp=p.founder_passport||{};var de=p.decision_engine||{};
+    var rows=[[t.ppIdea,(r.idea||p.summary||"")],[t.ppStatus,fixedLabel(pp.status||"Ready to validate")],[t.ppFirst,(pp.first_action||p.first_step_today||"")],[t.ppScore,(lang==="ar"?"الدرجة المبدئية: ":"Preliminary score: ")+st+"/25"],[t.ppDecision,fixedLabel(de.decision||"")],[t.ppChannel,(r.first_customer_channel||"")],[t.ppCost,((r.estimated_first_test_cost_aed!=null)?r.estimated_first_test_cost_aed+" "+currency()+" · "+(lang==="ar"?"تقدير ذكاء اصطناعي":"AI ESTIMATE"):"-")],[t.ppNext,(pp.next_step||r.next_step||"")]];
+    var ptbl=document.getElementById("passport-table");ptbl.innerHTML="";rows.forEach(function(rw){ptbl.innerHTML+=`<tr><td class="pk2">${rw[0]}</td><td class="pv2">${rw[1]||"-"}</td></tr>`;});
+    window._passportText=rows.map(function(rw){return rw[0]+": "+(rw[1]||"-");}).join("\n");
+  }catch(e){console.warn("passport",e);}
+  // Personas
+  try{
+    var pg=document.getElementById("persona-grid");pg.innerHTML="";
+    (p.customer_personas||[]).slice(0,3).forEach(function(per){
+      pg.innerHTML+=`<div class="persona"><div class="pname">${per.name||""} <span class="source-badge assumption">${lang==="ar"?"افتراض ذكاء اصطناعي":"AI ASSUMPTION"}</span></div><div class="prow"><b>${t.cares}:</b> ${per.cares_about||""}</div><div class="prow"><b>${t.reach}:</b> ${per.reach_through||""}</div><div class="prow"><b>${t.askp}:</b> ${per.ask||""}</div></div>`;
+    });
+  }catch(e){console.warn("personas",e);}
+  // Risk radar
+  try{
+    var rl=document.getElementById("risk-list");rl.innerHTML="";
+    (p.risk_radar||[]).forEach(function(rk){
+      var lv=(rk.level||"").toLowerCase();var cls=/(high|مرتفع)/.test(lv)?"rl-high":(/(med|متوسط)/.test(lv)?"rl-medium":"rl-low");
+      rl.innerHTML+=`<div class="risk-item"><span class="risk-name">${fixedLabel(rk.name||"")}</span><span class="risk-level ${cls}">${fixedLabel(rk.level||"")}</span><span class="risk-detail"><b>${rk.reason||""}</b><span class="risk-next">${lang==="ar"?"الخطوة التالية: ":"Next action: "}${rk.fix||""}</span></span></div>`;
+    });
+  }catch(e){console.warn("risks",e);}
+  // Pitches
+  try{
+    var pit=p.pitches||{};var pl=document.getElementById("pitch-list");pl.innerHTML="";
+    var defs=[["10s",pit.ten_sec],["30s",pit.thirty_sec],["WhatsApp",pit.whatsapp],["Instagram",pit.instagram]];
+    defs.forEach(function(d){if(!d[1])return;var id="pitch-"+d[0];pl.innerHTML+=`<div class="pitch-item"><div class="pitch-body"><div class="pitch-label">${lang==="ar"?({"10s":"10 ثوانٍ","30s":"30 ثانية",WhatsApp:"واتساب",Instagram:"إنستغرام"}[d[0]]):d[0]}</div><div class="pitch-text" id="${id}">${d[1]}</div></div><button class="pitch-copy" onclick="copyText('${id}',this)">${t.copy}</button></div>`;});
+  }catch(e){console.warn("pitches",e);}
+  // Opportunity map
+  try{
+    var selectedRegion=p._region||((document.getElementById("region")||{}).value)||"UAE-wide";var selectedContext=p._context||((document.getElementById("context")||{}).value)||"Not sure";var proof=(rawPlan.proof_summary||{}),hasEvidence=Number(proof.total_responses)>0;var mapNodes=[T[lang].regions[selectedRegion]||selectedRegion,(r.target_customer||t.mapNodes[1])+(lang==="ar"?" · افتراض":" · AI ASSUMPTION"),T[lang].contexts[selectedContext]||selectedContext,lang==="ar"?"مقابلات وقائمة انتظار بلا دفع":"Interviews and no-payment waitlist",hasEvidence?(lang==="ar"?"أدلة أدخلها المستخدم":"User-entered customer evidence"):(lang==="ar"?"الأدلة قيد الانتظار":"Evidence pending"),lang==="ar"?"القرار: تحقق أكثر":"Decision: Validate more"];
+    var om=document.getElementById("opp-map");om.innerHTML="";
+    mapNodes.forEach(function(n,i){var cls=i===0?"start":(i===mapNodes.length-1?"end":"");om.innerHTML+=`<div class="opp-node ${cls}">${n}</div>`;if(i<mapNodes.length-1)om.innerHTML+=`<div class="opp-arrow">↓</div>`;});
+  }catch(e){console.warn("map",e);}
+  // QR code
+  try{ renderQR(); }catch(e){console.warn("qr",e);}
+}
+
+function renderQR(){
+  var box=document.getElementById("qr-code");if(!box)return;box.innerHTML="";
+  var msg=(document.getElementById("wa-text")||{}).textContent||"";
+  var url="https://wa.me/?text="+encodeURIComponent(msg||"StartSmart UAE validation");
+  if(typeof QRCode!=="undefined"){new QRCode(box,{text:url,width:140,height:140,correctLevel:QRCode.CorrectLevel.M});}
+  else{box.innerHTML='<a href="'+url+'" target="_blank" rel="noopener noreferrer" style="font-size:12px;color:#2f6fed">'+(lang==="ar"?"افتح رابط اختبار واتساب":"Open WhatsApp test link")+'</a>';}
+}
+
+function setTxt(id,v){var el=document.getElementById(id);if(el)el.textContent=v;}
+function copyText(id,btn){var el=document.getElementById(id);if(!el)return;var txt=el.textContent||"";var done=function(){var o=btn.textContent;btn.textContent="✓ "+T[lang].copied;setTimeout(function(){btn.textContent=o;},1400);};if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(txt).then(done).catch(function(){fallbackCopy(txt);done();});}else{fallbackCopy(txt);done();}}
+function copyPassport(){var txt=window._passportText||"";var btn=document.getElementById("passportCopyBtn");var done=function(){btn.textContent="✓ "+T[lang].copied;setTimeout(function(){btn.textContent=T[lang].copy;},1400);};if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(txt).then(done).catch(function(){fallbackCopy(txt);done();});}else{fallbackCopy(txt);done();}}
+
+function buildProof(){const t=T[lang];const tbl=document.getElementById("proof-table");
+let head="<tr>";t.proofCols.forEach((c,i)=>head+=`<th>${i===5?(lang==="ar"?"قوة الدليل":"Evidence strength"):c}</th>`);head+="</tr>";
+let rows="";for(let i=1;i<=10;i++){rows+=`<tr>
+<td>${i}</td>
+<td><select onchange="calcProof()" class="p-int"><option value="">-</option><option value="yes">${t.interested}</option><option value="maybe">${t.maybe}</option><option value="no">${t.no}</option></select></td>
+<td><input type="number" min="0" step="0.1" class="p-price" oninput="calcProof()" placeholder="0"></td>
+<td><input type="text" class="p-freq" oninput="calcProof()" placeholder="${lang==='ar'?'أسبوعياً':'weekly'}"></td>
+<td><input type="text" class="p-concern" oninput="calcProof()" placeholder="-"></td>
+<td><select onchange="calcProof()" class="p-pre"><option value="">-</option><option value="interest">${lang==="ar"?"اهتمام فقط":"Sounds interesting"}</option><option value="intent">${lang==="ar"?"نية شراء معلنة":"Stated intent to buy"}</option><option value="reservation">${lang==="ar"?"حجز بلا دفع":"No-payment reservation"}</option><option value="payment">${lang==="ar"?"دفع فعلي":"Actual payment"}</option><option value="repeat">${lang==="ar"?"عميل متكرر":"Repeat customer"}</option></select></td>
+</tr>`;}
+tbl.innerHTML=head+rows;calcProof();}
+
+function calcProof(){const t=T[lang];
+const ints=[...document.querySelectorAll(".p-int")].map(s=>s.value);
+const priceInputs=[...document.querySelectorAll(".p-price")],validPrices=priceInputs.map(s=>s.value.trim()!==""&&Number.isFinite(Number(s.value))&&Number(s.value)>=0);
+const prices=priceInputs.filter((s,i)=>validPrices[i]).map(s=>Number(s.value));
+const pres=[...document.querySelectorAll(".p-pre")].map(s=>s.value);
+const concerns=[...document.querySelectorAll(".p-concern")].map(s=>(s.value||"").trim()).filter(Boolean);
+const nYes=ints.filter((v,i)=>v==="yes"||(!v&&pres[i]==="interest")).length;const nMaybe=ints.filter(v=>v==="maybe").length;
+const nNo=ints.filter(v=>v==="no").length;
+const nPre=pres.filter(v=>v==="reservation").length,nIntent=pres.filter(v=>v==="intent").length,nPaid=pres.filter(v=>v==="payment").length,nRepeat=pres.filter(v=>v==="repeat").length;
+const total=ints.map((v,i)=>v||pres[i]||validPrices[i]||document.querySelectorAll(".p-concern")[i].value.trim()||document.querySelectorAll(".p-freq")[i].value.trim()).filter(Boolean).length;
+const avg=prices.length?Math.round(prices.reduce((a,b)=>a+b,0)/prices.length*10)/10:0;
+// top concern = most frequent
+let topConcern="-";if(concerns.length){const freq={};concerns.forEach(c=>{const k=c.toLowerCase();freq[k]=(freq[k]||0)+1;});topConcern=Object.keys(freq).sort((a,b)=>freq[b]-freq[a])[0];}
+const stats=document.getElementById("proof-stats");
+stats.innerHTML=`<div class="stat-card"><div class="v" data-target="${nYes}">${nYes}</div><div class="l">${t.stInterested} /10</div></div>
+<div class="stat-card"><div class="v" data-target="${nMaybe}">${nMaybe}</div><div class="l">${t.stMaybe} /10</div></div>
+<div class="stat-card"><div class="v" data-target="${avg}">${avg}</div><div class="l">${t.stAvg}</div></div>
+<div class="stat-card"><div class="v" data-target="${nPre}">${nPre}</div><div class="l">${lang==="ar"?"حجوزات بلا دفع":"No-payment reservations"} /10</div></div>`;
+animateCounters();
+const verdict=document.getElementById("proof-verdict");let vtext;
+const strength=document.getElementById("evidence-strength");strength.textContent=total===0?(lang==="ar"?"لم تُجمع أدلة من العملاء بعد. الفكرة غير مُتحقق منها.":"No customer evidence collected yet. Not validated yet."):(lang==="ar"?`إجابات ${total} · اهتمام ${nYes} · نية شراء ${nIntent} · حجوزات بلا دفع ${nPre} · دفع فعلي ${nPaid} · عميل متكرر ${nRepeat}`:`${total} entries · ${nYes} interested · ${nIntent} stated intent · ${nPre} no-payment reservations · ${nPaid} actual payments · ${nRepeat} repeat customers`);
+const evidenceNode=document.querySelectorAll("#opp-map .opp-node")[4];if(evidenceNode)evidenceNode.textContent=total?(lang==="ar"?"أدلة أدخلها المستخدم":"User-entered customer evidence"):(lang==="ar"?"الأدلة قيد الانتظار":"Evidence pending");
+if(total===0){verdict.className="proof-verdict pv-test";vtext=lang==="ar"?"غير مُتحقق منها بعد — اختبر الفرضية مع عملاء حقيقيين.":"Not validated yet — test this hypothesis with real customers.";}
+else if(nPaid+nRepeat>0){verdict.className="proof-verdict pv-go";vtext=lang==="ar"?"سُجل سلوك شراء فعلي. راجع حجمه واستمر في الاختبار.":"Actual purchase behavior recorded. Review its scale and keep testing.";}
+else if(nPre>0){verdict.className="proof-verdict pv-test";vtext=lang==="ar"?"توجد حجوزات بلا دفع. هذا أقوى من المجاملات لكنه ليس عملية بيع.":"No-payment reservations recorded. Stronger than compliments, but not sales.";}
+else{verdict.className="proof-verdict pv-test";vtext=lang==="ar"?"هذه آراء ونوايا معلنة فقط، وليست إثباتاً للطلب.":"Opinions and stated intent only; demand is not validated.";}
+verdict.textContent=vtext;
+// store summary onto currentPlan for the PDF
+if(currentPlan){currentPlan.proof_summary={total_responses:total,interested:nYes,maybe:nMaybe,no:nNo,avg_price:avg,no_payment_reservations:nPre,stated_intent:nIntent,actual_payments:nPaid,repeat_customers:nRepeat,top_concern:topConcern,verdict:vtext};currentPlan.state.evidence={status:total?"customer_evidence":"not_validated",responses:total,strength:nRepeat?"repeat":nPaid?"payment":nPre?"reservation":nIntent?"intent":"interest",average_stated_price_aed:avg};if(total>=5&&currentPlan.opportunity_score&&currentPlan.opportunity_score.clear_customer){const sc=currentPlan.opportunity_score;if(sc._preproof_customer_score==null){sc._preproof_customer_score=Number(sc.clear_customer.score)||3;sc._preproof_customer_reason=sc.clear_customer.reason||"";}sc.clear_customer.score=nRepeat||nPaid?5:nPre?4:nIntent?3:nYes?2:1;sc.clear_customer.reason=lang==="ar"?"استناداً إلى الإدخالات الفعلية في وضع الإثبات.":"Based on actual Proof Mode entries.";sc.total=["local_fit","clear_customer","low_starting_cost","easy_first_step","growth_potential"].reduce((n,k)=>n+(Number((sc[k]||{}).score)||0),0);setTxt("score-note",lang==="ar"?"تحدّث بند حاجة العملاء بناءً على بياناتك؛ بقية البنود افتراضات.":"Customer Need updated from your entries; other components remain assumptions.");}else if(scRestoreNeeded()){const sc=currentPlan.opportunity_score;sc.clear_customer.score=sc._preproof_customer_score;sc.clear_customer.reason=sc._preproof_customer_reason||"";setTxt("score-note",lang==="ar"?"مبنية على افتراضات — حدّثها بأدلة حقيقية من العملاء.":"Based on assumptions — update with real customer evidence.");sc.total=["local_fit","clear_customer","low_starting_cost","easy_first_step","growth_potential"].reduce((n,k)=>n+(Number((sc[k]||{}).score)||0),0);}refreshScoreDisplay();syncEvidencePresentation(total,nPaid+nRepeat,vtext);}
+renderProofPolish();
+}
+function syncEvidencePresentation(total,purchases,verdict){
+  if(!currentPlan)return;const ar=lang==='ar',p=currentPlan;
+  const evidence=total?(ar?'أدلة أدخلها المستخدم: '+total+' إجابات. '+verdict:'User-entered customer evidence: '+total+' responses. '+verdict):(ar?'لم تُجمع أدلة من العملاء بعد.':'No customer evidence collected yet.');
+  if(p.idea_overview)p.idea_overview.evidence=evidence;
+  setTxt('overview-evidence',evidence);setTxt('readiness-evidence-text',evidence);
+  if(p.risk_radar&&p.risk_radar[0])p.risk_radar[0].reason=evidence;
+  const riskReason=document.querySelector('#risk-list .risk-detail b');if(riskReason)riskReason.textContent=evidence;
+  const de=p.decision_engine||{};de.decision=purchases?(ar?'راجع أدلة التجربة':'Review pilot evidence'):(ar?'تحقق أكثر':'Validate more');
+  de.reason=total?evidence:(ar?'قرار قبل جمع الأدلة: تحقق من الطلب والمتطلبات الرسمية.':'Pre-evidence decision: customer demand and official requirements need verification.');
+  de.next_test_action=total?(ar?'راجع الأدلة وتحقق من المتطلبات الرسمية قبل أي تجربة تشغيلية.':'Review the evidence and verify official requirements before any operational test.'):(ar?'قابل خمسة عملاء محتملين واجمع نوايا بلا دفع.':'Interview five potential customers and collect no-payment intent.');
+  p.decision_engine=de;p.state.decision=de.decision;
+  setTxt('decision-main',de.decision);setTxt('decision-reason',de.reason);setTxt('decision-next',T[lang].nexttest+': '+de.next_test_action);
+  const passportDecision=document.querySelectorAll('#passport-table .pv2')[4];if(passportDecision)passportDecision.textContent=de.decision;
+  window._passportText=[...document.querySelectorAll('#passport-table tr')].map(tr=>tr.cells[0].textContent+': '+tr.cells[1].textContent).join('\n');
+  const last=document.querySelectorAll('#opp-map .opp-node')[5];if(last)last.textContent=(ar?'القرار: ':'Decision: ')+de.decision;
+}
+function scRestoreNeeded(){return currentPlan&&currentPlan.opportunity_score&&currentPlan.opportunity_score._preproof_customer_score!=null;}
+function refreshScoreDisplay(){if(!currentPlan)return;const sc=currentPlan.opportunity_score||{},total=Number(sc.total)||0;cancelAnimationFrame(scoreAnimations.get(document.getElementById("gauge-num")));setTxt("gauge-num",total);const circle=document.querySelector(".gauge circle.prog");if(circle)circle.style.strokeDashoffset=(2*Math.PI*52)*(1-Math.max(0,Math.min(25,total))/25);const row=document.querySelectorAll("#score-bars .score-row")[1];if(row){const val=row.querySelector(".val"),fill=row.querySelector(".score-fill"),reason=row.querySelector(".score-reason");const v=Number((sc.clear_customer||{}).score)||0;if(val)val.textContent=v+"/5";if(fill)fill.style.width=(v*20)+"%";if(reason)reason.textContent=(sc.clear_customer||{}).reason||"";}const t=T[lang],interp=document.getElementById("score-interp");if(interp)interp.textContent=t.medium;if(sc.source&&sc.source!=="ai_assumption")interp.textContent+=" "+(lang==="ar"?"تتضمن الدرجة تقديرات احتياطية لعدم كفاية المعلومات.":"Includes fallback estimates where information is insufficient.");const scoreCell=document.querySelectorAll("#passport-table .pv2")[3];if(scoreCell)scoreCell.textContent=(lang==="ar"?"الدرجة المبدئية: ":"Preliminary score: ")+total+"/25";window._passportText=[...document.querySelectorAll("#passport-table tr")].map(tr=>tr.cells[0].textContent+": "+tr.cells[1].textContent).join("\n");const idea=(currentPlan.state||{}).idea||"";setTxt("share-text",t.shareTpl.replace("{idea}",idea).replace("{step}",(currentPlan.state||{}).first_action||"").replace("{score}",total).replace("{verdict}",t.medium));}
+
+function clearProof(){buildProof();if(currentPlan)delete currentPlan.proof_summary;}
+
+function exportCSV(){
+  const ints=[...document.querySelectorAll(".p-int")].map(s=>s.value);
+  const prices=[...document.querySelectorAll(".p-price")].map(s=>s.value);
+  const freqs=[...document.querySelectorAll(".p-freq")].map(s=>s.value);
+  const concs=[...document.querySelectorAll(".p-concern")].map(s=>s.value);
+  const pres=[...document.querySelectorAll(".p-pre")].map(s=>s.value);
+  let csv="row,interested,price_aed,frequency,concern,evidence_strength\n";
+  for(let i=0;i<10;i++){
+    const cells=[i+1,ints[i]||"",prices[i]||"",freqs[i]||"",(concs[i]||"").replace(/,/g," "),pres[i]||""];
+    csv+=cells.join(",")+"\n";
+  }
+  const blob=new Blob([csv],{type:"text/csv"});const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");a.href=url;a.download="startsmart_validation_data.csv";document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+}
+
+function copyShare(){const txt=document.getElementById("share-text").textContent||"";
+function done(){document.getElementById("shareBtn").textContent="✓ "+T[lang].copied;setTimeout(()=>{document.getElementById("shareBtn").textContent=T[lang].copy;},1500);}
+if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(txt).then(done).catch(()=>fallbackCopy(txt));}else{fallbackCopy(txt);}}
+
+function waText(){return document.getElementById("wa-text").textContent||"";}
+function copyDone(){document.getElementById("waBtn").textContent="✓ "+T[lang].copied;setTimeout(()=>{document.getElementById("waBtn").textContent=T[lang].copy;},1500);}
+function copyWA(){const txt=waText();
+if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(txt).then(copyDone).catch(()=>fallbackCopy(txt));}
+else{fallbackCopy(txt);}}
+function fallbackCopy(txt){const ta=document.createElement("textarea");ta.value=txt;ta.style.position="fixed";ta.style.top="-9999px";document.body.appendChild(ta);ta.focus();ta.select();try{document.execCommand("copy");copyDone();}catch(e){alert(txt);}document.body.removeChild(ta);}
+function openWA(){const url="https://wa.me/?text="+encodeURIComponent(waText());window.open(url,"_blank");}
+
+function currentIdea(){var el=document.getElementById("idea");var v=el?(el.value||"").trim():"";if(!v&&currentPlan&&currentPlan.readiness_report)v=currentPlan.readiness_report.idea||"";return v;}
+
+var _chatBusy=false;
+function advisorFallback(){return lang==="ar"?{title:"الخطوة التالية",summary:"المستشار غير متاح الآن.",points:[],next_action:"اسأل خمسة عملاء محتملين كيف يحلون المشكلة حالياً وسجل إجاباتهم.",caution:"تحقق من المتطلبات الرسمية قبل الدفع أو التشغيل التجاري."}:{title:"Next validation step",summary:"The Advisor is unavailable right now.",points:[],next_action:"Ask five potential customers how they solve this today and record their answers.",caution:"Verify official requirements before payment or commercial operation."};}
+function renderAdvisorCard(node,answer){node.replaceChildren();node.className="advisor-card";const h=document.createElement("h3"),summary=document.createElement("p");h.textContent=answer.title||(lang==="ar"?"مستشار ستارت سمارت":"StartSmart Advisor");summary.textContent=answer.summary||"";node.append(h,summary);(Array.isArray(answer.points)?answer.points:[]).slice(0,5).forEach(point=>{const p=document.createElement("div"),b=document.createElement("b"),body=document.createElement("span");p.className="advisor-point";b.textContent=(point.title||"").replace(/[:：]\s*$/,"")+": ";body.textContent=point.text||"";p.append(b,body);node.appendChild(p)});if(answer.next_action){const next=document.createElement("div"),b=document.createElement("b");next.className="advisor-action";b.textContent=lang==="ar"?"الخطوة التالية: ":"Next action: ";const text=document.createElement("span");text.textContent=answer.next_action;next.append(b,text);node.appendChild(next)}if(answer.caution){const c=document.createElement("div"),b=document.createElement("b");c.className="advisor-caution";b.textContent=lang==="ar"?"تنبيه: ":"Caution: ";const text=document.createElement("span");text.textContent=answer.caution;c.append(b,text);node.appendChild(c)}}
+async function askQuestion(){
+  if(_chatBusy)return;
+  var input=document.getElementById("chat-input");if(!input)return;
+  var q=(input.value||"").trim();if(!q)return;
+  var box=document.getElementById("chat-messages");if(!box)return;
+  input.value="";_chatBusy=true;
+  var sendBtn=document.getElementById("sendBtn");if(sendBtn)sendBtn.disabled=true;
+  var u=document.createElement("div");u.className="msg-b msg-user";u.textContent=q;box.appendChild(u);
+  var ai=document.createElement("div");ai.className="msg-b msg-ai";ai.textContent=T[lang].thinking||"…";box.appendChild(ai);
+  box.scrollTop=box.scrollHeight;
+  var answered=false;
+  function finish(answer){if(answered)return;answered=true;renderAdvisorCard(ai,answer);chatHistory.push({role:"user",content:q},{role:"assistant",content:JSON.stringify(answer)});chatHistory=chatHistory.slice(-8);box.scrollTop=box.scrollHeight;_chatBusy=false;if(sendBtn)sendBtn.disabled=false;}
+  try{
+    var ctx=currentPlan?JSON.stringify(currentPlan):JSON.stringify({idea:currentIdea(),category:(document.getElementById("category")||{}).value,user_type:(document.getElementById("user_type")||{}).value,budget:(document.getElementById("budget")||{}).value,_region:(document.getElementById("region")||{}).value,_context:(document.getElementById("context")||{}).value});
+    var ctrl=new AbortController();
+    var to=setTimeout(function(){ctrl.abort();},45000);
+    var resp=await fetch("/ask",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question:q,lang,plan_context:ctx,history:chatHistory}),signal:ctrl.signal});
+    clearTimeout(to);
+    var data=null;try{data=await resp.json();}catch(parseErr){data=null;}
+    var ans=(resp.ok&&data&&data.answer&&typeof data.answer==="object")?data.answer:null;
+    finish(ans||advisorFallback());
+  }catch(e){
+    console.error("ask error (using local advisor):",e&&e.name);
+    finish(advisorFallback());
+  }
+}
+
+async function exportPDF(){if(!currentPlan)return;
+const btn=document.getElementById("pdfBtn");const orig=btn.textContent;btn.textContent="...";btn.disabled=true;
+const ctrl=new AbortController();const timer=setTimeout(()=>ctrl.abort(),65000);try{const resp=await fetch("/pdf",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(Object.assign({},currentPlan,{_lang:lang})),signal:ctrl.signal});
+if(!resp.ok)throw new Error("pdf failed");
+const blob=await resp.blob();const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="StartSmart_UAE_Founder_Report.pdf";document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);}
+catch(e){console.error("PDF error",e);alert(T[lang].error);}
+finally{clearTimeout(timer);btn.textContent=orig;btn.disabled=false;}}
+
+function resetApp(){currentPlan=null;document.getElementById("journey-home").appendChild(document.getElementById("journey-block"));renderJourney();renderDashboardSummary();chatHistory=[];document.getElementById("error").textContent="";document.getElementById("chat-messages").replaceChildren();document.getElementById("results").style.display="none";document.getElementById("idea").value="";window.scrollTo({top:0,behavior:motionBehavior()});}
+
+function toggleTheme(){var r=document.documentElement;var dark=r.getAttribute("data-theme")==="dark";if(dark){r.removeAttribute("data-theme");document.getElementById("themeBtn").textContent="\u263e";}else{r.setAttribute("data-theme","dark");document.getElementById("themeBtn").textContent="\u2600";}styleCharts();}
+var _loaderTimer;
+function stopLoader(){clearInterval(_loaderTimer);var w=document.getElementById("loader");if(w)w.classList.remove("show");}
+
+// ---- animate proof counters ----
+function animateCounters(){
+  document.querySelectorAll('#proof-stats .v').forEach(el=>{el.textContent=el.dataset.target;});
+}
+
+// ---- floating chat ----
+function heroStart(){setEntry("existing");document.querySelector(".input-card").scrollIntoView({behavior:motionBehavior()});setTimeout(function(){document.getElementById("idea").focus();},400);}
+function runDemoStory(){
+  setEntry("existing");
+  document.getElementById("idea").value=DEMOS[lang][0];
+  var ut=document.getElementById("user_type");if(ut)ut.value="residents";
+  var rg=document.getElementById("region");if(rg)rg.value="Dubai";
+  var cx=document.getElementById("context");if(cx)cx.value="Local service";
+  document.getElementById("category").dataset.touched="";suggestCategory();
+  document.getElementById("budget").value=10000;updateBudget(10000);
+  document.querySelector(".input-card").scrollIntoView({behavior:motionBehavior()});
+  generate();
+}
+</script>
+<script src="{{ url_for('static', filename='startsmart.js') }}"></script>
+<script>
+applyLang();updateBudget(10000);
+</script>
+</body>
+</html>
