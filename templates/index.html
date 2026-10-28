@@ -705,6 +705,57 @@ header h1:after{content:"";position:absolute;left:50%;top:50%;transform:translat
 <script>
 let lang="en", currentPlan=null, timelineChart, costChart;
 let chatHistory=[];
+const SESSION_KEY="khotwa-business-session-v1";
+let restoringSession=false;
+function saveSession(){
+  if(restoringSession)return;
+  try{
+    const form={idea:document.getElementById("idea").value,categoryIndex:document.getElementById("category").selectedIndex,user_type:document.getElementById("user_type").value,budget:document.getElementById("budget").value,region:document.getElementById("region").value,context:document.getElementById("context").value};
+    const plan=currentPlan?JSON.parse(JSON.stringify(currentPlan)):null;
+    if(plan){delete plan.proof_summary;if(plan.state)delete plan.state.evidence;}
+    const proof=currentPlan?[...document.querySelectorAll("#proof-table tr")].slice(1).map(row=>{
+      const interest=row.querySelector(".p-int")?.value||"",precommitment=row.querySelector(".p-pre")?.value||"",raw=row.querySelector(".p-price")?.value||"";
+      return {interest,precommitment,price:raw!==""&&Number.isFinite(Number(raw))&&Number(raw)>=0?raw:""};
+    }):[];
+    const selected=document.querySelector('#result-nav [aria-selected="true"]');
+    const activePanel=selected?Number(selected.id.replace("result-tab-","")):0;
+    const snapshot=JSON.stringify({version:1,lang,theme:document.documentElement.getAttribute("data-theme")==="dark"?"dark":"light",form,plan,activePanel,proof});
+    // If an idea or generated plan contains contact details or a credential, keep it in memory only.
+    if(/(?:gsk_|sk-)[A-Za-z0-9_-]{16,}|[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}|(?:\+?971|0)5[0-9\s().-]{8,}/i.test(snapshot)){sessionStorage.removeItem(SESSION_KEY);return;}
+    sessionStorage.setItem(SESSION_KEY,snapshot);
+  }catch(e){console.warn("Session recovery unavailable",e&&e.name);}
+}
+function restoreSession(){
+  let saved;try{saved=JSON.parse(sessionStorage.getItem(SESSION_KEY)||"null");}catch(e){try{sessionStorage.removeItem(SESSION_KEY);}catch(_){}return;}
+  if(!saved||saved.version!==1||!saved.form||typeof saved.form!=="object")return;
+  restoringSession=true;
+  try{
+    lang=saved.lang==="ar"?"ar":"en";
+    if(saved.theme==="dark")document.documentElement.setAttribute("data-theme","dark");
+    else document.documentElement.removeAttribute("data-theme");
+    document.getElementById("themeBtn").textContent=saved.theme==="dark"?"\u2600":"\u263e";
+    applyLang();
+    const form=saved.form;
+    document.getElementById("idea").value=typeof form.idea==="string"?form.idea:"";
+    const category=document.getElementById("category");
+    if(Number.isInteger(form.categoryIndex)&&form.categoryIndex>=0&&form.categoryIndex<category.options.length){category.selectedIndex=form.categoryIndex;category.dataset.touched=form.categoryIndex?"true":"";}
+    for(const id of ["user_type","region","context"]){const field=document.getElementById(id);if(typeof form[id]==="string"&&[...field.options].some(o=>o.value===form[id]))field.value=form[id];}
+    const budget=document.getElementById("budget");if(Number.isFinite(Number(form.budget)))budget.value=form.budget;
+    updateBudget(budget.value);
+    if(saved.plan&&typeof saved.plan==="object"&&!Array.isArray(saved.plan)&&saved.plan.opportunity_score){
+      currentPlan=saved.plan;showPlan(currentPlan);buildProof();
+      if(Array.isArray(saved.proof))saved.proof.slice(0,10).forEach((entry,i)=>{
+        const row=document.querySelectorAll("#proof-table tr")[i+1];if(!row||!entry||typeof entry!=="object")return;
+        if(["yes","maybe","no"].includes(entry.interest))row.querySelector(".p-int").value=entry.interest;
+        if(["interest","intent","reservation","payment","repeat"].includes(entry.precommitment))row.querySelector(".p-pre").value=entry.precommitment;
+        if(entry.price!==""&&Number.isFinite(Number(entry.price))&&Number(entry.price)>=0)row.querySelector(".p-price").value=entry.price;
+      });
+      calcProof();selectPanel(Number.isInteger(saved.activePanel)&&saved.activePanel>=0&&saved.activePanel<PANEL_ORDER.length?saved.activePanel:0);
+    }
+    styleCharts();
+  }catch(e){console.warn("Session recovery failed",e&&e.name);currentPlan=null;document.getElementById("results").style.display="none";}
+  finally{restoringSession=false;}
+}
 function escapeHtml(value){return String(value==null?"":value).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));}
 function escapePlan(value){if(Array.isArray(value))return value.map(escapePlan);if(value&&typeof value==="object"){const out=Object.create(null);Object.keys(value).forEach(k=>out[k]=escapePlan(value[k]));return out;}return typeof value==="string"?escapeHtml(value):value;}
 const DEMOS={en:["Mobile car-wash service","Healthy meal-prep for busy professionals","Social media content service for small businesses"],ar:["خدمة غسيل سيارات متنقلة","وجبات صحية جاهزة للموظفين المشغولين","خدمة محتوى وسائل التواصل للمشاريع الصغيرة"]};
@@ -1214,7 +1265,7 @@ const PANEL_ORDER=["Overview","Validate","Customers","7-Day Plan","Risks","Pitch
 const PANEL_IDS={Overview:["lbl-overview","lbl-firststep","lbl-score","lbl-decision"],Validate:["lbl-bys","lbl-test","lbl-proof","lbl-validate","lbl-questions","lbl-wa","lbl-qr"],Customers:["lbl-personas","lbl-map","lbl-why"],"7-Day Plan":["lbl-7day","lbl-fuller"],Risks:["lbl-risks","lbl-donot"],Pitch:["lbl-passport","lbl-share","lbl-pitches"],Resources:["lbl-report","lbl-resources","lbl-chat"]};
 function setupDashboard(){const root=document.getElementById("results"),nav=document.getElementById("result-nav");if(root.dataset.dashboard)return;root.dataset.dashboard="1";PANEL_ORDER.forEach((name,index)=>{const panel=document.createElement("section");panel.className="dashboard-panel";panel.id="panel-"+index;panel.hidden=index!==0;panel.setAttribute("role","tabpanel");panel.setAttribute("aria-labelledby","result-tab-"+index);PANEL_IDS[name].forEach(id=>{const node=document.getElementById(id);if(node){let parent=node;while(parent.parentElement!==root&&parent.parentElement)parent=parent.parentElement;if(parent.parentElement===root)panel.appendChild(parent);}});root.appendChild(panel);const btn=document.createElement("button");btn.type="button";btn.id="result-tab-"+index;btn.setAttribute("role","tab");btn.setAttribute("aria-controls",panel.id);btn.setAttribute("aria-selected",index===0?"true":"false");btn.tabIndex=index===0?0:-1;btn.textContent=name;btn.onclick=()=>selectPanel(index);btn.onkeydown=e=>{if(["ArrowRight","ArrowLeft","Home","End"].includes(e.key)){e.preventDefault();const dir=lang==="ar"?-1:1;const next=e.key==="Home"?0:e.key==="End"?PANEL_ORDER.length-1:(index+(e.key==="ArrowRight"?dir:-dir)+PANEL_ORDER.length)%PANEL_ORDER.length;selectPanel(next);nav.children[next].focus()}};nav.appendChild(btn)});}
 function updateDashboardLabels(){const names=lang==="ar"?["نظرة عامة","التحقق","العملاء","خطة ٧ أيام","المخاطر","العرض","المصادر"]:PANEL_ORDER;document.querySelectorAll("#result-nav button").forEach((b,i)=>b.textContent=names[i]);document.querySelectorAll(".dashboard-panel").forEach((p,i)=>p.setAttribute("aria-label",names[i]));}
-function selectPanel(index){document.querySelectorAll(".dashboard-panel").forEach((p,i)=>p.hidden=i!==index);document.querySelectorAll("#result-nav button").forEach((b,i)=>{b.setAttribute("aria-selected",i===index?"true":"false");b.tabIndex=i===index?0:-1});document.getElementById("result-tab-"+index).scrollIntoView({block:"nearest",inline:"nearest",behavior:motionBehavior()});renderJourney();}
+function selectPanel(index){document.querySelectorAll(".dashboard-panel").forEach((p,i)=>p.hidden=i!==index);document.querySelectorAll("#result-nav button").forEach((b,i)=>{b.setAttribute("aria-selected",i===index?"true":"false");b.tabIndex=i===index?0:-1});document.getElementById("result-tab-"+index).scrollIntoView({block:"nearest",inline:"nearest",behavior:motionBehavior()});renderJourney();saveSession();}
 function ensurePlanState(plan,inputs){const r=plan.readiness_report||{},s=plan.state||{};plan.state={idea:inputs.idea,category:inputs.category,target_customer:(inputs.user_type&&T[lang].userTypes[inputs.user_type])||r.target_customer||s.target_customer||"",target_customer_source:inputs.user_type?"user_input":"ai_assumption",region:inputs.region,context:inputs.context,customer_type:inputs.user_type,user_budget_aed:Number(inputs.budget)||0,suggested_test_price_aed:Number(s.suggested_test_price_aed)||0,estimated_test_cost_aed:Number(s.estimated_test_cost_aed||r.estimated_first_test_cost_aed)||0,opportunity_score:plan.opportunity_score||{},decision:(plan.decision_engine||{}).decision||"",first_action:plan.first_step_today||"",evidence:s.evidence||{status:"not_validated",responses:0}};plan._category=inputs.category;plan._region=inputs.region;plan._context=inputs.context;plan._budget=inputs.budget;plan._user_type=inputs.user_type;if(r){r.idea=inputs.idea;r.target_customer=plan.state.target_customer;r.best_first_action=plan.state.first_action}if(plan.founder_passport)plan.founder_passport.first_action=plan.state.first_action;return plan;}
 
 function fillSelects(){const t=T[lang];const selected={categoryIndex:document.getElementById("category").selectedIndex,category:document.getElementById("category").value,user_type:document.getElementById("user_type").value,region:document.getElementById("region").value,context:document.getElementById("context").value};const c=document.getElementById("category");c.innerHTML="";const blank=document.createElement("option");blank.value="";blank.textContent=lang==="ar"?"اختر الفئة":"Choose a category";c.appendChild(blank);t.categories.forEach(x=>{const o=document.createElement("option");o.textContent=x;c.appendChild(o)});
@@ -1244,7 +1295,7 @@ setIf("pitch",t.pitch);setIf("lbl-decision",t.lblDecision);setIf("lbl-donot",t.l
 setIf("hchip1",t.hchip1);setIf("hchip2",t.hchip2);setIf("hchip3",t.hchip3);setIf("hero-badge",t.heroBadge);setIf("fsb1",t.fsb1);setIf("fsb2",t.fsb2);setIf("fsb3",t.fsb3);setIf("tb1",t.tb1);setIf("tb2",t.tb2);setIf("tb3",t.tb3);setIf("tb4",t.tb4);setIf("lbl-why",t.lblWhy);setIf("why-intro",t.whyIntro);setIf("foot-collab",t.footCollab);setIf("hero-start",t.heroStart);setIf("hero-demo",t.heroDemo);setIf("cl-text",t.clText);setIf("chat-title",t.chatTitle);setIf("chat-sub",t.chatSub);setIf("chat-note",t.chatNote);setIf("chat-foot",t.chatFoot);document.getElementById("chat-input").placeholder=t.chatPlaceholder;setIf("lbl-bys",t.lblBys);setIf("bys-l1",t.bysL1);setIf("bys-l2",t.bysL2);setIf("bys-l3",t.bysL3);setIf("lbl-passport",t.lblPassport);setIf("lbl-personas",t.lblPersonas);setIf("lbl-risks",t.lblRisks);setIf("lbl-pitches",t.lblPitches);setIf("lbl-map",t.lblMap);setIf("lbl-qr",t.lblQr);setIf("qr-help",t.qrHelp);setIf("qr-cap",t.qrCap);
 fillSelects();fillDemos();fillSuggested();renderJourney();updateBudget(document.getElementById("budget").value);setIf("waOpenBtn",lang==="ar"?"افتح واتساب":"Open WhatsApp");setIf("passportCopyBtn",t.copy);setIf("score-note",lang==="ar"?"مبنية على افتراضات — حدّثها بأدلة حقيقية من العملاء.":"Based on assumptions — update with real customer evidence.");setIf("segments-note",lang==="ar"?"أمثلة لشرائح تحتاج إلى اختبار — فرضية ذكاء اصطناعي":"Assumed segments to test — AI assumption");setIf("need-idea",lang==="ar"?"أحتاج فكرة مشروع":"I need a business idea");setIf("have-idea",lang==="ar"?"لدي فكرة بالفعل":"I already have an idea");setIf("discovery-title",lang==="ar"?"ثلاث أفكار للاختبار":"Find three ideas to test");setIf("discovery-caveat",lang==="ar"?"هذه اقتراحات غير مثبتة. اختبر الطلب قبل الإنفاق.":"These are unvalidated suggestions. Test customer demand before spending.");setIf("discover-btn",lang==="ar"?"اقترح ثلاث أفكار":"Suggest three ideas");[["d-skills-label","Skills","المهارات"],["d-interests-label","Interests","الاهتمامات"],["d-experience-label","Experience","الخبرة"],["d-budget-label","Approximate budget (AED)","الميزانية التقريبية (درهم)"],["d-region-label","UAE market","سوق الإمارات"],["d-context-label","Preferred business type","نوع المشروع المفضل"],["d-time-label","Time available each week","الوقت المتاح أسبوعياً"]].forEach(([id,en,ar])=>setIf(id,lang==="ar"?ar:en));const proof=document.getElementById("proof-table");if(proof&&proof.rows.length){proof.querySelectorAll("th").forEach((el,i)=>el.textContent=i===5?(lang==="ar"?"قوة الدليل":"Evidence strength"):(t.proofCols[i]||""));proof.querySelectorAll(".p-int").forEach(el=>{el.querySelector("[value=yes]").textContent=t.interested;el.querySelector("[value=maybe]").textContent=t.maybe;el.querySelector("[value=no]").textContent=t.no;});proof.querySelectorAll(".p-pre").forEach(el=>{[["interest","اهتمام فقط","Sounds interesting"],["intent","نية شراء معلنة","Stated intent to buy"],["reservation","حجز بلا دفع","No-payment reservation"],["payment","دفع فعلي","Actual payment"],["repeat","عميل متكرر","Repeat customer"]].forEach(([value,ar,en])=>el.querySelector('[value="'+value+'"').textContent=lang==="ar"?ar:en)});calcProof();}if(currentPlan){showPlan(currentPlan);if(currentPlan._local)document.getElementById("error").textContent=t.chatFail;}else renderResources(document.getElementById("region").value);polishLanguage();}
 
-function toggleLang(){lang=lang==="en"?"ar":"en";applyLang()}
+function toggleLang(){lang=lang==="en"?"ar":"en";applyLang();saveSession()}
 function updateBudget(v){const l=lang==="ar"?"الميزانية — ":"Budget — ";const u=lang==="ar"?" درهم":" AED";document.getElementById("budget-label").textContent=l+Number(v).toLocaleString()+u}
 
 async function generate(){const idea=document.getElementById("idea").value.trim();if(!idea){document.getElementById("error").textContent=T[lang].emptyIdea||"";return;}
@@ -1515,6 +1566,7 @@ verdict.textContent=vtext;
 // store summary onto currentPlan for the PDF
 if(currentPlan){currentPlan.proof_summary={total_responses:total,interested:nYes,maybe:nMaybe,no:nNo,avg_price:avg,no_payment_reservations:nPre,stated_intent:nIntent,actual_payments:nPaid,repeat_customers:nRepeat,top_concern:topConcern,verdict:vtext};currentPlan.state.evidence={status:total?"customer_evidence":"not_validated",responses:total,strength:nRepeat?"repeat":nPaid?"payment":nPre?"reservation":nIntent?"intent":"interest",average_stated_price_aed:avg};if(total>=5&&currentPlan.opportunity_score&&currentPlan.opportunity_score.clear_customer){const sc=currentPlan.opportunity_score;if(sc._preproof_customer_score==null){sc._preproof_customer_score=Number(sc.clear_customer.score)||3;sc._preproof_customer_reason=sc.clear_customer.reason||"";}sc.clear_customer.score=nRepeat||nPaid?5:nPre?4:nIntent?3:nYes?2:1;sc.clear_customer.reason=lang==="ar"?"استناداً إلى الإدخالات الفعلية في وضع الإثبات.":"Based on actual Proof Mode entries.";sc.total=["local_fit","clear_customer","low_starting_cost","easy_first_step","growth_potential"].reduce((n,k)=>n+(Number((sc[k]||{}).score)||0),0);setTxt("score-note",lang==="ar"?"تحدّث بند حاجة العملاء بناءً على بياناتك؛ بقية البنود افتراضات.":"Customer Need updated from your entries; other components remain assumptions.");}else if(scRestoreNeeded()){const sc=currentPlan.opportunity_score;sc.clear_customer.score=sc._preproof_customer_score;sc.clear_customer.reason=sc._preproof_customer_reason||"";setTxt("score-note",lang==="ar"?"مبنية على افتراضات — حدّثها بأدلة حقيقية من العملاء.":"Based on assumptions — update with real customer evidence.");sc.total=["local_fit","clear_customer","low_starting_cost","easy_first_step","growth_potential"].reduce((n,k)=>n+(Number((sc[k]||{}).score)||0),0);}refreshScoreDisplay();syncEvidencePresentation(total,nPaid+nRepeat,vtext);}
 renderProofPolish();
+saveSession();
 }
 function syncEvidencePresentation(total,purchases,verdict){
   if(!currentPlan)return;const ar=lang==='ar',p=currentPlan;
@@ -1535,7 +1587,7 @@ function syncEvidencePresentation(total,purchases,verdict){
 function scRestoreNeeded(){return currentPlan&&currentPlan.opportunity_score&&currentPlan.opportunity_score._preproof_customer_score!=null;}
 function refreshScoreDisplay(){if(!currentPlan)return;const sc=currentPlan.opportunity_score||{},total=Number(sc.total)||0;cancelAnimationFrame(scoreAnimations.get(document.getElementById("gauge-num")));setTxt("gauge-num",total);const circle=document.querySelector(".gauge circle.prog");if(circle)circle.style.strokeDashoffset=(2*Math.PI*52)*(1-Math.max(0,Math.min(25,total))/25);const row=document.querySelectorAll("#score-bars .score-row")[1];if(row){const val=row.querySelector(".val"),fill=row.querySelector(".score-fill"),reason=row.querySelector(".score-reason");const v=Number((sc.clear_customer||{}).score)||0;if(val)val.textContent=v+"/5";if(fill)fill.style.width=(v*20)+"%";if(reason)reason.textContent=(sc.clear_customer||{}).reason||"";}const t=T[lang],interp=document.getElementById("score-interp");if(interp)interp.textContent=t.medium;if(sc.source&&sc.source!=="ai_assumption")interp.textContent+=" "+(lang==="ar"?"تتضمن الدرجة تقديرات احتياطية لعدم كفاية المعلومات.":"Includes fallback estimates where information is insufficient.");const scoreCell=document.querySelectorAll("#passport-table .pv2")[3];if(scoreCell)scoreCell.textContent=(lang==="ar"?"الدرجة المبدئية: ":"Preliminary score: ")+total+"/25";window._passportText=[...document.querySelectorAll("#passport-table tr")].map(tr=>tr.cells[0].textContent+": "+tr.cells[1].textContent).join("\n");const idea=(currentPlan.state||{}).idea||"";setTxt("share-text",t.shareTpl.replace("{idea}",idea).replace("{step}",(currentPlan.state||{}).first_action||"").replace("{score}",total).replace("{verdict}",t.medium));}
 
-function clearProof(){buildProof();if(currentPlan)delete currentPlan.proof_summary;}
+function clearProof(){buildProof();if(currentPlan)delete currentPlan.proof_summary;saveSession();}
 
 function exportCSV(){
   const ints=[...document.querySelectorAll(".p-int")].map(s=>s.value);
@@ -1604,9 +1656,9 @@ const blob=await resp.blob();const url=URL.createObjectURL(blob);const a=documen
 catch(e){console.error("PDF error",e);alert(T[lang].error);}
 finally{clearTimeout(timer);btn.textContent=orig;btn.disabled=false;}}
 
-function resetApp(){currentPlan=null;document.getElementById("journey-home").appendChild(document.getElementById("journey-block"));renderJourney();renderDashboardSummary();chatHistory=[];document.getElementById("error").textContent="";document.getElementById("chat-messages").replaceChildren();document.getElementById("results").style.display="none";document.getElementById("idea").value="";window.scrollTo({top:0,behavior:motionBehavior()});}
+function resetApp(){currentPlan=null;document.getElementById("journey-home").appendChild(document.getElementById("journey-block"));renderJourney();renderDashboardSummary();chatHistory=[];document.getElementById("error").textContent="";document.getElementById("chat-messages").replaceChildren();document.getElementById("results").style.display="none";document.getElementById("idea").value="";document.getElementById("category").selectedIndex=0;document.getElementById("category").dataset.touched="";document.getElementById("user_type").selectedIndex=0;document.getElementById("region").selectedIndex=0;document.getElementById("context").selectedIndex=0;document.getElementById("budget").value=10000;updateBudget(10000);document.getElementById("proof-table").replaceChildren();document.getElementById("discovery-results").replaceChildren();setEntry("existing");try{sessionStorage.removeItem(SESSION_KEY);}catch(e){}window.scrollTo({top:0,behavior:motionBehavior()});}
 
-function toggleTheme(){var r=document.documentElement;var dark=r.getAttribute("data-theme")==="dark";if(dark){r.removeAttribute("data-theme");document.getElementById("themeBtn").textContent="\u263e";}else{r.setAttribute("data-theme","dark");document.getElementById("themeBtn").textContent="\u2600";}styleCharts();}
+function toggleTheme(){var r=document.documentElement;var dark=r.getAttribute("data-theme")==="dark";if(dark){r.removeAttribute("data-theme");document.getElementById("themeBtn").textContent="\u263e";}else{r.setAttribute("data-theme","dark");document.getElementById("themeBtn").textContent="\u2600";}styleCharts();saveSession();}
 var _loaderTimer;
 function stopLoader(){clearInterval(_loaderTimer);var w=document.getElementById("loader");if(w)w.classList.remove("show");}
 
@@ -1631,7 +1683,8 @@ function runDemoStory(){
 </script>
 <script src="{{ url_for('static', filename='startsmart.js') }}"></script>
 <script>
-applyLang();updateBudget(10000);
+applyLang();updateBudget(10000);restoreSession();
+for(const id of ["idea","category","user_type","budget","region","context"]){const field=document.getElementById(id);field.addEventListener("input",saveSession);field.addEventListener("change",saveSession);}
 </script>
 </body>
 </html>
