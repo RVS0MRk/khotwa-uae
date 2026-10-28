@@ -15,11 +15,15 @@ DIRTY_ADVISOR = {
 
 def fake_groq(system, user, **kwargs):
     if "Suggest exactly three" in system:
+        ar = "Write all field values except category in Arabic" in system
+        names = ("خدمة غسيل سيارات متنقلة", "أداة تذكير بمواعيد السيارة", "خدمة بحث في ملحقات السيارات") if ar else ("Mobile car wash", "Vehicle reminder tool", "Car accessory research service")
         return json.dumps({"ideas": [
-            {"name": name, "fit": "Uses AutoCAD, communication and engineering skills", "customer": "Car owners",
-             "first_test": "Offer free washes", "assumption": "Strong demand", "category": "Services & Maintenance"}
-            for name in ("Mobile car wash", "Vehicle reminder tool", "Car accessory research service")
-        ]})
+            {"name": name, "fit": "توظف مهارات التصميم والتواصل" if ar else "Uses AutoCAD, communication and engineering skills",
+             "customer": "مالكو السيارات" if ar else "Car owners",
+             "first_test": "مقابلات بلا دفع" if ar else "Offer free washes",
+             "assumption": "الحاجة إلى اختبار" if ar else "Strong demand", "category": "Services & Maintenance"}
+            for name in names
+        ]}, ensure_ascii=False)
     if "Founder Advisor" in system:
         if "malformed" in user:
             return "```broken JSON {"

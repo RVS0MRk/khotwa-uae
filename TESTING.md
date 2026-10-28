@@ -1,5 +1,21 @@
 # Khotwa correctness checks
 
+## Current quality audit (28 October 2026)
+
+The current implementation requests bilingual plan fields in a single mocked `/generate` call, caches both versions in the same browser tab, preserves numeric and Proof Mode state when switching languages, distinguishes user budget from AI estimates, and labels personas as unverified hypotheses. The Advisor has regression cases for false interview activity, fictional leads, budget source, and multi-part context recall. The local failure plan now uses distinct customer hypotheses and more realistic seven-day outputs. PDF sections paginate by content instead of forced section breaks; the PDF tests cover English and Arabic, long ideas, source labels and fractional Proof Mode prices. These checks use mocked Groq output; live model fluency and deployed Render performance require a separate manual check.
+
+Run the full local suite from the repository root:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+.\.venv\Scripts\python.exe -m unittest discover -v
+node test_browser.cjs
+node test_redesign.cjs
+.\.venv\Scripts\python.exe -m pip check
+```
+
+Set `PYTHON_EXE` to `.venv\Scripts\python.exe` if your `python` command does not point to the project environment. The browser suites require Playwright and Chrome. `test_redesign.cjs` now checks 320, 375, 390, 430, 768, 1024, 1366 and 1920 px in both languages and both themes, including all seven tabs, Proof Mode, discovery, Advisor and overflow. The older test counts and screenshot matrix below describe earlier passes.
+
 ## Visual pass
 
 The redesign lives in `static/startsmart.css`, `static/startsmart.js`, and the existing Flask template. Backend routes, Groq requests/prompts, scoring, evidence calculations, PDF logic and deployment configuration were not changed in this pass.

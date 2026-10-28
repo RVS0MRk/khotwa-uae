@@ -337,7 +337,7 @@ header h1:after{content:"";position:absolute;left:50%;top:50%;transform:translat
 .risk-item:last-child{border-bottom:none}
 .risk-name{width:110px;font-size:13px;font-weight:600;color:var(--ink);flex-shrink:0}
 .risk-level{font-size:11px;font-weight:700;padding:.2rem .6rem;border-radius:20px;flex-shrink:0}
-.rl-low{background:#e7f8ee;color:#0a7a3c}.rl-medium{background:#fff6e2;color:#8a6516}.rl-high{background:#fdeaec;color:#b01024}
+.rl-low{background:#e7f8ee;color:#0a7a3c}.rl-medium{background:#fff6e2;color:#8a6516}.rl-high{background:#fdeaec;color:#b01024}.rl-unknown{background:#edf0f4;color:#4b5870}
 .risk-detail{font-size:12px;color:#5e6478;line-height:1.4}
 .risk-detail b{color:var(--ink)}
 @media(max-width:600px){.risk-item{flex-wrap:wrap}.risk-name{width:auto}}
@@ -705,21 +705,24 @@ header h1:after{content:"";position:absolute;left:50%;top:50%;transform:translat
 <script>
 let lang="en", currentPlan=null, timelineChart, costChart;
 let chatHistory=[];
+let planVariants={en:null,ar:null},selectedIdeaSource="user_input";
 const SESSION_KEY="khotwa-business-session-v1";
 let restoringSession=false;
 function saveSession(){
   if(restoringSession)return;
   try{
-    const form={idea:document.getElementById("idea").value,categoryIndex:document.getElementById("category").selectedIndex,user_type:document.getElementById("user_type").value,budget:document.getElementById("budget").value,region:document.getElementById("region").value,context:document.getElementById("context").value};
+    const form={idea:document.getElementById("idea").value,idea_source:selectedIdeaSource,categoryIndex:document.getElementById("category").selectedIndex,user_type:document.getElementById("user_type").value,budget:document.getElementById("budget").value,region:document.getElementById("region").value,context:document.getElementById("context").value};
     const plan=currentPlan?JSON.parse(JSON.stringify(currentPlan)):null;
     if(plan){delete plan.proof_summary;if(plan.state)delete plan.state.evidence;}
+    const variants=JSON.parse(JSON.stringify(planVariants));
+    for(const key of ["en","ar"]){if(variants[key]){delete variants[key].proof_summary;if(variants[key].state)delete variants[key].state.evidence;}}
     const proof=currentPlan?[...document.querySelectorAll("#proof-table tr")].slice(1).map(row=>{
       const interest=row.querySelector(".p-int")?.value||"",precommitment=row.querySelector(".p-pre")?.value||"",raw=row.querySelector(".p-price")?.value||"";
       return {interest,precommitment,price:raw!==""&&Number.isFinite(Number(raw))&&Number(raw)>=0?raw:""};
     }):[];
     const selected=document.querySelector('#result-nav [aria-selected="true"]');
     const activePanel=selected?Number(selected.id.replace("result-tab-","")):0;
-    const snapshot=JSON.stringify({version:1,lang,theme:document.documentElement.getAttribute("data-theme")==="dark"?"dark":"light",form,plan,activePanel,proof});
+    const snapshot=JSON.stringify({version:1,lang,theme:document.documentElement.getAttribute("data-theme")==="dark"?"dark":"light",form,plan,variants,activePanel,proof});
     // If an idea or generated plan contains contact details or a credential, keep it in memory only.
     if(/(?:gsk_|sk-)[A-Za-z0-9_-]{16,}|[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}|(?:\+?971|0)5[0-9\s().-]{8,}/i.test(snapshot)){sessionStorage.removeItem(SESSION_KEY);return;}
     sessionStorage.setItem(SESSION_KEY,snapshot);
@@ -737,12 +740,14 @@ function restoreSession(){
     applyLang();
     const form=saved.form;
     document.getElementById("idea").value=typeof form.idea==="string"?form.idea:"";
+    selectedIdeaSource=form.idea_source==="ai_suggestion_selected"?"ai_suggestion_selected":"user_input";
     const category=document.getElementById("category");
     if(Number.isInteger(form.categoryIndex)&&form.categoryIndex>=0&&form.categoryIndex<category.options.length){category.selectedIndex=form.categoryIndex;category.dataset.touched=form.categoryIndex?"true":"";}
     for(const id of ["user_type","region","context"]){const field=document.getElementById(id);if(typeof form[id]==="string"&&[...field.options].some(o=>o.value===form[id]))field.value=form[id];}
     const budget=document.getElementById("budget");if(Number.isFinite(Number(form.budget)))budget.value=form.budget;
     updateBudget(budget.value);
     if(saved.plan&&typeof saved.plan==="object"&&!Array.isArray(saved.plan)&&saved.plan.opportunity_score){
+      if(saved.variants&&typeof saved.variants==="object")planVariants={en:saved.variants.en||null,ar:saved.variants.ar||null};
       currentPlan=saved.plan;showPlan(currentPlan);buildProof();
       if(Array.isArray(saved.proof))saved.proof.slice(0,10).forEach((entry,i)=>{
         const row=document.querySelectorAll("#proof-table tr")[i+1];if(!row||!entry||typeof entry!=="object")return;
@@ -1266,12 +1271,13 @@ const PANEL_IDS={Overview:["lbl-overview","lbl-firststep","lbl-score","lbl-decis
 function setupDashboard(){const root=document.getElementById("results"),nav=document.getElementById("result-nav");if(root.dataset.dashboard)return;root.dataset.dashboard="1";PANEL_ORDER.forEach((name,index)=>{const panel=document.createElement("section");panel.className="dashboard-panel";panel.id="panel-"+index;panel.hidden=index!==0;panel.setAttribute("role","tabpanel");panel.setAttribute("aria-labelledby","result-tab-"+index);PANEL_IDS[name].forEach(id=>{const node=document.getElementById(id);if(node){let parent=node;while(parent.parentElement!==root&&parent.parentElement)parent=parent.parentElement;if(parent.parentElement===root)panel.appendChild(parent);}});root.appendChild(panel);const btn=document.createElement("button");btn.type="button";btn.id="result-tab-"+index;btn.setAttribute("role","tab");btn.setAttribute("aria-controls",panel.id);btn.setAttribute("aria-selected",index===0?"true":"false");btn.tabIndex=index===0?0:-1;btn.textContent=name;btn.onclick=()=>selectPanel(index);btn.onkeydown=e=>{if(["ArrowRight","ArrowLeft","Home","End"].includes(e.key)){e.preventDefault();const dir=lang==="ar"?-1:1;const next=e.key==="Home"?0:e.key==="End"?PANEL_ORDER.length-1:(index+(e.key==="ArrowRight"?dir:-dir)+PANEL_ORDER.length)%PANEL_ORDER.length;selectPanel(next);nav.children[next].focus()}};nav.appendChild(btn)});}
 function updateDashboardLabels(){const names=lang==="ar"?["نظرة عامة","التحقق","العملاء","خطة ٧ أيام","المخاطر","العرض","المصادر"]:PANEL_ORDER;document.querySelectorAll("#result-nav button").forEach((b,i)=>b.textContent=names[i]);document.querySelectorAll(".dashboard-panel").forEach((p,i)=>p.setAttribute("aria-label",names[i]));}
 function selectPanel(index){document.querySelectorAll(".dashboard-panel").forEach((p,i)=>p.hidden=i!==index);document.querySelectorAll("#result-nav button").forEach((b,i)=>{b.setAttribute("aria-selected",i===index?"true":"false");b.tabIndex=i===index?0:-1});document.getElementById("result-tab-"+index).scrollIntoView({block:"nearest",inline:"nearest",behavior:motionBehavior()});renderJourney();saveSession();}
-function ensurePlanState(plan,inputs){const r=plan.readiness_report||{},s=plan.state||{};plan.state={idea:inputs.idea,category:inputs.category,target_customer:(inputs.user_type&&T[lang].userTypes[inputs.user_type])||r.target_customer||s.target_customer||"",target_customer_source:inputs.user_type?"user_input":"ai_assumption",region:inputs.region,context:inputs.context,customer_type:inputs.user_type,user_budget_aed:Number(inputs.budget)||0,suggested_test_price_aed:Number(s.suggested_test_price_aed)||0,estimated_test_cost_aed:Number(s.estimated_test_cost_aed||r.estimated_first_test_cost_aed)||0,opportunity_score:plan.opportunity_score||{},decision:(plan.decision_engine||{}).decision||"",first_action:plan.first_step_today||"",evidence:s.evidence||{status:"not_validated",responses:0}};plan._category=inputs.category;plan._region=inputs.region;plan._context=inputs.context;plan._budget=inputs.budget;plan._user_type=inputs.user_type;if(r){r.idea=inputs.idea;r.target_customer=plan.state.target_customer;r.best_first_action=plan.state.first_action}if(plan.founder_passport)plan.founder_passport.first_action=plan.state.first_action;return plan;}
+function ensurePlanState(plan,inputs){const r=plan.readiness_report||{},s=plan.state||{};plan.state={idea:inputs.idea,idea_source:inputs.idea_source==="ai_suggestion_selected"?"ai_suggestion_selected":"user_input",category:inputs.category,target_customer:(inputs.user_type&&T[lang].userTypes[inputs.user_type])||r.target_customer||s.target_customer||"",target_customer_source:inputs.user_type?"user_input":"ai_assumption",region:inputs.region,context:inputs.context,customer_type:inputs.user_type,user_budget_aed:Number(inputs.budget)||0,suggested_test_price_aed:Number(s.suggested_test_price_aed)||0,estimated_test_cost_aed:Number(s.estimated_test_cost_aed||r.estimated_first_test_cost_aed)||0,opportunity_score:plan.opportunity_score||{},decision:(plan.decision_engine||{}).decision||"",first_action:plan.first_step_today||"",evidence:s.evidence||{status:"not_validated",responses:0}};plan._category=inputs.category;plan._region=inputs.region;plan._context=inputs.context;plan._budget=inputs.budget;plan._user_type=inputs.user_type;if(r){r.idea=inputs.idea;r.target_customer=plan.state.target_customer;r.best_first_action=plan.state.first_action}if(plan.founder_passport)plan.founder_passport.first_action=plan.state.first_action;return plan;}
 
 function fillSelects(){const t=T[lang];const selected={categoryIndex:document.getElementById("category").selectedIndex,category:document.getElementById("category").value,user_type:document.getElementById("user_type").value,region:document.getElementById("region").value,context:document.getElementById("context").value};const c=document.getElementById("category");c.innerHTML="";const blank=document.createElement("option");blank.value="";blank.textContent=lang==="ar"?"اختر الفئة":"Choose a category";c.appendChild(blank);t.categories.forEach(x=>{const o=document.createElement("option");o.textContent=x;c.appendChild(o)});
+Array.from(c.options).slice(1).forEach((option,index)=>{option.value=T.en.categories[index]});
 const u=document.getElementById("user_type");u.innerHTML="";Object.keys(t.userTypes).forEach(k=>{const o=document.createElement("option");o.value=k;o.textContent=t.userTypes[k];u.appendChild(o)});
 const rg=document.getElementById("region");rg.innerHTML="";Object.keys(t.regions).forEach(k=>{const o=document.createElement("option");o.value=k;o.textContent=t.regions[k];rg.appendChild(o)});
-const cx=document.getElementById("context");cx.innerHTML="";Object.keys(t.contexts).forEach(k=>{const o=document.createElement("option");o.value=k;o.textContent=t.contexts[k];cx.appendChild(o)});if(selected.categoryIndex>0)c.selectedIndex=selected.categoryIndex;u.value=selected.user_type;rg.value=selected.region;cx.value=selected.context;["region","context"].forEach((name)=>{const target=document.getElementById("d-"+name),source=document.getElementById(name),previous=target.value;target.replaceChildren(...[...source.options].map(o=>o.cloneNode(true)));target.value=previous||source.value;});}
+const cx=document.getElementById("context");cx.innerHTML="";Object.keys(t.contexts).forEach(k=>{const o=document.createElement("option");o.value=k;o.textContent=t.contexts[k];cx.appendChild(o)});if(selected.categoryIndex>0)c.selectedIndex=selected.categoryIndex;u.value=selected.user_type;rg.value=selected.region||"UAE-wide";cx.value=selected.context||"Not sure";["region","context"].forEach((name)=>{const target=document.getElementById("d-"+name),source=document.getElementById(name),previous=target.value;target.replaceChildren(...[...source.options].map(o=>o.cloneNode(true)));target.value=previous||source.value;});}
 function suggestCategory(){const c=document.getElementById("category");if(c.dataset.touched)return;const idea=document.getElementById("idea").value.toLowerCase(),context=document.getElementById("context").value;let key="";if(/wash|clean|repair|maintenance|غسيل|تنظيف|صيانة/.test(idea)||context==="Local service")key="Services & Maintenance";else if(context==="Food & beverage")key="Food & Catering";else if(context==="Online")key="Technology & Digital";else if(context==="Retail")key="Retail & Trading";const i=T.en.categories.indexOf(key);if(i>=0)c.selectedIndex=i+1;document.getElementById("category-hint").textContent=key?(lang==="ar"?"اقتراح تلقائي — يمكنك تغييره.":"Suggested from your idea — you can change it."):(lang==="ar"?"اختر الفئة المناسبة.":"Choose the category that fits your idea.");}
 document.getElementById("idea").addEventListener("input",suggestCategory);document.getElementById("context").addEventListener("change",suggestCategory);
 function fillDemos(){const d=document.getElementById("demo-row");d.innerHTML="";DEMOS[lang].forEach(ex=>{const b=document.createElement("button");b.className="demo-chip";b.textContent=ex;b.onclick=()=>{document.getElementById("idea").value=ex;suggestCategory();};d.appendChild(b)});}
@@ -1295,7 +1301,7 @@ setIf("pitch",t.pitch);setIf("lbl-decision",t.lblDecision);setIf("lbl-donot",t.l
 setIf("hchip1",t.hchip1);setIf("hchip2",t.hchip2);setIf("hchip3",t.hchip3);setIf("hero-badge",t.heroBadge);setIf("fsb1",t.fsb1);setIf("fsb2",t.fsb2);setIf("fsb3",t.fsb3);setIf("tb1",t.tb1);setIf("tb2",t.tb2);setIf("tb3",t.tb3);setIf("tb4",t.tb4);setIf("lbl-why",t.lblWhy);setIf("why-intro",t.whyIntro);setIf("foot-collab",t.footCollab);setIf("hero-start",t.heroStart);setIf("hero-demo",t.heroDemo);setIf("cl-text",t.clText);setIf("chat-title",t.chatTitle);setIf("chat-sub",t.chatSub);setIf("chat-note",t.chatNote);setIf("chat-foot",t.chatFoot);document.getElementById("chat-input").placeholder=t.chatPlaceholder;setIf("lbl-bys",t.lblBys);setIf("bys-l1",t.bysL1);setIf("bys-l2",t.bysL2);setIf("bys-l3",t.bysL3);setIf("lbl-passport",t.lblPassport);setIf("lbl-personas",t.lblPersonas);setIf("lbl-risks",t.lblRisks);setIf("lbl-pitches",t.lblPitches);setIf("lbl-map",t.lblMap);setIf("lbl-qr",t.lblQr);setIf("qr-help",t.qrHelp);setIf("qr-cap",t.qrCap);
 fillSelects();fillDemos();fillSuggested();renderJourney();updateBudget(document.getElementById("budget").value);setIf("waOpenBtn",lang==="ar"?"افتح واتساب":"Open WhatsApp");setIf("passportCopyBtn",t.copy);setIf("score-note",lang==="ar"?"مبنية على افتراضات — حدّثها بأدلة حقيقية من العملاء.":"Based on assumptions — update with real customer evidence.");setIf("segments-note",lang==="ar"?"أمثلة لشرائح تحتاج إلى اختبار — فرضية ذكاء اصطناعي":"Assumed segments to test — AI assumption");setIf("need-idea",lang==="ar"?"أحتاج فكرة مشروع":"I need a business idea");setIf("have-idea",lang==="ar"?"لدي فكرة بالفعل":"I already have an idea");setIf("discovery-title",lang==="ar"?"ثلاث أفكار للاختبار":"Find three ideas to test");setIf("discovery-caveat",lang==="ar"?"هذه اقتراحات غير مثبتة. اختبر الطلب قبل الإنفاق.":"These are unvalidated suggestions. Test customer demand before spending.");setIf("discover-btn",lang==="ar"?"اقترح ثلاث أفكار":"Suggest three ideas");[["d-skills-label","Skills","المهارات"],["d-interests-label","Interests","الاهتمامات"],["d-experience-label","Experience","الخبرة"],["d-budget-label","Approximate budget (AED)","الميزانية التقريبية (درهم)"],["d-region-label","UAE market","سوق الإمارات"],["d-context-label","Preferred business type","نوع المشروع المفضل"],["d-time-label","Time available each week","الوقت المتاح أسبوعياً"]].forEach(([id,en,ar])=>setIf(id,lang==="ar"?ar:en));const proof=document.getElementById("proof-table");if(proof&&proof.rows.length){proof.querySelectorAll("th").forEach((el,i)=>el.textContent=i===5?(lang==="ar"?"قوة الدليل":"Evidence strength"):(t.proofCols[i]||""));proof.querySelectorAll(".p-int").forEach(el=>{el.querySelector("[value=yes]").textContent=t.interested;el.querySelector("[value=maybe]").textContent=t.maybe;el.querySelector("[value=no]").textContent=t.no;});proof.querySelectorAll(".p-pre").forEach(el=>{[["interest","اهتمام فقط","Sounds interesting"],["intent","نية شراء معلنة","Stated intent to buy"],["reservation","حجز بلا دفع","No-payment reservation"],["payment","دفع فعلي","Actual payment"],["repeat","عميل متكرر","Repeat customer"]].forEach(([value,ar,en])=>el.querySelector('[value="'+value+'"').textContent=lang==="ar"?ar:en)});calcProof();}if(currentPlan){showPlan(currentPlan);if(currentPlan._local)document.getElementById("error").textContent=t.chatFail;}else renderResources(document.getElementById("region").value);polishLanguage();}
 
-function toggleLang(){lang=lang==="en"?"ar":"en";applyLang();saveSession()}
+function toggleLang(){const target=lang==="en"?"ar":"en";if(currentPlan&&!currentPlan._local&&planVariants[target]&&planVariants[target].state?.idea===currentPlan.state?.idea)currentPlan=JSON.parse(JSON.stringify(planVariants[target]));lang=target;applyLang();saveSession()}
 function updateBudget(v){const l=lang==="ar"?"الميزانية — ":"Budget — ";const u=lang==="ar"?" درهم":" AED";document.getElementById("budget-label").textContent=l+Number(v).toLocaleString()+u}
 
 async function generate(){const idea=document.getElementById("idea").value.trim();if(!idea){document.getElementById("error").textContent=T[lang].emptyIdea||"";return;}
@@ -1304,14 +1310,16 @@ document.getElementById("genBtn").disabled=true;document.getElementById("genBtn"
 var category=document.getElementById("category").value,user_type=document.getElementById("user_type").value,budget=document.getElementById("budget").value,region=document.getElementById("region").value,context=document.getElementById("context").value;
 try{
   var ctrl=new AbortController();var to=setTimeout(function(){ctrl.abort();},45000);
-  var resp=await fetch("/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({idea,lang,category,user_type,budget,region,context}),signal:ctrl.signal});
+  var resp=await fetch("/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({idea,idea_source:selectedIdeaSource,lang,category,user_type,budget,region,context}),signal:ctrl.signal});
   clearTimeout(to);
   var plan=null;try{plan=await resp.json();}catch(pe){plan=null;}
   if(!plan||plan.error||!plan.opportunity_score){plan=localPlan(idea,category,user_type,budget,region,context);}
-  ensurePlanState(plan,{idea,category,user_type,budget,region,context});chatHistory=[];document.getElementById("chat-messages").replaceChildren();currentPlan=plan;showPlan(plan);selectPanel(0);buildProof();if(plan._local)document.getElementById("error").textContent=T[lang].chatFail;
+  const alternate=plan._alternate_plan;delete plan._alternate_plan;
+  ensurePlanState(plan,{idea,idea_source:selectedIdeaSource,category,user_type,budget,region,context});planVariants={en:null,ar:null};if(!plan._local&&alternate&&alternate.opportunity_score){planVariants[lang]=JSON.parse(JSON.stringify(plan));planVariants[lang==="en"?"ar":"en"]=alternate;}
+  chatHistory=[];document.getElementById("chat-messages").replaceChildren();currentPlan=plan;showPlan(plan);selectPanel(0);buildProof();if(plan._local)document.getElementById("error").textContent=T[lang].chatFail;
 }catch(e){
   console.warn("generate failed, using local plan:",e&&e.name);
-  try{currentPlan=ensurePlanState(localPlan(idea,category,user_type,budget,region,context),{idea,category,user_type,budget,region,context});chatHistory=[];document.getElementById("chat-messages").replaceChildren();showPlan(currentPlan);selectPanel(0);buildProof();document.getElementById("error").textContent=T[lang].chatFail;}
+  try{currentPlan=ensurePlanState(localPlan(idea,category,user_type,budget,region,context),{idea,idea_source:selectedIdeaSource,category,user_type,budget,region,context});planVariants={en:null,ar:null};chatHistory=[];document.getElementById("chat-messages").replaceChildren();showPlan(currentPlan);selectPanel(0);buildProof();document.getElementById("error").textContent=T[lang].chatFail;}
   catch(e2){console.error("local plan failed",e2);document.getElementById("error").textContent=T[lang].error;}
 }
 finally{document.getElementById("genBtn").disabled=false;document.getElementById("genBtn").textContent=T[lang].gen;stopLoader();}}
@@ -1338,7 +1346,7 @@ function renderPathCosts(plan){
   const gapText=gap===null?(ar?'غير متاحة':'Not available'):amount(gap);
   const rows=[[ar?'ميزانيتك':'Your budget',amount(Number((plan.state||{}).user_budget_aed)||0)+' · '+(ar?'إدخال المستخدم':'USER INPUT')],
     [ar?'تكلفة الإعداد المقدرة':'Estimated setup cost',costText],[ar?'الفجوة المقدرة':'Estimated gap',gapText],
-    [ar?'المدة المقدرة':'Estimated timeline',plan.total_timeline_days+' '+T[lang].days]];
+    [ar?'المدة المقدرة':'Estimated timeline',plan.total_timeline_days+' '+(ar?(Number(plan.total_timeline_days)===1?'يوم':'أيام'):(Number(plan.total_timeline_days)===1?'day':'days'))+' · '+(ar?'تقدير تخطيطي':'planning estimate')]];
   const box=document.getElementById('plan-meta');box.replaceChildren();
   rows.forEach(([label,text])=>{const span=document.createElement('span');span.textContent=label+': '+text;box.appendChild(span)});
   if(gap>0){const span=document.createElement('span');span.textContent=ar?'تحقق من الطلب قبل زيادة إنفاقك.':'Validate demand before increasing your spending.';box.appendChild(span)}
@@ -1353,11 +1361,12 @@ function renderPathCosts(plan){
 function executionRisk(idea,category,ar){
   const c=idea+' '+category;
   if(/social.?media|content|marketing|محتوى|تواصل اجتماعي|تسويق/i.test(c))return ar?['تحتاج قدرة إنتاج المحتوى وتأخر موافقات العملاء واتساق التسليم إلى اختبار.','اختبر نموذج جدول محتوى ومسار الموافقات مع عملاء محتملين.']:['Content-production capacity, client approval delays and delivery consistency need testing.','Test a sample content calendar and approval workflow with prospective clients.'];
-  if(/app\b|software|digital|platform|tool|رقمي|تطبيق|برمج|منصة/i.test(c))return ar?['تحتاج جهود التطوير وتهيئة المستخدمين والدعم والموثوقية إلى اختبار.','اختبر شرحاً لنموذج أولي وسجّل صعوبات البدء والدعم.']:['Development effort, onboarding, support capacity and reliability need testing.','Test a prototype walkthrough and record onboarding and support difficulties.'];
+  if(/food|cater|meal|restaurant|طعام|وجبة|وجبات|مطعم/i.test(c))return ar?['تحتاج قدرة إعداد الوجبات وتوقيتها واتساق التسليم إلى اختبار.','ضع جدولاً افتراضياً للطلبات والإعداد دون تجهيز الطعام أو بيعه.']:['Meal preparation capacity, timing and consistent delivery need testing.','Map a sample order and preparation schedule without preparing or selling food.'];
+  if(/app\b|software|digital|platform|tool|website|no.?code|AI.?powered|رقمي|تطبيق|برمج|منصة|موقع|ذكاء اصطناعي/i.test(c))return ar?['تحتاج جهود التطوير وحماية البيانات وموثوقية المخرجات والدعم إلى اختبار.','اختبر نموذجاً أولياً ونهج الخصوصية والدعم مع مستخدمين محتملين.']:['Development effort, data handling, output reliability and customer support need testing.','Test a prototype, privacy approach and support workflow with prospective users.'];
   if(/mobile|car.?wash|delivery|clean|متنقل|غسيل|توصيل|تنظيف/i.test(c))return ar?['تحتاج أوقات التنقل والمواعيد ولوجستيات الخدمة إلى اختبار.','اختبر مساراً وجدول مواعيد افتراضيين دون تشغيل.']:['Travel time, scheduling and service logistics need testing.','Test a mock route and appointment schedule without operating.'];
   return ar?[`تحتاج القدرة على تقديم ${idea} واتساق الجودة إلى اختبار.`,'حدد نموذجاً لمسار تقديم العرض قبل التشغيل.']:[`Delivery capacity and quality consistency for ${idea} need testing.`,'Map one sample delivery workflow before operating.'];
 }
-function fixedLabel(value){if(lang!=='ar')return value;return ({'Customer Demand':'طلب العملاء','Cost / Financial':'التكلفة / المال','Trust / Adoption':'الثقة / التبني',Execution:'التنفيذ','Regulation / Compliance':'الأنظمة / الامتثال',Medium:'متوسط',High:'مرتفع',Low:'منخفض','Ready to validate':'جاهز للتحقق','Ready to validate, not operate':'جاهز للتحقق، لا للتشغيل','Validate more':'تحقق أكثر','Review pilot evidence':'راجع أدلة التجربة'}[value]||value);}
+function fixedLabel(value){if(lang!=='ar')return value;return ({'Customer Demand':'طلب العملاء','Cost / Financial':'التكلفة / المال','Trust / Adoption':'الثقة / التبني',Execution:'التنفيذ','Regulation / Compliance':'الأنظمة / الامتثال',Medium:'متوسط',High:'مرتفع',Low:'منخفض',Unknown:'غير محدد','Ready to validate':'جاهز للتحقق','Ready to validate, not operate':'جاهز للتحقق، لا للتشغيل','Validate more':'تحقق أكثر','Review pilot evidence':'راجع أدلة التجربة'}[value]||value);}
 
 function localPlan(idea,category,user_type,budget,region,context){
   const L=T[lang].localPlan,ar=lang==='ar';
@@ -1388,18 +1397,53 @@ function contextSegmentNames(idea,target,category,ar){
   return ar?[`أفراد يبحثون عن ${subject}`,`أصحاب أعمال يحتاجون إلى ${subject}`,`جهات تشتري ${subject} لفرقها`]:[`Individuals seeking ${subject}`,`Business owners needing ${subject}`,`Teams purchasing ${subject} together`];
 }
 
+function localPersonaHypothesis(idea,category,index,ar){
+  const context=idea+' '+category;
+  const food=ar?[
+    ['وجبات مريحة في وقت متوقع','الطهي المنزلي أو الطلب الجاهز','مجموعات الأسر والأحياء','كيف تختار وجبتك في يوم مزدحم؟'],
+    ['طلب غداء جماعي موثوق','طلبات فردية أو مقصف العمل','مجموعات العمل','كيف يرتب فريقك الغداء الآن؟'],
+    ['كميات مرنة لفعالية صغيرة','التحضير الذاتي أو تموين قائم','منظمو الفعاليات','ما أصعب جزء في ترتيب الطعام لفعالية؟']]:[
+    ['Convenient meals at a predictable time','Home cooking or takeaway','Household and neighbourhood groups','How do you choose a meal on a busy day?'],
+    ['Reliable group lunch ordering','Individual orders or office canteens','Workplace groups','How does your team arrange lunch now?'],
+    ['Flexible portions for a small event','Self-catering or an existing caterer','Event organisers','What is hardest about arranging food for an event?']];
+  const digital=ar?[
+    ['حضور رقمي يسهل تحديثه','صفحات التواصل أو أدوات إنشاء المواقع','مجموعات الأعمال المحلية','كيف تحدّث حضورك الرقمي الآن؟'],
+    ['معالجة أسرع لاستفسارات العملاء','رسائل يدوية أو وكالة خارجية','شبكات القطاع','أين تتأخر استفسارات العملاء اليوم؟'],
+    ['مسار رقمي موثوق ودعم مناسب','جداول أو أدوات منفصلة','شبكات المهنيين','أي مهمة متكررة تريد تبسيطها؟']]:[
+    ['An online presence they can update','Social pages or DIY site builders','Local business groups','How do you update your online presence now?'],
+    ['Faster customer-enquiry handling','Manual messages or an agency','Sector networks','Where do customer enquiries get delayed?'],
+    ['Reliable digital workflow and support','Spreadsheets or disconnected tools','Professional networks','Which recurring task would you simplify?']];
+  const service=ar?[
+    ['موعد خدمة يناسب جدولهم','تنفيذ المهمة ذاتياً أو مزود قائم','مجموعات الأحياء','متى سببت لك مواعيد الخدمة صعوبة؟'],
+    ['جودة خدمة متوقعة في العمل','متعهد قائم أو موظفون','مديرو المرافق','كيف تقيّم موثوقية مزود الخدمة؟'],
+    ['تنسيق خدمة بين مواقع متعددة','حجوزات منفصلة','مشغلو المواقع المتعددة','ما أكبر مشكلة تنسيق بين المواقع؟']]:[
+    ['An appointment that fits their schedule','Doing it themselves or a provider','Neighbourhood groups','When did scheduling last cause difficulty?'],
+    ['Predictable workplace service quality','An existing contractor or staff','Facility managers','How do you assess service reliability?'],
+    ['Coordinated service across locations','Separate bookings','Multi-site operators','What is the main coordination problem?']];
+  const generic=ar?[
+    ['طريقة أوضح لحل المشكلة','حل ذاتي أو منتج حالي','مقابلات مباشرة','ما آخر طريقة جربتها لحل المشكلة؟'],
+    ['خيار عملي يناسب الميزانية','مورد قائم أو الاستغناء عن الحل','مجموعات مهنية','ما الذي يجعل تغيير خيارك مجدياً؟'],
+    ['تجربة موثوقة قابلة للتكرار','مزود آخر أو إحالات','مستخدمون متكررون','ما الذي يدفعك للعودة؟']]:[
+    ['A clearer way to solve the problem','Self-service or a current product','Direct interviews','What did you try most recently?'],
+    ['A practical option within budget','An existing supplier or doing without','Professional groups','What would make switching worthwhile?'],
+    ['A dependable repeatable experience','Another provider or referrals','Repeat users','What would make you return?']];
+  const rows=/food|cater|meal|restaurant|طعام|وجبة|وجبات|مطعم/i.test(context)?food:/website|software|digital|online|platform|app\b|no.?code|tech|موقع|تقني|رقمي|برمج|منصة|تطبيق/i.test(context)?digital:/service|wash|clean|repair|maintenance|delivery|خدمة|غسيل|تنظيف|صيانة|توصيل/i.test(context)?service:generic;
+  return rows[index%3];
+}
+
 function normalizeLocalPlan(p,idea,region,context){
   const ar=lang==="ar",car=/car.?wash|غسيل سيارات/i.test(idea);
   const names=car?(ar?["مالكو السيارات السكنية","مديرو المكاتب والمرافق","مشغلو الأساطيل"]:["Residential car owners","Office and facility managers","Fleet operators"]):contextSegmentNames(idea,(p.readiness_report||{}).target_customer,p._category,ar);
   p.small_test_plan={intro:ar?"اختبر الطلب دون تشغيل أو دفع قبل التحقق الرسمي.":"Test demand without operating or taking payment before official checks.",points:ar?["حدد شريحة عميل واحدة","قابل خمسة عملاء محتملين","اختبر العرض برسالة أو صفحة بسيطة","اجمع نوايا أو حجوزات بلا دفع","راجع النتائج قبل الإنفاق"]:["Choose one customer segment","Interview five potential customers","Test the offer with a message or landing page","Collect intent or no-payment waitlist signups","Review results before spending"]};
-  const days=ar?[["حدد العميل المستهدف","اختر شريحة ومشكلة محددة","شريحة واضحة واحدة"],["مقابلات العملاء","اسأل عن البدائل الحالية","خمس مقابلات فعلية"],["اختبر العرض","اعرض رسالة بسيطة","عرض اختُبر مع مستخدمين"],["اجمع نوايا بلا دفع","اطلب قائمة انتظار أو حجزاً بلا دفع","ثلاث تسجيلات أو نوايا واضحة"],["راجع الأدلة","وثّق الاعتراضات ومخاوف السعر","أبرز الاعتراضات موثقة"],["تحقق من المتطلبات","تحقق رسمياً من النشاط والموافقات ثم جهز خطة تجربة قانونية إذا بررت الأدلة","الفحوص الرسمية مكتملة قبل التشغيل"],["اتخذ القرار","استمر أو عدّل أو توقف حسب الأدلة","قرار يستند إلى الأدلة"]]:[["Define target customer","Select one segment and problem","One clear segment selected"],["Customer interviews","Ask about current alternatives","At least five real interviews"],["Test the offer","Show one simple message","One offer tested with target users"],["Collect no-payment intent","Invite waitlist signups or reservations","At least three signups or clear intent responses"],["Review evidence","Record objections and price concerns","Top objections documented"],["Verify requirements","Check official activity and approvals; prepare a lawful pilot plan only if justified","Official checks complete before operation"],["Decide","Continue, adjust, or stop from evidence","Evidence-based decision"]];
-  p.seven_day_plan=days.map((d,i)=>({day:i+1,focus:d[0],action:d[1],output:d[2],time_needed:"1–2h",success_check:d[2]}));
-  p.customer_personas=names.map(name=>({name,cares_about:ar?"حل المشكلة الحالية":"Solving the current problem",reach_through:ar?"تواصل مباشر ومقابلات":"Direct outreach and interviews",ask:ar?"كيف تحل المشكلة الآن؟":"How do you solve this problem today?"}));
+  const days=ar?[["حدد العميل المستهدف","اختر شريحة ومشكلة محددة","بطاقة فرضية لشريحة واحدة"],["رتب مقابلات العملاء","ادعُ أشخاصاً من الشريحة واسأل من يوافق عن البدائل الحالية","سجل الدعوات وأي مقابلات تمت فعلاً"],["اختبر العرض","جهز رسالة بسيطة واطلب رأياً بلا بيع","نسخة واحدة من رسالة العرض"],["اجمع نوايا بلا دفع","اعرض قائمة انتظار أو حجزاً بلا دفع","سجل النوايا أو الحجوزات إن وصلت"],["راجع الأدلة","قارن الردود والاعتراضات ومخاوف السعر","ملخص للأدلة والفجوات"],["تحقق من المتطلبات","راجع النشاط والموافقات لدى الجهة الرسمية قبل التشغيل","قائمة أسئلة للتحقق الرسمي"],["اتخذ القرار","استمر أو عدّل أو توقف حسب الأدلة","مذكرة قرار للخطوة التالية"]]:[["Define target customer","Choose one segment and problem","One segment hypothesis card"],["Arrange customer interviews","Invite people and ask those who agree about current alternatives","Outreach log and notes from any completed interviews"],["Test the offer","Prepare a simple message and seek feedback without selling","One draft offer message"],["Collect no-payment intent","Offer a no-payment waitlist or reservation","Intent or reservation log if anyone responds"],["Review evidence","Compare responses, objections and price concerns","Evidence and gaps summary"],["Verify requirements","Check activity and possible approvals with the official authority","Official-check questions list"],["Decide","Continue, adjust or stop based on actual evidence","Next-step decision memo"]];
+  const checks=ar?["تصف البطاقة المشكلة والبديل الحالي وسؤال اختبار","لا تُحسب مقابلة إلا إذا حدثت فعلاً","سجل الردود الفعلية أو غياب الردود","ميّز الاهتمام عن النية والحجز","اذكر ما سُجل وما لم يُعرف بعد","لا تبدأ التشغيل قبل تأكيد المتطلبات","اربط القرار بالأدلة والفجوات"]:["The card states the problem, alternative and a test question","Count only interviews that actually happened","Record actual responses or the lack of replies","Separate interest, intent and reservation","State what is recorded and unknown","Do not operate before requirements are confirmed","Tie the decision to evidence and gaps"];
+  p.seven_day_plan=days.map((d,i)=>({day:i+1,focus:d[0],action:d[1],output:d[2],time_needed:i===3||i===5?(ar?"مدة متغيرة":"Time varies"):(i===1?(ar?"2–4 ساعات · تقدير":"2–4h · estimate"):(ar?"1–2 ساعة · تقدير":"1–2h · estimate")),success_check:checks[i]}));
+  p.customer_personas=names.map((name,i)=>{const [need,alternative,channel,question]=localPersonaHypothesis(idea,p._category,i,ar);return {name,cares_about:need,current_alternative:alternative,why_benefit:ar?`قد تكون بديلاً عن ${alternative} إذا كانت ${need} مهمة لهم؛ هذا افتراض للاختبار.`:`May replace ${alternative} if ${need.toLowerCase()} matters; test this assumption.`,reach_through:channel,ask:question,source:"ai_assumption"};});
   const riskNames=ar?["طلب العملاء","التكلفة / المال","الثقة / التبني","التنفيذ","الأنظمة / الامتثال"]:["Customer Demand","Cost / Financial","Trust / Adoption","Execution","Regulation / Compliance"];
   const reasons=ar?["لم تُجمع أدلة من العملاء بعد.","التكاليف المقدرة غير مؤكدة.","يجب اختبار مخاوف الثقة المحتملة.","يجب اختبار تعقيدات المسارات والمواعيد.","المتطلبات الدقيقة غير مؤكدة وتعتمد على النشاط والإمارة."]:["No customer evidence has been collected yet.","Estimated costs are unverified.","Potential trust concerns should be tested.","Routing and scheduling complexity should be tested.","Exact requirements are unverified and depend on the activity and emirate."];
   const fixes=ar?["قابل العملاء وسجّل نوايا بلا دفع.","تحقق من عروض الأسعار المحلية.","اسأل عن أسباب التردد.","اختبر جدولاً افتراضياً بلا تشغيل.","تحقق من تصنيف النشاط والموافقات لدى الجهة الرسمية المختصة."]:["Interview customers and record no-payment intent.","Verify local supplier quotes.","Ask why customers hesitate.","Test a mock schedule without operating.","Verify activity classification and approvals with the relevant official authority."];
   [reasons[3],fixes[3]]=executionRisk(idea,p._category,ar);
-  p.risk_radar=riskNames.map((name,i)=>({name,level:"Medium",reason:reasons[i],fix:fixes[i]}));
+  p.risk_radar=riskNames.map((name,i)=>({name,level:i===3?"Medium":"Unknown",reason:reasons[i],fix:fixes[i],source:"ai_assumption"}));
   p.decision_engine={decision:ar?"تحقق أكثر":"Validate more",reason:ar?"قرار قبل جمع الأدلة: تحقق من الطلب والمتطلبات الرسمية.":"Pre-evidence decision: customer demand and official requirements need verification.",next_test_action:ar?"قابل خمسة عملاء محتملين واجمع نوايا بلا دفع.":"Interview five potential customers and collect no-payment intent.",risk_level:"Medium",recommended_test_budget_aed:""};
   p.do_not_start_with=ar?["لا تشغّل الخدمة أو تقبل الدفع قبل التحقق الرسمي.","لا تشترِ معدات كبيرة قبل وجود أدلة طلب."]:["Do not operate or accept payment before official checks.","Do not buy major equipment before demand evidence."];
   p.instead_do=ar?["قابل عملاء محتملين.","اجمع حجوزات بلا دفع.","تحقق من تصنيف النشاط والموافقات رسمياً."]:["Interview potential customers.","Collect no-payment reservations.","Verify activity classification and approvals officially."];
@@ -1414,11 +1458,12 @@ function normalizeLocalPlan(p,idea,region,context){
 }
 
 function showPlan(rawPlan){syncPathCosts(rawPlan);setupDashboard();updateDashboardLabels();const p=escapePlan(rawPlan);const t=T[lang];const state=rawPlan.state||{};
-const legend=document.getElementById("source-legend");legend.replaceChildren();[["FACT","fact"],["USER INPUT","input"],["AI ASSUMPTION","assumption"],["CUSTOMER EVIDENCE","evidence"]].forEach(([label,cls])=>{const b=document.createElement("span");b.className="source-badge "+cls;b.textContent=lang==="ar"?({FACT:"حقيقة", "USER INPUT":"إدخال المستخدم","AI ASSUMPTION":"افتراض الذكاء الاصطناعي","CUSTOMER EVIDENCE":"دليل العملاء"}[label]):label;legend.appendChild(b)});
+const legend=document.getElementById("source-legend");legend.replaceChildren();[["USER INPUT","input"],["AI SUGGESTION SELECTED BY USER","assumption"],["AI ASSUMPTION","assumption"],["RECORDED CUSTOMER EVIDENCE","evidence"]].forEach(([label,cls])=>{const b=document.createElement("span");b.className="source-badge "+cls;b.textContent=lang==="ar"?({"USER INPUT":"إدخال المستخدم","AI SUGGESTION SELECTED BY USER":"اقتراح ذكاء اصطناعي اختاره المستخدم","AI ASSUMPTION":"افتراض ذكاء اصطناعي","RECORDED CUSTOMER EVIDENCE":"أدلة العملاء المسجلة"}[label]):label;legend.appendChild(b)});
 const jb=document.getElementById("overview-body");jb.innerHTML="";const js=p.idea_overview||{};
 [[lang==="ar"?"الفكرة":"Idea",state.idea],[lang==="ar"?"الفئة":"Category",(T[lang].categories[T.en.categories.indexOf(state.category)]||state.category)],[lang==="ar"?"السوق":"Selected market",(T[lang].regions[state.region]||state.region)],[lang==="ar"?"نوع المشروع":"Business type",(T[lang].contexts[state.context]||state.context)],[lang==="ar"?"ميزانيتك":"Your budget",(Number(state.user_budget_aed)||0).toLocaleString()+" "+currency()],[state.target_customer_source==="user_input"?(lang==="ar"?"العميل المختار":"Selected customer"):(lang==="ar"?"العميل المستهدف (افتراض)":"Target customer (assumption)"),state.target_customer]].forEach(([key,value])=>{const row=document.createElement("div"),k=document.createElement("span"),v=document.createElement("span"),b=document.createElement("span");row.className="overview-row";k.className="jk";v.className="jv";k.textContent=key;v.textContent=value||"—";b.className="source-badge "+(key.includes("assumption")||key.includes("افتراض")?"assumption":"input");b.textContent=key.includes("assumption")||key.includes("افتراض")?(lang==="ar"?"افتراض":"AI ASSUMPTION"):(lang==="ar"?"إدخال المستخدم":"USER INPUT");v.append(" ",b);row.append(k,v);jb.appendChild(row)});
 {const row=document.createElement("div"),k=document.createElement("span"),v=document.createElement("span"),b=document.createElement("span"),priced=Number(state.suggested_test_price_aed)>0;row.className="overview-row";k.className="jk";v.className="jv";k.textContent=lang==="ar"?"سعر اختبار مقترح":"Suggested test price";v.textContent=priced?Number(state.suggested_test_price_aed).toLocaleString()+" "+currency()+" ":(lang==="ar"?"لم يُقترح بعد ":"Not proposed yet ");b.className="source-badge "+(priced?"assumption":"unvalidated");b.textContent=priced?(lang==="ar"?"افتراض":"AI ASSUMPTION"):(lang==="ar"?"غير مُتحقق":"UNVALIDATED");v.appendChild(b);row.append(k,v);jb.appendChild(row)}
 Object.keys(t.jk).forEach(k=>{if(js[k])jb.innerHTML+=`<div class="overview-row"><span class="jk">${t.jk[k]}</span><span class="jv" ${k==="evidence"?'id="overview-evidence"':""}>${js[k]}</span></div>`;});
+if(state.idea_source==="ai_suggestion_selected"){const badge=jb.querySelector(".overview-row .source-badge");if(badge){badge.className="source-badge assumption";badge.textContent=lang==="ar"?"اقتراح ذكاء اصطناعي اختاره المستخدم":"AI SUGGESTION SELECTED BY USER";}}
 document.getElementById("first-step-text").textContent=rawPlan.first_step_today||"";
 const sc=p.opportunity_score||{};const total=sc.total||0;
 const gcol=total>=20?"#009639":total>=15?"#c8a24a":"#ce1126";
@@ -1436,7 +1481,7 @@ const ql=document.getElementById("questions-list");ql.innerHTML="";(p.validation
 let waMsg=rawPlan.whatsapp_message||"";const ideaVal=document.getElementById("idea").value.trim();if(ideaVal&&waMsg.includes("[idea]"))waMsg=waMsg.replace("[idea]",ideaVal);else if(ideaVal&&!waMsg.toLowerCase().includes(ideaVal.toLowerCase().slice(0,12)))waMsg=waMsg+" ("+ideaVal+")";document.getElementById("wa-text").textContent=(lang==="ar"?"خطوة — من الفكرة إلى الخطوة الأولى.\n":"Khotwa — From idea to first step.\n")+waMsg;
 const rt=document.getElementById("report-table");rt.innerHTML="";const r=p.readiness_report||{};Object.keys(t.rkeys).forEach(k=>{let val=k==="idea"?escapeHtml(state.idea):r[k];let label=t.rkeys[k];if(k==="target_customer")label+=state.target_customer_source==="user_input"?(lang==="ar"?" · إدخال المستخدم":" · USER INPUT"):(lang==="ar"?" · افتراض ذكاء اصطناعي":" · AI ASSUMPTION");if(k==="main_risk")label+=lang==="ar"?" · افتراض تخطيطي":" · planning assumption";if(k==="next_step")label+=lang==="ar"?" · إجراء موصى به":" · recommended action";if(k==="estimated_first_test_cost_aed"&&val!=null)val=Number(state.estimated_test_cost_aed||val).toLocaleString()+" "+currency()+" · "+(lang==="ar"?"تقدير ذكاء اصطناعي":"AI ESTIMATE");rt.innerHTML+=`<tr><td class="k">${label}</td><td class="v">${val||"-"}</td></tr>`;});
 rt.innerHTML+='<tr id="readiness-evidence"><td class="k">'+(lang==='ar'?'أدلة العملاء':'CUSTOMER EVIDENCE')+'</td><td class="v" id="readiness-evidence-text">'+escapeHtml((rawPlan.idea_overview||{}).evidence||(lang==='ar'?'لم تُجمع أدلة من العملاء بعد.':'No customer evidence collected yet.'))+'</td></tr>';
-const list=document.getElementById("steps-list");list.innerHTML="";(p.steps||[]).forEach(s=>{list.innerHTML+=`<div class="step-card"><div class="step-num">${s.step_number}</div><div class="step-body"><h3>${s.action}</h3><p>${s.description}</p><div class="tags"><span class="tag">${s.location}</span><span class="tag">${s.who_to_contact}</span><span class="tag">${s.estimated_cost_aed==null?(lang==="ar"?"لم تُقدر التكلفة بعد":"Cost not estimated yet"):Number(s.estimated_cost_aed).toLocaleString()+" "+currency()+" · "+(lang==="ar"?"تقدير ذكاء اصطناعي":"AI ESTIMATE")}</span><span class="tag">${s.timeline_days} ${t.days}</span></div></div></div>`;});
+const list=document.getElementById("steps-list");list.innerHTML="";(p.steps||[]).forEach(s=>{const duration=lang==="ar"?(Number(s.timeline_days)===1?"يوم":"أيام"):(Number(s.timeline_days)===1?"day":"days");list.innerHTML+=`<div class="step-card"><div class="step-num">${s.step_number}</div><div class="step-body"><h3>${s.action}</h3><p>${s.description}</p><div class="tags"><span class="tag">${s.location}</span><span class="tag">${s.who_to_contact}</span><span class="tag">${s.estimated_cost_aed==null?(lang==="ar"?"لم تُقدر التكلفة بعد":"Cost not estimated yet"):Number(s.estimated_cost_aed).toLocaleString()+" "+currency()+" · "+(lang==="ar"?"تقدير ذكاء اصطناعي":"AI ESTIMATE")}</span><span class="tag">${s.timeline_days} ${duration} · ${lang==="ar"?"تقدير تخطيطي":"planning estimate"}</span></div></div></div>`;});
 renderPathCosts(rawPlan);
 document.getElementById("tip").innerHTML=`<strong>${t.firstTip}:</strong> ${p.first_customer_tip}`;
 if(timelineChart){timelineChart.destroy();timelineChart=null;}if(costChart){costChart.destroy();costChart=null;}
@@ -1454,7 +1499,7 @@ var inl=document.getElementById("instead-list");inl.innerHTML="";(p.instead_do||
 // shareable summary
 var sc2=p.opportunity_score||{};var st=(sc2.total||0);
 var verdict=st>=20?t.strong:(st>=15?t.medium:t.weak);
-var shareTxt=t.shareTpl.replace("{idea}",((rawPlan.readiness_report||{}).idea||rawPlan.summary||"")).replace("{step}",(rawPlan.first_step_today||"")).replace("{score}",st).replace("{verdict}",verdict);
+var shareTxt=t.shareTpl.replace("{idea}",((rawPlan.readiness_report||{}).idea||rawPlan.summary||"")).replace("{step}",(rawPlan.first_step_today||"").replace(/[.!؟\s]+$/g,"")).replace("{score}",st).replace("{verdict}",verdict.replace(/[.!؟\s]+$/g,""));
 document.getElementById("share-text").textContent=shareTxt;
 var wg=document.getElementById("why-grid");if(wg){wg.replaceChildren();const values=[[lang==="ar"?"السوق المختار":"Selected market",(T[lang].regions[state.region]||state.region)],[lang==="ar"?"نوع المشروع":"Business type",(T[lang].contexts[state.context]||state.context)],[lang==="ar"?"قناة أولى محتملة":"Likely first channel",(rawPlan.readiness_report||{}).first_customer_channel||"—"],[lang==="ar"?"طريقة التحقق":"Validation approach",lang==="ar"?"مقابلات وحجوزات بلا دفع":"Interviews and no-payment reservations"],[lang==="ar"?"تحقق رسمي":"Official checks",["Abu Dhabi","Al Ain"].includes(state.region)?(lang==="ar"?"تم / دائرة التنمية الاقتصادية في أبوظبي":"TAMM / ADDED"):(lang==="ar"?"الجهة الرسمية المختصة":"Relevant official authority")]];values.forEach(([k,v])=>{const card=document.createElement("div"),b=document.createElement("b"),line=document.createElement("div");card.className="local-item";b.textContent=k;line.textContent=v;card.append(b,line);wg.appendChild(card)})}
 renderExtras(rawPlan,(rawPlan.readiness_report||{}),st);renderResources(rawPlan._region||document.getElementById("region").value);
@@ -1477,7 +1522,7 @@ function renderExtras(rawPlan,r,st){
   // Founder Passport
   try{
     var pp=p.founder_passport||{};var de=p.decision_engine||{};
-    var rows=[[t.ppIdea,(r.idea||p.summary||"")],[t.ppStatus,fixedLabel(pp.status||"Ready to validate")],[t.ppFirst,(pp.first_action||p.first_step_today||"")],[t.ppScore,(lang==="ar"?"الدرجة المبدئية: ":"Preliminary score: ")+st+"/25"],[t.ppDecision,fixedLabel(de.decision||"")],[t.ppChannel,(r.first_customer_channel||"")],[t.ppCost,((r.estimated_first_test_cost_aed!=null)?r.estimated_first_test_cost_aed+" "+currency()+" · "+(lang==="ar"?"تقدير ذكاء اصطناعي":"AI ESTIMATE"):"-")],[t.ppNext,(pp.next_step||r.next_step||"")]];
+    var rows=[[t.ppIdea,(r.idea||p.summary||"")],[t.ppStatus,fixedLabel(pp.status||"Ready to validate")],[t.ppFirst,(pp.first_action||p.first_step_today||"")],[t.ppScore,st+"/25"],[t.ppDecision,fixedLabel(de.decision||"")],[t.ppChannel,(r.first_customer_channel||"")],[t.ppCost,((r.estimated_first_test_cost_aed!=null)?r.estimated_first_test_cost_aed+" "+currency()+" · "+(lang==="ar"?"تقدير ذكاء اصطناعي":"AI ESTIMATE"):"-")],[t.ppNext,(pp.next_step||r.next_step||"")]];
     var ptbl=document.getElementById("passport-table");ptbl.innerHTML="";rows.forEach(function(rw){ptbl.innerHTML+=`<tr><td class="pk2">${rw[0]}</td><td class="pv2">${rw[1]||"-"}</td></tr>`;});
     window._passportText=rows.map(function(rw){return rw[0]+": "+(rw[1]||"-");}).join("\n");
   }catch(e){console.warn("passport",e);}
@@ -1485,14 +1530,14 @@ function renderExtras(rawPlan,r,st){
   try{
     var pg=document.getElementById("persona-grid");pg.innerHTML="";
     (p.customer_personas||[]).slice(0,3).forEach(function(per){
-      pg.innerHTML+=`<div class="persona"><div class="pname">${per.name||""} <span class="source-badge assumption">${lang==="ar"?"افتراض ذكاء اصطناعي":"AI ASSUMPTION"}</span></div><div class="prow"><b>${t.cares}:</b> ${per.cares_about||""}</div><div class="prow"><b>${t.reach}:</b> ${per.reach_through||""}</div><div class="prow"><b>${t.askp}:</b> ${per.ask||""}</div></div>`;
+      pg.innerHTML+=`<div class="persona"><div class="pname">${per.name||""} <span class="source-badge assumption">${lang==="ar"?"افتراض ذكاء اصطناعي · ليس عميلاً محدداً":"AI ASSUMPTION · NOT AN IDENTIFIED LEAD"}</span></div><div class="prow"><b>${t.cares}:</b> ${per.cares_about||""}</div>${per.current_alternative?`<div class="prow"><b>${lang==="ar"?"البديل الحالي المحتمل":"Possible current alternative"}:</b> ${per.current_alternative}</div>`:""}${per.why_benefit?`<div class="prow"><b>${lang==="ar"?"لماذا قد يستفيد":"Why they might benefit"}:</b> ${per.why_benefit}</div>`:""}<div class="prow"><b>${t.reach}:</b> ${per.reach_through||""}</div><div class="prow"><b>${t.askp}:</b> ${per.ask||""}</div></div>`;
     });
   }catch(e){console.warn("personas",e);}
   // Risk radar
   try{
     var rl=document.getElementById("risk-list");rl.innerHTML="";
     (p.risk_radar||[]).forEach(function(rk){
-      var lv=(rk.level||"").toLowerCase();var cls=/(high|مرتفع)/.test(lv)?"rl-high":(/(med|متوسط)/.test(lv)?"rl-medium":"rl-low");
+      var lv=(rk.level||"").toLowerCase();var cls=/(high|مرتفع)/.test(lv)?"rl-high":(/(med|متوسط)/.test(lv)?"rl-medium":/(low|منخفض)/.test(lv)?"rl-low":"rl-unknown");
       rl.innerHTML+=`<div class="risk-item"><span class="risk-name">${fixedLabel(rk.name||"")}</span><span class="risk-level ${cls}">${fixedLabel(rk.level||"")}</span><span class="risk-detail"><b>${rk.reason||""}</b><span class="risk-next">${lang==="ar"?"الخطوة التالية: ":"Next action: "}${rk.fix||""}</span></span></div>`;
     });
   }catch(e){console.warn("risks",e);}
@@ -1521,8 +1566,8 @@ function renderQR(){
 }
 
 function setTxt(id,v){var el=document.getElementById(id);if(el)el.textContent=v;}
-function copyText(id,btn){var el=document.getElementById(id);if(!el)return;var txt=el.textContent||"";var done=function(){var o=btn.textContent;btn.textContent="✓ "+T[lang].copied;setTimeout(function(){btn.textContent=o;},1400);};if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(txt).then(done).catch(function(){fallbackCopy(txt);done();});}else{fallbackCopy(txt);done();}}
-function copyPassport(){var txt=window._passportText||"";var btn=document.getElementById("passportCopyBtn");var done=function(){btn.textContent="✓ "+T[lang].copied;setTimeout(function(){btn.textContent=T[lang].copy;},1400);};if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(txt).then(done).catch(function(){fallbackCopy(txt);done();});}else{fallbackCopy(txt);done();}}
+function copyText(id,btn){var el=document.getElementById(id);if(!el)return;var txt=el.textContent||"";var done=function(){var o=btn.textContent;btn.textContent="✓ "+T[lang].copied;setTimeout(function(){btn.textContent=o;},1400);};if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(txt).then(done).catch(function(){if(fallbackCopy(txt))done();});}else if(fallbackCopy(txt))done();}
+function copyPassport(){var txt=window._passportText||"";var btn=document.getElementById("passportCopyBtn");var done=function(){btn.textContent="✓ "+T[lang].copied;setTimeout(function(){btn.textContent=T[lang].copy;},1400);};if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(txt).then(done).catch(function(){if(fallbackCopy(txt))done();});}else if(fallbackCopy(txt))done();}
 
 function buildProof(){const t=T[lang];const tbl=document.getElementById("proof-table");
 let head="<tr>";t.proofCols.forEach((c,i)=>head+=`<th>${i===5?(lang==="ar"?"قوة الدليل":"Evidence strength"):c}</th>`);head+="</tr>";
@@ -1530,8 +1575,8 @@ let rows="";for(let i=1;i<=10;i++){rows+=`<tr>
 <td>${i}</td>
 <td><select onchange="calcProof()" class="p-int"><option value="">-</option><option value="yes">${t.interested}</option><option value="maybe">${t.maybe}</option><option value="no">${t.no}</option></select></td>
 <td><input type="number" min="0" step="0.1" class="p-price" oninput="calcProof()" placeholder="0"></td>
-<td><input type="text" class="p-freq" oninput="calcProof()" placeholder="${lang==='ar'?'أسبوعياً':'weekly'}"></td>
-<td><input type="text" class="p-concern" oninput="calcProof()" placeholder="-"></td>
+<td><input type="text" class="p-freq" maxlength="500" oninput="calcProof()" placeholder="${lang==='ar'?'أسبوعياً':'weekly'}"></td>
+<td><input type="text" class="p-concern" maxlength="500" oninput="calcProof()" placeholder="-"></td>
 <td><select onchange="calcProof()" class="p-pre"><option value="">-</option><option value="interest">${lang==="ar"?"اهتمام فقط":"Sounds interesting"}</option><option value="intent">${lang==="ar"?"نية شراء معلنة":"Stated intent to buy"}</option><option value="reservation">${lang==="ar"?"حجز بلا دفع":"No-payment reservation"}</option><option value="payment">${lang==="ar"?"دفع فعلي":"Actual payment"}</option><option value="repeat">${lang==="ar"?"عميل متكرر":"Repeat customer"}</option></select></td>
 </tr>`;}
 tbl.innerHTML=head+rows;calcProof();}
@@ -1585,7 +1630,7 @@ function syncEvidencePresentation(total,purchases,verdict){
   const last=document.querySelectorAll('#opp-map .opp-node')[5];if(last)last.textContent=(ar?'القرار: ':'Decision: ')+de.decision;
 }
 function scRestoreNeeded(){return currentPlan&&currentPlan.opportunity_score&&currentPlan.opportunity_score._preproof_customer_score!=null;}
-function refreshScoreDisplay(){if(!currentPlan)return;const sc=currentPlan.opportunity_score||{},total=Number(sc.total)||0;cancelAnimationFrame(scoreAnimations.get(document.getElementById("gauge-num")));setTxt("gauge-num",total);const circle=document.querySelector(".gauge circle.prog");if(circle)circle.style.strokeDashoffset=(2*Math.PI*52)*(1-Math.max(0,Math.min(25,total))/25);const row=document.querySelectorAll("#score-bars .score-row")[1];if(row){const val=row.querySelector(".val"),fill=row.querySelector(".score-fill"),reason=row.querySelector(".score-reason");const v=Number((sc.clear_customer||{}).score)||0;if(val)val.textContent=v+"/5";if(fill)fill.style.width=(v*20)+"%";if(reason)reason.textContent=(sc.clear_customer||{}).reason||"";}const t=T[lang],interp=document.getElementById("score-interp");if(interp)interp.textContent=t.medium;if(sc.source&&sc.source!=="ai_assumption")interp.textContent+=" "+(lang==="ar"?"تتضمن الدرجة تقديرات احتياطية لعدم كفاية المعلومات.":"Includes fallback estimates where information is insufficient.");const scoreCell=document.querySelectorAll("#passport-table .pv2")[3];if(scoreCell)scoreCell.textContent=(lang==="ar"?"الدرجة المبدئية: ":"Preliminary score: ")+total+"/25";window._passportText=[...document.querySelectorAll("#passport-table tr")].map(tr=>tr.cells[0].textContent+": "+tr.cells[1].textContent).join("\n");const idea=(currentPlan.state||{}).idea||"";setTxt("share-text",t.shareTpl.replace("{idea}",idea).replace("{step}",(currentPlan.state||{}).first_action||"").replace("{score}",total).replace("{verdict}",t.medium));}
+function refreshScoreDisplay(){if(!currentPlan)return;const sc=currentPlan.opportunity_score||{},total=Number(sc.total)||0;cancelAnimationFrame(scoreAnimations.get(document.getElementById("gauge-num")));setTxt("gauge-num",total);const circle=document.querySelector(".gauge circle.prog");if(circle)circle.style.strokeDashoffset=(2*Math.PI*52)*(1-Math.max(0,Math.min(25,total))/25);const row=document.querySelectorAll("#score-bars .score-row")[1];if(row){const val=row.querySelector(".val"),fill=row.querySelector(".score-fill"),reason=row.querySelector(".score-reason");const v=Number((sc.clear_customer||{}).score)||0;if(val)val.textContent=v+"/5";if(fill)fill.style.width=(v*20)+"%";if(reason)reason.textContent=(sc.clear_customer||{}).reason||"";}const t=T[lang],interp=document.getElementById("score-interp");if(interp)interp.textContent=t.medium;if(sc.source&&sc.source!=="ai_assumption")interp.textContent+=" "+(lang==="ar"?"تتضمن الدرجة تقديرات احتياطية لعدم كفاية المعلومات.":"Includes fallback estimates where information is insufficient.");const scoreCell=document.querySelectorAll("#passport-table .pv2")[3];if(scoreCell)scoreCell.textContent=total+"/25";window._passportText=[...document.querySelectorAll("#passport-table tr")].map(tr=>tr.cells[0].textContent+": "+tr.cells[1].textContent).join("\n");const idea=(currentPlan.state||{}).idea||"";setTxt("share-text",t.shareTpl.replace("{idea}",idea).replace("{step}",((currentPlan.state||{}).first_action||"").replace(/[.!؟\s]+$/g,"")).replace("{score}",total).replace("{verdict}",t.medium.replace(/[.!؟\s]+$/g,"")));}
 
 function clearProof(){buildProof();if(currentPlan)delete currentPlan.proof_summary;saveSession();}
 
@@ -1595,10 +1640,11 @@ function exportCSV(){
   const freqs=[...document.querySelectorAll(".p-freq")].map(s=>s.value);
   const concs=[...document.querySelectorAll(".p-concern")].map(s=>s.value);
   const pres=[...document.querySelectorAll(".p-pre")].map(s=>s.value);
-  let csv="row,interested,price_aed,frequency,concern,evidence_strength\n";
+  const csvCell=value=>{let text=String(value??"");if(/^[\s\uFEFF]*[=+@-]/.test(text))text="'"+text;return '"'+text.replace(/"/g,'""')+'"';};
+  let csv="row,interested,price_aed,frequency,concern,evidence_strength\r\n";
   for(let i=0;i<10;i++){
-    const cells=[i+1,ints[i]||"",prices[i]||"",freqs[i]||"",(concs[i]||"").replace(/,/g," "),pres[i]||""];
-    csv+=cells.join(",")+"\n";
+    const cells=[i+1,ints[i]||"",prices[i]||"",freqs[i]||"",concs[i]||"",pres[i]||""];
+    csv+=cells.map(csvCell).join(",")+"\r\n";
   }
   const blob=new Blob([csv],{type:"text/csv"});const url=URL.createObjectURL(blob);
   const a=document.createElement("a");a.href=url;a.download="Khotwa_UAE_Validation_Data.csv";document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
@@ -1606,14 +1652,14 @@ function exportCSV(){
 
 function copyShare(){const txt=document.getElementById("share-text").textContent||"";
 function done(){document.getElementById("shareBtn").textContent="✓ "+T[lang].copied;setTimeout(()=>{document.getElementById("shareBtn").textContent=T[lang].copy;},1500);}
-if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(txt).then(done).catch(()=>fallbackCopy(txt));}else{fallbackCopy(txt);}}
+if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(txt).then(done).catch(()=>{if(fallbackCopy(txt))done();});}else if(fallbackCopy(txt))done();}
 
 function waText(){return document.getElementById("wa-text").textContent||"";}
 function copyDone(){document.getElementById("waBtn").textContent="✓ "+T[lang].copied;setTimeout(()=>{document.getElementById("waBtn").textContent=T[lang].copy;},1500);}
 function copyWA(){const txt=waText();
-if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(txt).then(copyDone).catch(()=>fallbackCopy(txt));}
-else{fallbackCopy(txt);}}
-function fallbackCopy(txt){const ta=document.createElement("textarea");ta.value=txt;ta.style.position="fixed";ta.style.top="-9999px";document.body.appendChild(ta);ta.focus();ta.select();try{document.execCommand("copy");copyDone();}catch(e){alert(txt);}document.body.removeChild(ta);}
+if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(txt).then(copyDone).catch(()=>{if(fallbackCopy(txt))copyDone();});}
+else if(fallbackCopy(txt))copyDone();}
+function fallbackCopy(txt){const ta=document.createElement("textarea");ta.value=txt;ta.style.position="fixed";ta.style.top="-9999px";document.body.appendChild(ta);ta.focus();ta.select();let copied=false;try{copied=document.execCommand("copy");}catch(e){}document.body.removeChild(ta);if(!copied)alert(txt);return copied;}
 function openWA(){const url="https://wa.me/?text="+encodeURIComponent(waText());window.open(url,"_blank");}
 
 function currentIdea(){var el=document.getElementById("idea");var v=el?(el.value||"").trim():"";if(!v&&currentPlan&&currentPlan.readiness_report)v=currentPlan.readiness_report.idea||"";return v;}
@@ -1656,7 +1702,7 @@ const blob=await resp.blob();const url=URL.createObjectURL(blob);const a=documen
 catch(e){console.error("PDF error",e);alert(T[lang].error);}
 finally{clearTimeout(timer);btn.textContent=orig;btn.disabled=false;}}
 
-function resetApp(){currentPlan=null;document.getElementById("journey-home").appendChild(document.getElementById("journey-block"));renderJourney();renderDashboardSummary();chatHistory=[];document.getElementById("error").textContent="";document.getElementById("chat-messages").replaceChildren();document.getElementById("results").style.display="none";document.getElementById("idea").value="";document.getElementById("category").selectedIndex=0;document.getElementById("category").dataset.touched="";document.getElementById("user_type").selectedIndex=0;document.getElementById("region").selectedIndex=0;document.getElementById("context").selectedIndex=0;document.getElementById("budget").value=10000;updateBudget(10000);document.getElementById("proof-table").replaceChildren();document.getElementById("discovery-results").replaceChildren();setEntry("existing");try{sessionStorage.removeItem(SESSION_KEY);}catch(e){}window.scrollTo({top:0,behavior:motionBehavior()});}
+function resetApp(){currentPlan=null;planVariants={en:null,ar:null};document.getElementById("journey-home").appendChild(document.getElementById("journey-block"));renderJourney();renderDashboardSummary();chatHistory=[];document.getElementById("error").textContent="";document.getElementById("chat-messages").replaceChildren();document.getElementById("results").style.display="none";document.getElementById("idea").value="";document.getElementById("category").selectedIndex=0;document.getElementById("category").dataset.touched="";document.getElementById("user_type").selectedIndex=0;document.getElementById("region").selectedIndex=0;document.getElementById("context").selectedIndex=0;document.getElementById("budget").value=10000;updateBudget(10000);document.getElementById("proof-table").replaceChildren();document.getElementById("discovery-results").replaceChildren();setEntry("existing");try{sessionStorage.removeItem(SESSION_KEY);}catch(e){}window.scrollTo({top:0,behavior:motionBehavior()});}
 
 function toggleTheme(){var r=document.documentElement;var dark=r.getAttribute("data-theme")==="dark";if(dark){r.removeAttribute("data-theme");document.getElementById("themeBtn").textContent="\u263e";}else{r.setAttribute("data-theme","dark");document.getElementById("themeBtn").textContent="\u2600";}styleCharts();saveSession();}
 var _loaderTimer;
@@ -1685,6 +1731,9 @@ function runDemoStory(){
 <script>
 applyLang();updateBudget(10000);restoreSession();
 for(const id of ["idea","category","user_type","budget","region","context"]){const field=document.getElementById(id);field.addEventListener("input",saveSession);field.addEventListener("change",saveSession);}
+document.getElementById("idea").addEventListener("input",()=>{selectedIdeaSource="user_input";saveSession();});
+document.getElementById("discovery-results").addEventListener("click",event=>{if(event.target.closest(".idea-card button"))selectedIdeaSource="ai_suggestion_selected";},true);
+document.getElementById("newBtn").addEventListener("click",()=>{selectedIdeaSource="user_input";},true);
 </script>
 </body>
 </html>

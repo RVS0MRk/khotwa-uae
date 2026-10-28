@@ -30,7 +30,7 @@ async function main(){
     assert.equal(await page.locator('#journey').getAttribute('data-stage'),'2');
     assert.equal(await page.locator('#evidence-ladder').getAttribute('data-highest'),'0');
     await page.locator('.p-price').nth(0).fill('23');await page.locator('.p-price').nth(1).fill('30');
-    assert.equal(await page.locator('#proof-progress-count').innerText(),'2 / 10 conversations recorded');
+    assert.equal(await page.locator('#proof-progress-count').innerText(),'2 / 10 entries recorded');
     assert.equal(await page.locator('#proof-stats .v').nth(2).innerText(),'26.5');
     await page.locator('.p-pre').first().selectOption('reservation');
     assert.equal(await page.locator('#evidence-ladder').getAttribute('data-highest'),'2');
@@ -53,12 +53,12 @@ async function main(){
     await page.locator('#result-tab-0').focus();await page.keyboard.press('End');assert.equal(await page.locator('#result-tab-6').getAttribute('aria-selected'),'true');
     await page.evaluate(()=>{clearProof();selectPanel(0);});assert.equal(await page.locator('#journey').getAttribute('data-stage'),'1');
     // Capture every requested viewport × language × theme. All tabs receive a full panel capture.
-    const sizes=[[1366,768],[1440,900],[390,844],[430,932]];
+    const sizes=[[320,740],[375,812],[390,844],[430,932],[768,1024],[1024,768],[1366,768],[1920,1080]];
     for(const [width,height] of sizes){
       await page.setViewportSize({width,height});
       for(const language of ['en','ar'])for(const theme of ['light','dark']){
         const prefix=`${width}-${height}-${language}-${theme}`;
-        await page.evaluate(({language,theme})=>{lang=language;document.documentElement.setAttribute('data-theme',theme);applyLang();setEntry('existing');}, {language,theme});
+        await page.evaluate(({language,theme})=>{if(lang!==language)toggleLang();document.documentElement.setAttribute('data-theme',theme);applyLang();setEntry('existing');}, {language,theme});
         assert.equal(await page.locator('#brand-name').innerText(),language==='ar'?'خطوة':'Khotwa');
         assert.equal(await page.locator('#title').innerText(),language==='ar'?'من الفكرة إلى الخطوة الأولى.':'From idea to first step.');
         assert.ok((await page.title()).startsWith(language==='ar'?'خطوة':'Khotwa'));
@@ -69,7 +69,8 @@ async function main(){
         await page.evaluate(()=>selectPanel(0));await page.locator('#dashboard-summary').screenshot({path:path.join(output,prefix+'-summary.png')});
         for(let i=0;i<7;i++){
           await page.evaluate(i=>selectPanel(i),i);await page.waitForFunction(i=>{const b=document.getElementById('result-tab-'+i).getBoundingClientRect(),n=document.getElementById('result-nav').getBoundingClientRect();return b.left>=n.left-1&&b.right<=n.right+1;},i);
-          assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,prefix+' panel '+i+' page overflow');
+          const overflow=await page.evaluate(()=>({page:document.documentElement.scrollWidth,width:innerWidth,items:[...document.querySelectorAll('body *')].filter(e=>{const r=e.getBoundingClientRect(),s=getComputedStyle(e);return r.right>innerWidth+2&&s.position!=='fixed'&&s.display!=='none'&&!e.closest('.journey')}).slice(0,20).map(e=>({tag:e.tagName,id:e.id,cls:e.className,right:Math.round(e.getBoundingClientRect().right)})),score:['main','.score-hero','.score-bars','.score-row','.score-top','.score-track','.score-top .val'].map(q=>{const e=document.querySelector(q),r=e.getBoundingClientRect();return [q,Math.round(r.left),Math.round(r.right),Math.round(r.width)]})}));
+          assert.equal(overflow.page<=overflow.width,true,prefix+' panel '+i+' page overflow '+JSON.stringify(overflow));
           await page.locator('#panel-'+i).screenshot({path:path.join(output,prefix+'-tab'+i+'.png')});
           if(width<600&&i===1)assert.equal(await page.locator('#proof-table tr').nth(1).evaluate(e=>getComputedStyle(e).display),'grid');
         }

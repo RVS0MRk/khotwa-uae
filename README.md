@@ -2,6 +2,8 @@
 
 Khotwa is a bilingual English/Arabic Flask website for first-time UAE founders. It offers idea discovery, a seven-tab dashboard, Founder Journey, Proof Mode, the Khotwa Advisor powered by Groq, scoring and charts, and an English/Arabic PDF founder report. Business and regulatory guidance is a starting point; users should verify requirements with the appropriate UAE authority before operating or accepting payment.
 
+Generated plans request English and Arabic wording in the **same** Groq JSON response. The browser keeps both versions for language switching, so switching languages does not call Groq again or reset Proof Mode. If translated fields are missing or invalid, Khotwa uses cautious localized guidance and marks that plan with `_localization_status: fallback`. The business name, selected market, budget, score and recorded evidence remain tied to the same plan. Arabic prose quality still depends on the live model response and should be reviewed in the deployed site.
+
 ## Requirements and local run
 
 - Python **3.12** (`.python-version` selects the 3.12 series on Render).
@@ -28,7 +30,7 @@ node test_browser.cjs
 node test_redesign.cjs
 ```
 
-The browser tests start an isolated Flask server with mocked Groq responses. They require Node.js, the `playwright` package, and Chrome. The Python PDF tests also require `pypdf` as a **test-only** package (`pip install pypdf`). `test_api.py` is a separate **live** Groq connection test; run it only when you intend to make a real API request:
+The browser tests start an isolated Flask server with mocked Groq responses. They require Node.js, the `playwright` package, and Chrome. Install Python test dependencies with `.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt`; `pypdf` is test-only and is not installed by Render. `test_api.py` is a separate **live** Groq connection test; run it only when you intend to make a real API request:
 
 ```powershell
 .\.venv\Scripts\python.exe test_api.py
@@ -69,7 +71,9 @@ Review `git status --short` and `git diff --cached --name-only` **before** the c
 
 Gunicorn binds to `0.0.0.0:$PORT` with one worker, two threads, and a 70-second worker timeout. This lets health checks respond while another thread waits for Groq. Only one PDF is built at a time; a concurrent PDF request receives a JSON `503` response. The app sets a 256 KiB JSON request limit, short input limits, PDF collection limits, and an in-memory public request window on Render (30 costly requests per client and 150 total per 10 minutes). The limit resets on restart and is basic cost protection, not a dedicated abuse service. The Groq HTTP timeout is 40 seconds; the browser gives live requests 45 seconds and PDF export 65 seconds.
 
-Render Free currently has 512 MB RAM and limited CPU. It sleeps after 15 minutes without traffic, so the first visit may take about a minute. Its filesystem is ephemeral. PDF generation and matplotlib charts can be slow or memory-intensive under concurrent use; one Gunicorn worker favors memory over parallel throughput. If reports time out or the service runs out of memory, inspect Render logs and use a paid instance or simplify PDF chart generation before a larger public launch. This free setup is suitable for classroom testing, not guaranteed high traffic.
+Proof Mode values are kept in the current tab with `sessionStorage` for refresh recovery. Free-text frequency and concern notes, Advisor chat, and API keys are excluded from recovery. Clear removes recorded rows; New Idea resets the previous business. Customer entries are user-reported and are not independently verified. PDF pagination follows content length and includes recorded Proof Mode values only when provided. User budget is labelled **USER INPUT**; model costs and prices are estimates or hypotheses.
+
+Render Free currently has 512 MB RAM and limited CPU. It sleeps after 15 minutes without traffic, so the first visit may take about a minute. Its filesystem is ephemeral. PDF generation and matplotlib charts can be slow or memory-intensive under concurrent use; one Gunicorn worker favors memory over parallel throughput. If reports time out or the service runs out of memory, inspect Render logs and use a paid instance or simplify PDF chart generation before a larger public launch. This free setup is suitable for classroom testing, not guaranteed high traffic. See [Render's Free service limits](https://render.com/docs/free), [Python version settings](https://render.com/docs/python-version), and [Flask deployment guide](https://render.com/docs/deploy-flask).
 
 ## Public testing checklist
 
@@ -77,7 +81,8 @@ Render Free currently has 512 MB RAM and limited CPU. It sleeps after 15 minutes
 - Check `/health` and that CSS, favicon, fonts, tabs, dark mode, and animations load.
 - Test idea discovery, plan generation, all seven tabs, Founder Journey, Proof Mode, scoring, charts, and WhatsApp QR/link.
 - Ask the live Groq Advisor a follow-up question; confirm that no raw JSON, Markdown, or HTML appears.
-- Export English and Arabic PDFs; check Arabic shaping, chart pages, and download behavior on a phone.
+- Switch a generated dashboard to Arabic and back without generating again; check Arabic prose in every tab and that scores and Proof Mode values remain the same.
+- Export English and Arabic PDFs; check Arabic shaping, all pages, Proof Mode values, chart pages, and download behavior on a phone.
 - Confirm Arabic/RTL layout and narrow-screen usability.
 - Try one malformed/oversized request and repeated requests; confirm JSON errors, throttling, and no secrets in responses or logs.
 - Check Render logs and usage for timeouts, memory pressure, and unexpected Groq request volume.

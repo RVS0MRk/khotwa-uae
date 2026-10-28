@@ -78,6 +78,36 @@ async function main() {
     assert.equal(state.user_budget_aed, 4000);
     assert.equal(state.category, 'Services & Maintenance');
     assert.equal(state.evidence.responses, 0);
+    assert.equal(state.idea_source, 'ai_suggestion_selected');
+    assert.ok((await page.locator('#overview-body').innerText()).includes('AI SUGGESTION SELECTED BY USER'));
+    let extraGenerateCalls=0;
+    await page.route('**/generate', route=>{extraGenerateCalls++;return route.continue();});
+    const initialScore=await page.evaluate(()=>currentPlan.opportunity_score.total);
+    await page.locator('#langBtn').click();
+    assert.equal(await page.evaluate(()=>currentPlan._content_lang),'ar');
+    assert.ok(/[\u0600-\u06ff]/.test(await page.locator('#overview-body').innerText()));
+    assert.ok(/[\u0600-\u06ff]/.test(await page.locator('#score-bars').innerText()));
+    assert.equal(await page.evaluate(()=>currentPlan.opportunity_score.total),initialScore);
+    assert.equal(await page.evaluate(()=>currentPlan.state.user_budget_aed),4000);
+    await page.locator('#langBtn').click();
+    assert.equal(await page.evaluate(()=>currentPlan._content_lang),'en');
+    assert.equal(extraGenerateCalls,0,'language switching reused the generated plan');
+    await page.unroute('**/generate');
+    await page.evaluate(()=>{window._copied=[];Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async value=>{window._copied.push(value);}}});});
+    for(const language of ['en','ar']){
+      if(language==='ar')await page.locator('#langBtn').click();
+      await page.evaluate(()=>{document.querySelectorAll('.pitch-copy').forEach(button=>button.click());for(const id of ['passportCopyBtn','waBtn','shareBtn'])document.getElementById(id).click();});
+      await page.waitForFunction(n=>window._copied.length===n,language==='ar'?14:7);
+      const copied=await page.evaluate(()=>window._copied.slice(-7));
+      assert.equal(copied.length,7);
+      assert.ok(copied.every(value=>value.trim().length>20));
+      assert.ok(!copied.some(value=>/Preliminary score:\s*Preliminary score:|payment\.\./i.test(value)));
+    }
+    await page.waitForTimeout(1600);
+    await page.evaluate(()=>{Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async()=>{throw Error('test clipboard failure');}}});document.execCommand=()=>true;document.getElementById('shareBtn').click();});
+    await page.waitForFunction(()=>document.getElementById('shareBtn').textContent.includes('✓'));
+    assert.ok(!(await page.locator('#waBtn').innerText()).includes('✓'));
+    await page.locator('#langBtn').click();
     for (const index of [6, 0, 3]) {
       await page.evaluate(i=>selectPanel(i), index);
       await page.waitForFunction(i=>{
@@ -114,6 +144,11 @@ async function main() {
     await page.locator('.p-price').nth(1).fill('30');
     assert.equal(await page.evaluate(()=>currentPlan.proof_summary.avg_price),26.5);
     assert.equal(await page.locator('#proof-stats .v').nth(2).innerText(),'26.5');
+    await page.locator('.p-concern').first().fill('=1+1,"comma"');
+    const csvDownload=page.waitForEvent('download');
+    await page.locator('#proofCsvBtn').click();
+    const csv=fs.readFileSync(await (await csvDownload).path(),'utf8');
+    assert.ok(csv.includes('"\'=1+1,""comma"""'),'CSV escapes spreadsheet formulas, commas and quotes');
     await page.evaluate(()=>positionAdvisorLauncher());
     const priceBox=await page.locator('.p-price').nth(1).boundingBox(),launcherBox=await page.locator('#chatLauncher').boundingBox();
     assert.ok(priceBox.x+priceBox.width<=launcherBox.x-8 || priceBox.x>=launcherBox.x+launcherBox.width+8 || priceBox.y+priceBox.height<=launcherBox.y-8 || priceBox.y>=launcherBox.y+launcherBox.height+8,'LTR launcher stays outside form controls');
@@ -124,6 +159,9 @@ async function main() {
     await page.locator('#proofClearBtn').click();
     assert.equal(await page.evaluate(() => currentPlan.state.evidence.responses), 0);
     assert.equal(await page.evaluate(() => currentPlan.decision_engine.decision), 'Validate more');
+    const clearDownload=page.waitForEvent('download');
+    await page.locator('#proofCsvBtn').click();
+    assert.ok(!(fs.readFileSync(await (await clearDownload).path(),'utf8')).includes('=1+1'));
     await page.locator('#chatLauncher').click();
     await page.locator('#chat-input').fill('What are my biggest risks?');
     await page.locator('#sendBtn').click();
@@ -195,6 +233,9 @@ async function main() {
     await page.waitForFunction(() => currentPlan && currentPlan._local && document.getElementById('results').style.display==='block');
     assert.equal(await page.locator('#report-table img').count(), 0);
     assert.equal(await page.locator('#overview-body img').count(), 0);
+    assert.equal(new Set(await page.locator('#day-grid .day-card').evaluateAll(cards=>cards.map(c=>c.querySelector('.a:last-child')?.textContent))).size,7);
+    assert.ok(new Set(await page.evaluate(()=>currentPlan.risk_radar.map(r=>r.level))).size>1);
+    assert.equal(new Set(await page.evaluate(()=>currentPlan.customer_personas.map(p=>p.ask))).size,3);
     assert.equal(await page.evaluate(() => currentPlan.state.user_budget_aed), 10000);
     const recoveryContext = await browser.newContext();
     const recoveryPage = await recoveryContext.newPage();
@@ -262,8 +303,99 @@ async function main() {
     assert.equal(await recoveryPage.locator('#results').isVisible(),false);
     assert.equal(await recoveryPage.locator('#idea').inputValue(),'');
     await recoveryContext.close();
+    for(const profile of [
+      {idea:'AI-Powered No-Code Website Builder for SMBs',category:'Technology & Digital',region:'Abu Dhabi',budget:'5000',risk:'data handling'},
+      {idea:'Healthy meal prep for professionals',category:'Food & Catering',region:'Dubai',budget:'3000',risk:'Meal preparation'},
+      {idea:'Mobile cleaning service',category:'Services & Maintenance',region:'Sharjah',budget:'4000',risk:'Travel time'},
+    ]){
+      const context=await browser.newContext();const journey=await context.newPage();
+      try{
+        await journey.goto(base,{waitUntil:'networkidle'});
+        await journey.locator('#idea').fill(profile.idea);
+        await journey.evaluate(category=>{document.getElementById('category').selectedIndex=T.en.categories.indexOf(category)+1;},profile.category);
+        await journey.locator('#region').selectOption(profile.region);
+        await journey.locator('#budget').fill(profile.budget);
+        await journey.locator('#genBtn').click();
+        await journey.waitForFunction(()=>currentPlan&&document.getElementById('results').style.display==='block');
+        const plan=await journey.evaluate(()=>currentPlan);
+        assert.equal(plan.state.idea,profile.idea);
+        assert.equal(plan.state.category,profile.category);
+        assert.equal(plan.state.region,profile.region);
+        assert.equal(plan.state.user_budget_aed,Number(profile.budget));
+        assert.ok(plan.risk_radar[3].reason.includes(profile.risk));
+        assert.equal(new Set(plan.customer_personas.map(p=>p.ask)).size,3);
+        assert.equal(plan.opportunity_score.total,['local_fit','clear_customer','low_starting_cost','easy_first_step','growth_potential'].reduce((n,key)=>n+plan.opportunity_score[key].score,0));
+        await journey.evaluate(()=>selectPanel(6));
+        const resource=await journey.locator('#regional-resource').innerText();
+        assert.equal(resource.includes('Abu Dhabi Department'),profile.region==='Abu Dhabi');
+        if(profile.category==='Technology & Digital'){
+          for(const language of ['en','ar']){
+            if(language==='ar')await journey.locator('#langBtn').click();
+            const report=await journey.request.post(base+'/pdf',{data:{...await journey.evaluate(()=>currentPlan),_lang:language}});
+            assert.equal(report.status(),200);
+            assert.ok((await report.body()).subarray(0,4).equals(Buffer.from('%PDF')));
+          }
+        }
+      }finally{await context.close();}
+    }
+    const arabicContext=await browser.newContext();const arabicPage=await arabicContext.newPage();
+    try{
+      await arabicPage.goto(base,{waitUntil:'networkidle'});
+      await arabicPage.locator('#langBtn').click();
+      await arabicPage.locator('#idea').fill('وجبات صحية للموظفين');
+      await arabicPage.evaluate(()=>{document.getElementById('category').selectedIndex=T.en.categories.indexOf('Food & Catering')+1;});
+      await arabicPage.locator('#region').selectOption('Dubai');
+      await arabicPage.locator('#budget').fill('4000');
+      const arabicGenerate=arabicPage.waitForResponse(response=>response.url().endsWith('/generate'));
+      await arabicPage.locator('#genBtn').click();
+      const arabicResponse=await arabicGenerate;
+      assert.equal(arabicResponse.status(),200,await arabicResponse.text());
+      await arabicPage.waitForFunction(()=>currentPlan&&document.getElementById('results').style.display==='block');
+      assert.equal(await arabicPage.evaluate(()=>currentPlan._content_lang),'ar');
+      for(const selector of ['#overview-body','#score-bars','#day-grid','#questions-list','#persona-grid','#risk-list','#pitch-list']){
+        assert.ok(/[\u0600-\u06ff]/.test(await arabicPage.locator(selector).innerText()),selector);
+      }
+      await arabicPage.evaluate(()=>selectPanel(1));
+      await arabicPage.locator('.p-int').first().selectOption('yes');
+      await arabicPage.reload({waitUntil:'networkidle'});
+      assert.equal(await arabicPage.evaluate(()=>currentPlan.state.idea),'وجبات صحية للموظفين');
+      assert.equal(await arabicPage.evaluate(()=>currentPlan.state.evidence.responses),1);
+      assert.equal(await arabicPage.locator('html').getAttribute('lang'),'ar');
+    }finally{await arabicContext.close();}
+    const proofContext=await browser.newContext();const proofPage=await proofContext.newPage();
+    try{
+      await proofPage.goto(base,{waitUntil:'networkidle'});
+      await proofPage.locator('#idea').fill('Neighbourhood service concept');
+      await proofPage.evaluate(()=>{document.getElementById('category').selectedIndex=T.en.categories.indexOf('Services & Maintenance')+1;});
+      await proofPage.locator('#genBtn').click();
+      await proofPage.waitForFunction(()=>currentPlan&&document.getElementById('results').style.display==='block');
+      await proofPage.evaluate(()=>selectPanel(1));
+      for(let i=0;i<10;i++){
+        await proofPage.locator('.p-int').nth(i).selectOption(i<4?'yes':i<7?'maybe':'no');
+        if(i<5)await proofPage.locator('.p-pre').nth(i).selectOption(['interest','intent','reservation','payment','repeat'][i]);
+      }
+      for(const [i,value] of [[0,'10'],[1,'20'],[2,'30'],[3,'-100'],[5,'40']])await proofPage.locator('.p-price').nth(i).fill(value);
+      const proofState=await proofPage.evaluate(()=>currentPlan.proof_summary);
+      assert.equal(proofState.total_responses,10);
+      assert.equal(proofState.interested,4);
+      assert.equal(proofState.maybe,3);
+      assert.equal(proofState.no,3);
+      assert.equal(proofState.stated_intent,1);
+      assert.equal(proofState.no_payment_reservations,1);
+      assert.equal(proofState.actual_payments,1);
+      assert.equal(proofState.repeat_customers,1);
+      assert.equal(proofState.avg_price,25);
+      assert.equal(await proofPage.evaluate(()=>currentPlan.opportunity_score.clear_customer.score),5);
+      await proofPage.reload({waitUntil:'networkidle'});
+      assert.equal(await proofPage.evaluate(()=>currentPlan.proof_summary.total_responses),10);
+      assert.equal(await proofPage.evaluate(()=>currentPlan.proof_summary.avg_price),25);
+      await proofPage.locator('#proofClearBtn').click();
+      await proofPage.reload({waitUntil:'networkidle'});
+      assert.equal(await proofPage.evaluate(()=>currentPlan.state.evidence.responses),0);
+      assert.equal(await proofPage.locator('.p-int').first().inputValue(),'');
+    }finally{await proofContext.close();}
     assert.deepEqual(errors, []);
-    console.log('PASS: syntax, discovery, tab-local refresh recovery, session isolation, Proof Mode Clear and New Idea, budget gap, scores, segments, Advisor, malformed fallback, safe rendering, Arabic PDF, EN/AR 390px.');
+    console.log('PASS: syntax, discovery, bilingual cache, four business journeys, seven Copy buttons in both languages, CSV safety, ten-row Proof Mode and Clear/reload, session isolation, budget gap, scores, segments, Advisor, malformed fallback, safe rendering, English/Arabic PDFs, EN/AR 390px.');
     console.log('Screenshots: '+output);
   } catch (error) {
     console.error(error);

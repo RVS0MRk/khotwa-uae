@@ -216,7 +216,8 @@ class RouteTests(unittest.TestCase):
         self.assertIn("After confirming", p["steps"][5]["description"])
         self.assertEqual(p["customer_personas"][0]["name"], "Residential car owners")
         self.assertEqual(p["decision_engine"]["decision"], "Validate more")
-        self.assertIn("Example introductory price: AED 30", p["pitches"]["thirty_sec"])
+        self.assertIn("Price hypothesis: AED 30", p["pitches"]["thirty_sec"])
+        self.assertIn("define the unit and scope", p["pitches"]["thirty_sec"])
         self.assertIn("AI ASSUMPTION", p["pitches"]["thirty_sec"])
 
     def test_exact_discovery_profile_produces_three_safe_cards(self):

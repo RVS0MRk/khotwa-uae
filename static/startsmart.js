@@ -41,7 +41,7 @@ function renderDashboardSummary(){
   const s=currentPlan.state||{},p=currentPlan.proof_summary||{};const heading=root.querySelector('.summary-heading');heading.replaceChildren();
   const title=uiNode('div');title.append(uiNode('div','section-label',uiText('YOUR BUSINESS','مشروعك')),uiNode('h2','',s.idea||currentPlan.readiness_report?.idea||''));
   const market=uiNode('div','summary-market');market.append(uiNode('b','',T[lang].regions[s.region]||s.region||''),uiNode('span','',T[lang].contexts[s.context]||s.context||''));heading.append(title,market);
-  let evidence=uiText('No evidence','لا توجد أدلة');if(p.total_responses)evidence=uiText(p.total_responses+' responses',p.total_responses+' إجابات');
+  let evidence=uiText('No evidence recorded','لا توجد أدلة مسجّلة');if(p.total_responses)evidence=uiText(p.total_responses+(Number(p.total_responses)===1?' response':' responses'),p.total_responses+(Number(p.total_responses)===1?' إجابة':' إجابات'));
   const detail=[];if(p.no_payment_reservations)detail.push(uiText(p.no_payment_reservations+' reservations',p.no_payment_reservations+' حجوزات'));if(p.actual_payments)detail.push(uiText(p.actual_payments+' payments',p.actual_payments+' عمليات دفع'));if(p.repeat_customers)detail.push(uiText(p.repeat_customers+' repeat customers',p.repeat_customers+' عملاء متكررين'));
   const stats=root.querySelector('.summary-stats');stats.replaceChildren();
   [[uiText('Your budget','ميزانيتك'),Number(s.user_budget_aed||0).toLocaleString()+' '+currency(),uiText('USER INPUT','إدخال المستخدم')],[uiText('Preliminary score','الدرجة المبدئية'),(currentPlan.opportunity_score?.total||0)+'/25',uiText('Mainly assumptions','افتراضات في الغالب')],[uiText('Evidence status','حالة الأدلة'),evidence,detail.join(' · ')||uiText('From Proof Mode only','من وضع الإثبات فقط')],[uiText('TODAY','اليوم'),s.first_action||currentPlan.first_step_today||'','']].forEach(([label,value,sub],i)=>{const box=uiNode('div','summary-stat'+(i===3?' today':''));box.append(uiNode('small','',label),uiNode('strong','',value),uiNode('span','sub',sub));stats.appendChild(box);});
@@ -64,8 +64,8 @@ function labelProofRows(){
 function renderProofPolish(){
   const p=currentPlan?.proof_summary||{},total=Number(p.total_responses)||0;
   setTxt('proof-progress-title',uiText('Customer validation','التحقق مع العملاء'));
-  const count=document.getElementById('proof-progress-count'),fraction=uiNode('bdi','',total+' / 10');fraction.dir='ltr';count.replaceChildren(fraction,document.createTextNode(uiText(' conversations recorded',' محادثات مسجّلة')));
-  const progress=document.getElementById('proof-progress');progress.style.width=(total*10)+'%';progress.parentElement.setAttribute('aria-valuenow',String(total));progress.parentElement.setAttribute('aria-label',uiText('Conversations recorded','المحادثات المسجّلة'));
+  const count=document.getElementById('proof-progress-count'),fraction=uiNode('bdi','',total+' / 10');fraction.dir='ltr';count.replaceChildren(fraction,document.createTextNode(uiText(total===1?' entry recorded':' entries recorded',total===1?' إدخال مسجّل':' إدخالات مسجّلة')));
+  const progress=document.getElementById('proof-progress');progress.style.width=(total*10)+'%';progress.parentElement.setAttribute('aria-valuenow',String(total));progress.parentElement.setAttribute('aria-label',uiText('Proof Mode entries recorded','إدخالات وضع الإثبات المسجّلة'));
   // Keep all original counters/order; add the three stronger evidence counts.
   const stats=document.getElementById('proof-stats');
   [['stated_intent','Stated intent','نية شراء معلنة'],['actual_payments','Actual payment','دفع فعلي'],['repeat_customers','Repeat behavior','سلوك متكرر']].forEach(([key,en,ar])=>{const card=uiNode('div','stat-card');card.dataset.evidence=key;const value=uiNode('div','v',String(p[key]||0));value.dataset.target=String(p[key]||0);card.append(value,uiNode('div','l',uiText(en,ar)));stats.appendChild(card);});
