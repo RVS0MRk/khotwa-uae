@@ -1,9 +1,5 @@
 <!-- Floating AI advisor -->
-<button class="chat-launcher" id="chatLauncher" data-onclick="event-17" aria-controls="chatPanel" aria-expanded="false" aria-label="Open Khotwa Advisor">
-  <span class="cl-icon" aria-hidden="true">↗</span>
-  <span class="cl-text" id="cl-text">Need help?</span>
-  <span class="cl-pulse" aria-hidden="true"></span>
-</button>
+
 
 <div class="chat-backdrop" id="chat-backdrop" hidden data-onclick="event-18"></div>
 <div class="chat-panel" inert id="chatPanel" role="dialog" aria-label="Khotwa Advisor" aria-hidden="true">
@@ -15,7 +11,7 @@
     </div>
     <button class="chat-close" id="chatClose" data-onclick="event-19" aria-label="Close advisor">✕</button>
   </div>
-  <div class="suggested" id="suggested" style="padding:.75rem .9rem 0"></div>
+  <div class="suggested advisor-suggestions" id="suggested"></div>
   <div class="chat-messages" id="chat-messages" aria-live="polite"></div>
   <div class="chat-input-row">
     <input type="text" id="chat-input" placeholder="Ask anything about your plan..." data-onkeydown="event-20" aria-label="Type your question">

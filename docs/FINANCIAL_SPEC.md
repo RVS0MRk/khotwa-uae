@@ -1,55 +1,52 @@
-# Financial calculation contract
+# Khotwa financial calculation contract (V2.1)
 
-The authoritative implementation is `finance.py`. It performs no network calls and stores no data. `/finance`, both PDF types and Advisor context use its results. The browser formats decimal strings and uses Number only for display and chart widths, never as the authoritative monetary engine.
+`finance.py` is the authoritative Decimal engine. It has no network or persistence. `/finance`, both PDF reports and Advisor context recalculate from user assumptions; clients cannot submit authoritative results.
 
-## Inputs and units
+Money inputs are AED decimal strings, rounded to fils with ROUND_HALF_UP. Intermediate precision is 50 digits. Output money and month estimates have two decimals; ratios and mathematical break-even units have four. Operational break-even units use ceiling. Blank/null means unknown, never zero. Negative zero normalizes to zero. Boolean, non-finite, negative nonzero, unknown fields, fractional units and values above the computational limit of 1 trillion are rejected.
 
-All money is AED. `units` is a non-negative whole number per month; price, variable cost and COGS must describe the same founder-defined selling unit. Null or blank is unknown. Explicit zero is accepted. NaN, infinity, booleans, negative numbers, unknown fields and inputs greater than AED 1 trillion are rejected. The upper bound is a computational limit, not a suggested business assumption.
+## Inputs and outputs
 
-Money inputs and reports round to 0.01 AED using Decimal ROUND_HALF_UP. Intermediate calculations use 50-digit Decimal precision. Ratios and continuous break-even units report four decimals; runway reports two. Whole break-even units use ROUND_CEILING. Results are serialized as strings, except whole-unit counts and status fields.
-
-## Formulas
-
-| Output | Method |
+| Output | Formula / assumption |
 |---|---|
-| Monthly revenue | units × selling price |
-| Monthly variable expenses | units × variable cost per unit |
-| Contribution per unit | price − all variable cost per unit |
-| Contribution ratio | contribution / price; unknown if price is zero |
-| Gross profit | revenue − units × separately supplied accounting COGS per unit |
-| Gross margin | gross profit / revenue; unknown if revenue is zero |
-| Operating profit | revenue − variable expenses − fixed operating expenses |
-| Continuous break-even units | fixed expenses / positive contribution per unit |
-| Minimum whole break-even units | ceiling(continuous break-even units) |
-| Whole-unit break-even revenue | minimum whole units × price |
-| One-time expenses | equipment + initial software + launch marketing + other one-time costs |
-| Contingency | directly entered AED, or chosen percentage of one-time expenses only |
-| Required startup capital | one-time expenses + working-capital cash buffer + contingency |
-| Funding gap | required capital − available funds; negative means surplus |
-| Available operating cash | available funds − initial expenses − ring-fenced contingency |
-| Monthly net cash flow | separately supplied cash collections − recurring cash payments |
-| Runway | operating cash / positive monthly net cash burn |
+| Revenue | monthly whole units x price per matching unit |
+| Variable expenses | units x variable cost per unit |
+| Contribution | price minus all variable cost per unit |
+| Contribution ratio | contribution / price; unknown at zero price |
+| Operating profit | revenue minus variable expenses minus fixed expenses |
+| Gross profit | revenue minus units x supplied accounting COGS |
+| Gross margin | gross profit / revenue; unknown at zero revenue |
+| Continuous break-even | fixed expenses / positive contribution |
+| Whole break-even units | ceiling(continuous units); unreachable for contribution <= 0 |
+| Break-even revenue | whole break-even units x price |
+| One-time expenses | equipment + initial software + launch marketing + other setup + explicitly entered licensing |
+| Contingency | entered AED or selected percent of one-time expenses only |
+| Startup capital | one-time expenses + working-capital buffer + contingency |
+| Funding gap | startup capital minus available funds; negative = surplus |
+| Operating cash | available funds minus one-time expenses minus contingency |
+| Monthly net cash flow | effective cash collections minus effective recurring payments |
+| Cash runway | operating cash / positive monthly net cash burn |
+| Simple payback months | one-time spending / positive monthly net cash benefit |
 
-Working capital is a required cash buffer, not a second spending item. It remains within available operating cash and is not deducted twice. A funding request is not treated as received money. COGS is an optional accounting classification; it is not assumed to equal all variable costs. Accounting profit and cash timing remain separate.
+Working capital is held cash, not a second expense. Payback uses spent initial capital, excluding held working capital and contingency, and explicitly uses the selected cash basis. It ignores variable future cash flows and time value of money. No positive cash benefit means payback unavailable. Unknown cost/cash input means unknown payback. Zero initial spend with positive benefit yields 0.00 months. Underfunded initial spending has an underfunded runway status; zero or positive cash flow has a no-current-burn status, not infinity.
 
-When contribution is zero or negative, break-even is `unreachable`, with no infinity or fabricated unit count. When cash flow is neutral or positive and operating cash is known, runway is `no_burn`. When initial spending is underfunded, runway is `underfunded`. Missing cash inputs produce `unknown`, even if accounting profit exists.
+## Explicit accounting and cash modes
 
-## Independently checked example
+`cash_mode=entered` is the default. Separate cash receipts/payments remain authoritative even when profit is positive. `cash_mode=simplified` requires the user's selection: collections equal projected revenue, payments equal variable plus fixed operating expenses in the same month. It does not overwrite detailed cash fields or describe them as actuals. `cash_flow_basis` reports entered_cash_flow, simplified_user_assumption or missing_information.
 
-Equipment 1000 + software 200 + marketing 300 + other 500 = **2000** one-time expenses. A 10% contingency is **200**. With working capital 1000, required capital is **3200**. Available funds 3000 leave a **200** shortfall.
+`cogs_basis=separate` permits a different accounting category, including fixed production costs. No false restriction is imposed. With `subset_of_variable`, accounting COGS per unit cannot exceed variable cost per unit: the engine returns a warning and withholds contradictory gross profit/margin while retaining independent operating-profit calculations.
 
-Price 50, units 100, variable cost 20 and fixed expenses 1200 produce revenue **5000**, variable expenses **2000**, contribution **30** per unit (**60%**) and operating profit **1800**. COGS 15 per unit gives gross profit **3500** and gross margin **70%**. Break-even is **40** whole units, generating **2000** revenue.
+Licensing is optional and has no invented fee. Old saved records retain their known subtotal when it is absent; `licensing_not_provided` explicitly warns that capital excludes unprovided licensing. Missing licensing remains null. Entering 0 explicitly differs from leaving it blank. Users must move any licensing already inside Other costs to the new field to avoid duplicating their own input. An entered licensing amount is added exactly once, including the resulting change to percentage contingency.
 
-Cash collections 4000 and payments 4600 imply monthly burn **600**. Operating cash is 3000 − 2000 − 200 = **800**, giving **1.33 months** runway. Positive accounting profit therefore does not imply positive cash flow.
+## Scenarios and sensitivity
 
-## Scenarios, sensitivity and stages
+Default scenarios vary base sales volume by -20% and +20%, rounded to whole units with a minimum one-unit move when possible. Base retains original inputs; missing values remain missing. From zero, downside remains zero and upside is one; no negative sales are invented. These are labelled editable illustrations, not model forecasts or demand evidence. Independent dictionaries, individual reset, use-current/reset-original controls and same-tab recovery are preserved.
 
-Three independently editable input dictionaries use the same engine. They initially match the base assumptions; no forecasts or fixed percentages are invented. Reset restores the first explicitly calculated inputs. Reducing scenario units to 10 in the example gives revenue 500 and operating loss 900, without changing the other scenarios.
+Sensitivity changes one assumption at a time toward +/-10%. Whole-unit changes that would round back to baseline move by at least one where possible. For three units, comparisons are two and four, labelled actual -33.33%/+33.33%, not literal +/-10%. The response includes baseline, actual rounded comparison, actual percentage, signed profit impact and complete result. Percentage from a zero baseline is undefined. Monetary comparisons reflect actual fil rounding. Results sort by descending absolute profit impact; tied leading fields are all named. Table and chart use the same sorted list.
 
-Sensitivity changes units, price, variable cost or fixed cost separately by ±10%. Unit counts round to the nearest whole unit; other changed monetary inputs follow the fils policy. In the example, a 10% price decrease produces operating profit **1300**; a 10% unit increase produces **2100**.
+Example: price 50, units 100, variable cost 20, fixed costs 1200 gives revenue 5000, contribution 30 (60%), profit 1800 and break-even 40 units. With initial costs 2000, working capital 1000, contingency 10%, and available funds 3000, startup capital is 3200 (licensing unprovided warning). Collections 4000 and payments 4600 give burn 600, operating cash 800 and runway 1.33 months. Simplified mode instead yields cash benefit 1800, no current burn and payback 1.11 months on known initial spending; it is not actual cash evidence.
 
-Six stage allocations remain founder choices. A known allocation sum above available funds triggers a warning even if other stage budgets are blank. Full allocation totals and remaining capital remain unknown until every stage value is supplied. Stage completion and readiness checks are self-reported, never automatically inferred from AI prose.
+## Presentation and boundaries
 
-## Boundaries
+Both languages use Latin digits, thousands grouping, two decimal fils and the AED code: `3,200.00 AED`. RTL browser currency runs are directionally isolated to keep minus signs with their numbers. PDFs use the same numeric policy, percentage ratios such as 60%, whole operational units and localized footers. CSV contains raw and formatted values plus meaningful units; ratios are not labelled AED. Unknowns stay unknown. UI formatting does not change engine values.
 
-This is a single-period planning model, not a full ledger, tax model, debt amortization model or demand forecast. Founders must supply cash timing assumptions. Quotes, customer behavior, financing availability and regulatory approvals are not verified by the calculator. Sensitivity and scenarios are illustrations, not success probabilities.
+This is a single-period educational model, not a ledger, tax calculation, financing offer, debt amortization schedule or forecast. User estimates do not earn customer-evidence points or alter the fixed five-by-five scoring methodology. Tests include retained V2 examples and 3,000 reproducible independent comparisons across different costs, prices, volumes, losses and cash benefits.

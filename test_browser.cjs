@@ -122,7 +122,7 @@ async function main() {
     assert.equal(await page.locator('#decision-main').innerText(), 'Validate more');
     await page.locator('#result-tab-3').click();
     const meta = await page.locator('#plan-meta').innerText();
-    for (const text of ['4,000 AED', '5,000 AED', '1,000 AED', 'AI ESTIMATE', 'Validate demand before increasing']) assert.ok(meta.includes(text), text);
+    for (const text of ['4,000.00 AED', '5,000.00 AED', '1,000.00 AED', 'AI ESTIMATE', 'Validate demand before increasing']) assert.ok(meta.includes(text), text);
     assert.equal(await page.locator('#steps-list .step-card').count(), 7);
     assert.equal(new Set(await page.locator('#day-grid .day-card').allTextContents()).size, 7);
     await page.locator('#result-tab-2').click();
@@ -196,7 +196,7 @@ async function main() {
     assert.equal(await page.evaluate(()=>currentPlan.estimated_budget_gap_aed),200);
     assert.ok(!(await page.locator('#plan-meta').innerText()).includes('5,000'));
     await page.evaluate(()=>selectPanel(6));
-    assert.ok((await page.locator('#report-table').innerText()).includes('400 AED'));
+    assert.ok((await page.locator('#report-table').innerText()).includes('400.00 AED'));
     await page.evaluate(()=>selectPanel(0));
     assert.ok((await page.locator('#overview-body').innerText()).includes('Potential benefit'));
     assert.ok(!(await page.locator('#overview-body').innerText()).includes('injury'));
@@ -211,7 +211,7 @@ async function main() {
     assert.equal(await page.locator('html').getAttribute('lang'), 'ar');
     assert.ok((await page.locator('body').getAttribute('class')).includes('rtl'));
     assert.equal(await page.locator('.p-freq').first().getAttribute('placeholder'),'أسبوعياً');
-    assert.ok(!(await page.locator('#overview-body').innerText()).includes('AED'));
+    assert.ok((await page.locator('#overview-body').innerText()).includes('AED'));assert.ok((await page.locator('#overview-body').innerText()).includes('ميزانيتك'));
     assert.ok(!(await page.locator('#regional-resource').innerText()).includes('Department'));
     assert.ok(!(await page.locator('#qr-code').innerText()).includes('Open WhatsApp'));
     for (const index of [6,0,3]) {

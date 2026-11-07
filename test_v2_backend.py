@@ -4,7 +4,8 @@ import unittest
 from unittest.mock import patch
 from pypdf import PdfReader
 
-os.environ["GROQ_API_KEY"] = "test-only-placeholder"
+from test_support import configure_mock_environment
+configure_mock_environment()
 import app as khotwa
 from test_finance import BASE
 
@@ -34,7 +35,7 @@ class V2BackendTests(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
             reader = PdfReader(io.BytesIO(response.data))
             text = "\n".join(p.extract_text() for p in reader.pages)
-            self.assertIn("1800.00", text)
+            self.assertIn("1,800.00 AED", text)
             self.assertNotIn("99999999", text)
             self.assertGreaterEqual(len(reader.pages), 2)
 

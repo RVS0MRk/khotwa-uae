@@ -37,7 +37,7 @@ _pdf_lock = Lock()
 @app.after_request
 def security_headers(response):
     response.headers["Content-Security-Policy"] = (
-        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; "
+        "default-src 'self'; script-src 'self'; style-src 'self'; style-src-elem 'self'; style-src-attr 'unsafe-inline'; "
         "img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; "
         "object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
     )
@@ -47,7 +47,7 @@ def security_headers(response):
     response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
     if request.path in _PUBLIC_ENDPOINTS:
         response.headers["Cache-Control"] = "no-store"
-    if request.is_secure:
+    if request.is_secure or os.environ.get("RENDER") == "true":
         response.headers["Strict-Transport-Security"] = "max-age=31536000"
     return response
 
@@ -1638,7 +1638,7 @@ def build_pdf(p, lang="en"):
         E.append(Paragraph(tx(L["deng"]), h2))
         extra = ""
         if de.get("risk_level"): extra += f'{tx(L["risk"])}: {tx(de.get("risk_level"))}  '
-        if de.get("recommended_test_budget_aed"): extra += tx(f'{L["testbudget"]}: {de.get("recommended_test_budget_aed")} AED (AI ESTIMATE)')
+        if de.get("recommended_test_budget_aed"): extra += tx(f'{L["testbudget"]}: {_format_money(de.get("recommended_test_budget_aed"))} AED (AI ESTIMATE)')
         dec_tbl = Table([[Paragraph(f'<b>{tx(de.get("decision",""))}</b><br/>{tx(de.get("reason",""))}<br/><font color="#666666">{tx(L["nexttest"])}: {tx(de.get("next_test_action",""))}</font><br/><font color="#666666">{extra}</font>', body)]], colWidths=[None])
         dec_tbl.setStyle(TableStyle([("BACKGROUND",(0,0),(-1,-1),colors.HexColor("#eef4ff")),
             ("BOX",(0,0),(-1,-1),0.5,colors.HexColor("#2f6fed")),("TOPPADDING",(0,0),(-1,-1),10),
@@ -1650,9 +1650,9 @@ def build_pdf(p, lang="en"):
     protected = max(0, budget - test_cost)
     if budget > 0:
         E.append(Spacer(1,8)); E.append(Paragraph(tx(L["bys"]), h2))
-        estimated = (f'{test_cost:,} AED (AI ESTIMATE)' if test_cost else ('لم تُقدّر بعد' if ar else 'Not estimated yet'))
-        remaining = (f'{tx(L["bys_save"])}: <b>{tx(str(protected) + " AED")}</b>' if test_cost else '')
-        bys_tbl = Table([[Paragraph(f'{tx(L["bys_plan"] + " (USER INPUT)")}: <b>{tx(str(budget) + " AED")}</b><br/>{tx(L["bys_test"])}: <b>{tx(estimated)}</b><br/><font color="#0a7a3c">{remaining}</font>', body)]], colWidths=[None])
+        estimated = (f'{_format_money(test_cost)} AED (AI ESTIMATE)' if test_cost else ('لم تُقدّر بعد' if ar else 'Not estimated yet'))
+        remaining = (f'{tx(L["bys_save"])}: <b>{tx(_format_money(protected) + " AED")}</b>' if test_cost else '')
+        bys_tbl = Table([[Paragraph(f'{tx(L["bys_plan"] + " (USER INPUT)")}: <b>{tx(_format_money(budget) + " AED")}</b><br/>{tx(L["bys_test"])}: <b>{tx(estimated)}</b><br/><font color="#0a7a3c">{remaining}</font>', body)]], colWidths=[None])
         bys_tbl.setStyle(TableStyle([("BACKGROUND",(0,0),(-1,-1),colors.HexColor("#e7f8ee")),("BOX",(0,0),(-1,-1),0.5,colors.HexColor("#1d9e75")),
             ("TOPPADDING",(0,0),(-1,-1),10),("BOTTOMPADDING",(0,0),(-1,-1),10),("LEFTPADDING",(0,0),(-1,-1),10),("RIGHTPADDING",(0,0),(-1,-1),10)]))
         E.append(bys_tbl)
@@ -1666,7 +1666,7 @@ def build_pdf(p, lang="en"):
         (L["score"], score_label),
         (L["decision"], de.get("decision","")),
         (L["channel"], r.get("first_customer_channel","")),
-        (L["testcost"], (f"{_int(r.get('estimated_first_test_cost_aed'))} AED (AI ESTIMATE)" if r.get("estimated_first_test_cost_aed") not in (None,"") else "-")),
+        (L["testcost"], (f"{_format_money(r.get('estimated_first_test_cost_aed'))} AED (AI ESTIMATE)" if r.get("estimated_first_test_cost_aed") not in (None,"") else "-")),
         (L["next"], pp.get("next_step") or r.get("next_step","")),
     ]))
     E.append(Spacer(1,10))
@@ -1702,7 +1702,7 @@ def build_pdf(p, lang="en"):
         E.append(kv([
             (L["pm_int"], f"{_int(pm.get('interested'))}/{_int(pm.get('total_responses'))}"),
             (L["pm_maybe"], f"{_int(pm.get('maybe'))}/{_int(pm.get('total_responses'))}"),
-            (L["pm_avg"], f"{_format_money(pm.get('avg_price'), 1)} AED"),
+            (L["pm_avg"], f"{_format_money(pm.get('avg_price'))} AED"),
             (L["pm_pre"], f"{_int(pm.get('no_payment_reservations'))}/{_int(pm.get('total_responses'))}"),
             ("دفع فعلي" if ar else "Actual payments", str(_int(pm.get("actual_payments")))),
             ("عملاء متكررون" if ar else "Repeat customers", str(_int(pm.get("repeat_customers")))),
@@ -1739,7 +1739,7 @@ def build_pdf(p, lang="en"):
     # ---- PAGE 5: READINESS ----
     E.append(Paragraph(tx(L["rr"]), h2))
     E.append(kv([(L["idea"] + " (" + idea_source + ")",r.get("idea","")),(L["target"] + (" (USER INPUT)" if state.get("target_customer_source") == "user_input" else " (AI ASSUMPTION)"),r.get("target_customer","")),(L["best"] + " (RECOMMENDED ACTION)",r.get("best_first_action","")),
-                 (L["testcost"],(f"{_int(r.get('estimated_first_test_cost_aed'))} AED (AI ESTIMATE)" if r.get("estimated_first_test_cost_aed") not in (None,"") else "-")),
+                 (L["testcost"],(f"{_format_money(r.get('estimated_first_test_cost_aed'))} AED (AI ESTIMATE)" if r.get("estimated_first_test_cost_aed") not in (None,"") else "-")),
                  (L["notstart"],r.get("what_not_to_start_with","")),(L["risk"] + " (AI ASSUMPTION)",r.get("main_risk","")),
                  (L["channel"],r.get("first_customer_channel","")),(L["next"] + " (RECOMMENDED ACTION)",r.get("next_step","")),
                  ("أدلة العملاء" if ar else "CUSTOMER EVIDENCE", (p.get("idea_overview") or {}).get("evidence") or L["pm_none"])]))

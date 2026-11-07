@@ -12,6 +12,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle, Spacer, PageBreak
 from finance import analyze, calculate
+from decimal import Decimal, ROUND_HALF_UP
 
 LABELS = {
     "startup_capital": ("Startup capital required", "رأس المال المطلوب"),
@@ -25,14 +26,15 @@ LABELS = {
     "fixed_expenses": ("Monthly fixed expenses", "المصروفات الثابتة الشهرية"),
     "operating_profit": ("Monthly operating profit / loss", "الربح أو الخسارة التشغيلية"),
     "contribution_per_unit": ("Contribution per unit", "مساهمة الوحدة"),
-    "contribution_ratio": ("Contribution ratio (fraction)", "نسبة المساهمة (كسر عشري)"),
+    "contribution_ratio": ("Contribution margin ratio", "نسبة هامش المساهمة"),
     "gross_profit": ("Gross profit (COGS basis)", "مجمل الربح وفق تكلفة البضاعة"),
-    "gross_margin": ("Gross margin (fraction)", "نسبة مجمل الربح (كسر عشري)"),
+    "gross_margin": ("Gross margin", "نسبة مجمل الربح"),
     "break_even_units": ("Minimum whole break-even units", "أقل وحدات كاملة للتعادل"),
     "break_even_continuous_units": ("Continuous mathematical break-even units", "وحدات التعادل الرياضية"),
     "break_even_revenue": ("Whole-unit break-even revenue", "إيراد التعادل بوحدات كاملة"),
     "operating_cash": ("Operating cash after initial spend and reserve", "السيولة بعد الإنفاق الأولي والاحتياطي"),
     "monthly_cash_flow": ("Monthly net cash flow", "صافي التدفق النقدي الشهري"),
+    "payback_months": ("Simple payback estimate (months)", "تقدير الاسترداد البسيط (شهر)"),
     "runway_months": ("Cash runway (months)", "المدة النقدية (شهر)"),
 }
 
@@ -51,32 +53,68 @@ def text_style(lang):
     return style, tx
 
 
+def format_value(key, value, lang="en"):
+    """Presentation never changes a calculation or converts unknown to zero."""
+    if value is None:
+        return "غير معلوم" if lang == "ar" else "Unknown"
+    n = Decimal(str(value))
+    if n == 0:
+        n = abs(n)
+    if key in ("contribution_ratio", "gross_margin"):
+        return f"{n * 100:,.2f}".rstrip("0").rstrip(".") + "%"
+    if key in ("break_even_units", "units"):
+        return f"{n:,.0f}" + (" وحدة" if lang == "ar" else " units")
+    if key in ("runway_months", "payback_months", "break_even_continuous_units"):
+        return f"{abs(n) if n == 0 else n:,.2f}"
+    rounded = n.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    return f"{abs(rounded) if rounded == 0 else rounded:,.2f} AED"
+
+
+def result_value(key, r, lang):
+    ar = lang == "ar"
+    if key == "break_even_units" and r["break_even_status"] == "unreachable":
+        return "التعادل غير قابل للوصول" if ar else "Break-even not reachable"
+    if key == "runway_months":
+        if r["runway_status"] == "no_burn":
+            return "لا يوجد استنزاف نقدي شهري حالياً" if ar else "No current monthly cash burn"
+        if r["runway_status"] == "underfunded":
+            return "الإنفاق الأولي غير ممول بالكامل" if ar else "Initial spending underfunded"
+    if key == "payback_months" and r["payback_status"] == "no_positive_benefit":
+        return "لا توجد منفعة نقدية موجبة" if ar else "No positive net cash benefit"
+    return format_value(key, r.get(key), lang)
+
+
 def finance_flowables(inputs, lang="en"):
     r = calculate(inputs)
     style, tx = text_style(lang)
     ar = lang == "ar"
-    out = [Paragraph(tx("ملخص الاستثمار · افتراضات المستخدم · درهم" if ar else "Investment summary · USER ASSUMPTIONS · AED"), style)]
-    rows = []
+    heading = ParagraphStyle("section", parent=style, fontSize=17, leading=24,
+                             spaceBefore=12, spaceAfter=12, keepWithNext=True)
+    out = [Paragraph(tx("النتائج المالية · افتراضات المستخدم" if ar else "Financial results · user assumptions"), heading)]
+    rows = [[Paragraph(tx(x), style) for x in (("الحساب", "النتيجة") if ar else ("Calculation", "Result"))]]
     for key, labels in LABELS.items():
-        value = r.get(key)
-        if key == "break_even_units" and r["break_even_status"] == "unreachable":
-            value = "لا يمكن الوصول إلى التعادل وفق الافتراضات الحالية" if ar else "Break-even not reachable under current assumptions"
-        if key == "runway_months" and r["runway_status"] == "no_burn":
-            value = "لا يوجد استنزاف نقدي شهري حالياً" if ar else "No current monthly cash burn"
-        if key == "runway_months" and r["runway_status"] == "underfunded":
-            value = "الإنفاق الأولي غير ممول بالكامل" if ar else "Initial spending is underfunded"
-        row = [Paragraph(tx(labels[1 if ar else 0]), style), Paragraph(tx(value), style)]
-        rows.append(list(reversed(row)) if ar else row)
-    table = Table(rows, colWidths=[235, 235], hAlign="CENTER")
-    table.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "TOP"), ("LINEBELOW", (0, 0), (-1, -1), .4, colors.HexColor("#d8ded5")), ("TOPPADDING", (0, 0), (-1, -1), 3), ("BOTTOMPADDING", (0, 0), (-1, -1), 3)]))
+        rows.append([Paragraph(tx(labels[1 if ar else 0]), style), Paragraph(tx(result_value(key, r, lang)), style)])
+    if ar:
+        rows = [list(reversed(row)) for row in rows]
+    table = Table(rows, colWidths=[235, 235], hAlign="CENTER", repeatRows=1)
+    table.setStyle(TableStyle([("BACKGROUND", (0,0), (-1,0), colors.HexColor("#e8f2ec")),
+        ("VALIGN", (0,0), (-1,-1), "TOP"), ("LINEBELOW", (0,0), (-1,-1), .4, colors.HexColor("#d8ded5")),
+        ("TOPPADDING", (0,0), (-1,-1), 3), ("BOTTOMPADDING", (0,0), (-1,-1), 3)]))
     out.append(table)
-    explanations = [
-        ("Revenue = units × price. Operating profit = revenue − all variable costs − fixed costs. Contribution = price − variable cost per unit. Gross profit uses the separately entered accounting cost of goods sold.", "الإيراد = الوحدات × السعر. الربح التشغيلي = الإيراد − كل التكاليف المتغيرة − الثابتة. المساهمة = السعر − التكلفة المتغيرة للوحدة. مجمل الربح يستخدم تكلفة البضاعة المحاسبية المدخلة بشكل مستقل."),
-        ("Break-even whole units round upward: fixed costs ÷ contribution per unit. Capital = one-time costs + working-capital buffer + contingency. Percentage contingency applies only to one-time expenses.", "تُقرّب وحدات التعادل لأعلى: الثابتة ÷ مساهمة الوحدة. رأس المال = التأسيس + رأس المال العامل + الطوارئ. تُحسب نسبة الطوارئ من التأسيس فقط."),
-        ("Cash runway uses cash collections and payments, not accounting profit. The working-capital buffer is not deducted twice. Unknown values stay unknown. Money rounds to fils using ROUND_HALF_UP; ratios use four decimal places.", "تعتمد المدة النقدية على المقبوضات والمدفوعات لا الربح المحاسبي. لا يُخصم رأس المال العامل مرتين. تبقى القيم المجهولة مجهولة. تُقرّب النقود إلى الفلس ونسب الهوامش إلى أربع منازل."),
-        ("These are mathematical illustrations, not forecasts or proof of viability. User-recorded evidence is not independently verified.", "هذه أمثلة حسابية وليست توقعات أو إثباتاً للجدوى. الأدلة المسجّلة من المستخدم لم تُتحقق مستقلاً.")]
-    # Keep explanatory sentences separate so shaped Arabic never wraps from
-    # the wrong visual end in ReportLab installations without optional rlbidi.
+    basis = r["cash_flow_basis"]
+    basis_text = {"entered_cash_flow": ("Cash basis: separately entered receipts and payments.", "الأساس النقدي: المقبوضات والمدفوعات المدخلة بشكل مستقل."),
+        "simplified_user_assumption": ("Cash basis: user-selected simplified estimate; revenue collected and variable plus fixed expenses paid in the same month.", "الأساس النقدي: تقدير مبسط اختاره المستخدم لتحصيل الإيراد وسداد المتغيرة والثابتة في الشهر نفسه."),
+        "missing_information": ("Cash basis: unavailable due to missing information.", "الأساس النقدي: غير متاح لنقص المعلومات.")}[basis]
+    explanations = [basis_text,
+        ("Payback = one-time spending / positive monthly net cash benefit. Held cash buffers are excluded. Constant-cash estimate; excludes changing cash flows and time value of money.", "الاسترداد = مصروفات التأسيس ÷ المنفعة النقدية الشهرية الموجبة دون الاحتياطيات النقدية. تقدير ثابت دون تغير التدفقات أو القيمة الزمنية للنقود."),
+        ("Revenue = units x price. Operating profit = revenue - variable expenses - fixed expenses. Gross profit uses separately entered COGS.", "الإيراد = الوحدات × السعر. الربح التشغيلي = الإيراد − المتغيرة − الثابتة. مجمل الربح يستخدم تكلفة البضاعة المدخلة."),
+        ("Whole break-even units round upward. Capital = one-time spending + working capital + contingency; cash buffers are not deducted twice.", "تُقرّب وحدات التعادل لأعلى. رأس المال = التأسيس + رأس المال العامل + الطوارئ دون خصم الاحتياطيات مرتين."),
+        ("These are mathematical illustrations, not forecasts or proof of viability. Recorded evidence is user-reported, not independently verified.", "هذه أمثلة حسابية وليست توقعات أو إثباتاً للجدوى. الأدلة المسجلة إقرار من المستخدم دون تحقق مستقل.")]
+    if "licensing_not_provided" in r["warnings"]:
+        explanations.insert(0, ("Licensing not provided: capital is the known subtotal excluding unprovided licensing. Existing records retain their subtotal. Do not duplicate licensing within Other costs.", "لم يُدخل الترخيص: رأس المال مجموع جزئي يستثني الترخيص غير المقدم. تحتفظ السجلات القديمة بمجموعها. لا تكرر الترخيص ضمن التكاليف الأخرى."))
+    if "cogs_exceeds_variable" in r["warnings"]:
+        explanations.insert(0, ("Inconsistent COGS subset exceeds variable costs. Gross profit and margin withheld until corrected.", "تكلفة البضاعة المختارة جزءاً من المتغيرة تتجاوزها. حُجب مجمل الربح والهامش حتى التصحيح."))
+    out.append(Spacer(1, 12))
     out.extend(Paragraph(tx(sentence.strip() + "."), style) for pair in explanations
                for sentence in pair[1 if ar else 0].split(".") if sentence.strip())
     return out
@@ -94,10 +132,10 @@ def build_investment_report(payload, lang="en"):
     overview = p.get("idea_overview") or {}
     fields = [("Business idea", "فكرة المشروع", state.get("idea")), ("Problem hypothesis", "فرضية المشكلة", overview.get("problem")),
               ("Proposed solution", "الحل المقترح", overview.get("solution")), ("Target customer", "العميل المستهدف", state.get("target_customer")),
-              ("Market assumption", "افتراض السوق", state.get("region")), ("Business model / pricing unit", "نموذج العمل ووحدة السعر", notes.get("model")),
+              ("Market assumption", "افتراض السوق", ({"Abu Dhabi":"أبوظبي","Dubai":"دبي","Sharjah":"الشارقة","UAE-wide":"الإمارات"}.get(state.get("region"),state.get("region")) if ar else state.get("region"))), ("Business model / pricing unit", "نموذج العمل ووحدة السعر", notes.get("model")),
               ("Competitive differentiation", "التميّز التنافسي", notes.get("differentiation")), ("Use of funding", "استخدام التمويل", notes.get("use_of_funds")),
               ("Recorded customer entries (user-reported)", "إدخالات العملاء المسجّلة بإقرار المستخدم", (p.get("proof_summary") or {}).get("total_responses", 0)),
-              ("Funding request (user input, AED)", "طلب التمويل بإدخال المستخدم (درهم)", result["base"]["inputs"].get("funding_request")),
+              ("Funding request (user input, AED)", "طلب التمويل بإدخال المستخدم (درهم)", format_value("funding_request", result["base"]["inputs"].get("funding_request"), lang)),
               ("Key risk hypothesis", "فرضية الخطر الرئيسي", (p.get("readiness_report") or {}).get("main_risk")),
               ("Next milestone", "المرحلة التالية", p.get("first_step_today"))]
     for en, arabic, value in fields:
@@ -107,7 +145,7 @@ def build_investment_report(payload, lang="en"):
     names = [("conservative", "متحفّظ" if ar else "Conservative"), ("base", "أساسي" if ar else "Base case"), ("optimistic", "متفائل" if ar else "Optimistic")]
     rows = [[Paragraph(tx("البند" if ar else "Measure"), style)] + [Paragraph(tx(label), style) for _, label in names]]
     for metric in ("revenue", "operating_profit", "startup_capital", "funding_gap", "break_even_units", "runway_months"):
-        rows.append([Paragraph(tx(LABELS[metric][1 if ar else 0]), style)] + [Paragraph(tx(result["scenarios"][key][metric]), style) for key, _ in names])
+        rows.append([Paragraph(tx(LABELS[metric][1 if ar else 0]), style)] + [Paragraph(tx(result_value(metric, result["scenarios"][key], lang)), style) for key, _ in names])
     if ar:
         rows = [list(reversed(row)) for row in rows]
     table = Table(rows, colWidths=([105, 105, 105, 155] if ar else [155, 105, 105, 105]), repeatRows=1)
@@ -116,7 +154,15 @@ def build_investment_report(payload, lang="en"):
     buf = io.BytesIO()
     doc = SimpleDocTemplate(buf, pagesize=A4, rightMargin=50, leftMargin=50, topMargin=55, bottomMargin=50, title="Khotwa Investment Brief")
     def page(canvas, document):
-        canvas.setFont("Helvetica", 9); canvas.setFillColor(colors.HexColor("#556760"));canvas.drawString(50, 25, "Khotwa | User assumptions | AED");canvas.drawRightString(A4[0]-50, 25, str(document.page))
+        canvas.setFont("KhotwaAmiri" if ar else "Helvetica", 9)
+        canvas.setFillColor(colors.HexColor("#556760"))
+        footer = "خطوة | افتراضات المستخدم | AED" if ar else "Khotwa | User assumptions | AED"
+        if ar:
+            canvas.drawRightString(A4[0]-50, 25, get_display(arabic_reshaper.reshape(footer)))
+            canvas.drawString(50, 25, str(document.page))
+        else:
+            canvas.drawString(50, 25, footer)
+            canvas.drawRightString(A4[0]-50, 25, str(document.page))
     doc.build(output, onFirstPage=page, onLaterPages=page)
     buf.seek(0)
     return buf

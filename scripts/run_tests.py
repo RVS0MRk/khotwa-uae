@@ -13,7 +13,7 @@ if "--python-only" not in sys.argv:
     node = shutil.which("node")
     if not node:
         raise SystemExit("Node.js is required. Install Node LTS, npm install, then npx playwright install chromium.")
-    commands += [[node, name] for name in ("test_browser.cjs", "test_redesign.cjs", "test_v2.cjs")]
+    commands += [[node, name] for name in ("test_browser.cjs", "test_redesign.cjs", "test_v2.cjs", "test_v21.cjs")]
 for command in commands:
     print("Running: " + " ".join(command), flush=True)
     result = subprocess.run(command, env=env)

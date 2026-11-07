@@ -6,7 +6,8 @@ from copy import deepcopy
 from unittest.mock import patch
 from pypdf import PdfReader
 
-os.environ["GROQ_API_KEY"] = "test-only-placeholder"
+from test_support import configure_mock_environment
+configure_mock_environment()
 import app as startsmart
 
 KEYS = ("local_fit", "clear_customer", "low_starting_cost", "easy_first_step", "growth_potential")

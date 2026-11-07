@@ -2,7 +2,8 @@
 import json
 import os
 
-os.environ["GROQ_API_KEY"] = "test-only-placeholder"
+from test_support import configure_mock_environment
+configure_mock_environment()
 import app as startsmart
 
 DIRTY_ADVISOR = {

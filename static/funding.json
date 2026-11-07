@@ -8,22 +8,47 @@
     "status": "verified",
     "en": {
       "name": "Khalifa Fund",
-      "description": "Financing programmes for Emirati-owned businesses.",
+      "description": "Seven loan programmes for Emirati-owned businesses in Abu Dhabi.",
       "support": "Loans; not an automatic grant.",
       "target": "Emirati entrepreneurs and eligible MSMEs.",
       "scope": "Abu Dhabi",
-      "eligibility": "Funding page states 100% UAE-national ownership, Abu Dhabi establishment and an approved sector.",
-      "limitations": "Official funding and FAQ pages differ on age and business-age rules. Confirm programme-specific rules through TAMM. No amount or approval is promised."
+      "eligibility": "100% UAE-national ownership; Abu Dhabi; approved activity; credit assessment. Programme rules vary.",
+      "limitations": "Funding page: owner aged 18–65; some programmes accept startups. FAQ differs on age/business age. Confirm through TAMM; no approval promised."
     },
     "ar": {
       "name": "صندوق خليفة",
-      "description": "برامج تمويل للمشاريع المملوكة للإماراتيين.",
+      "description": "سبعة برامج قروض للمشاريع الإماراتية في أبوظبي.",
       "support": "قروض وليست منحة تلقائية.",
       "target": "رواد الأعمال الإماراتيون والمنشآت المؤهلة.",
       "scope": "أبوظبي",
-      "eligibility": "تذكر صفحة التمويل ملكية إماراتية كاملة وتأسيساً في أبوظبي وقطاعاً معتمداً.",
-      "limitations": "تختلف صفحتا التمويل والأسئلة الرسمية بشأن العمر وعمر المشروع. أكّد شروط البرنامج عبر تم. لا يُضمن مبلغ أو قبول."
-    }
+      "eligibility": "ملكية إماراتية 100٪؛ أبوظبي؛ نشاط معتمد؛ تقييم ائتماني. تختلف شروط البرامج.",
+      "limitations": "صفحة التمويل: عمر 18–65؛ بعض البرامج تقبل التأسيس. تختلف الأسئلة الرسمية في العمر وعمر المشروع. أكّد عبر تم دون ضمان قبول."
+    },
+    "checked": "2026-11-07",
+    "programs": {
+      "en": [
+        "First-time Founders Loan",
+        "AI & Robotics Loan",
+        "Revolving Loan",
+        "Small Loan",
+        "Working Capital Loan",
+        "Fixed Assets Loan",
+        "Expansion Loan"
+      ],
+      "ar": [
+        "قرض المؤسسين لأول مرة",
+        "قرض الذكاء الاصطناعي والروبوتات",
+        "القرض المتجدد",
+        "القرض الصغير",
+        "قرض رأس المال العامل",
+        "قرض الأصول الثابتة",
+        "قرض التوسع"
+      ]
+    },
+    "sources": [
+      "https://www.khalifafund.ae/services/funding-scheme/",
+      "https://www.khalifafund.ae/faq/"
+    ]
   },
   {
     "id": "hub71",
@@ -35,7 +60,7 @@
     "en": {
       "name": "Hub71",
       "description": "Technology-startup ecosystem and programme application.",
-      "support": "Ecosystem access, mentorship and programme-dependent incentives.",
+      "support": "Programme incentives and cash in exchange for equity through a SAFE; mentorship and ecosystem access.",
       "target": "Technology founders building a scalable startup.",
       "scope": "Abu Dhabi",
       "eligibility": "Application asks about product, traction, team and whether a co-founder will live in or relocate to Abu Dhabi.",
@@ -44,12 +69,13 @@
     "ar": {
       "name": "هب ٧١",
       "description": "منظومة للمشاريع التقنية والتقديم للبرامج.",
-      "support": "شبكات وإرشاد وحوافز تختلف حسب البرنامج.",
+      "support": "حوافز ونقد مقابل ملكية عبر SAFE؛ إرشاد وشبكات.",
       "target": "مؤسسو المشاريع التقنية القابلة للتوسع.",
       "scope": "أبوظبي",
       "eligibility": "يسأل الطلب عن المنتج والأدلة والفريق وإقامة مؤسس مشارك في أبوظبي أو انتقاله إليها.",
       "limitations": "يسأل الطلب عن الجنسيات دون تحديد قيد جنسية عام في الصفحة. راجع شروط الدفعة الحالية وأي شروط للملكية."
-    }
+    },
+    "checked": "2026-11-07"
   },
   {
     "id": "dubai-sme",
@@ -57,7 +83,7 @@
     "url": "https://www.investindubai.gov.ae/en/why-dubai/start-ups-and-smes",
     "apply": "https://www.mysme.ae/",
     "verified": "2026-11-07",
-    "status": "verified",
+    "status": "partial",
     "en": {
       "name": "Dubai SME",
       "description": "Entrepreneurship support and government-procurement membership starting point.",
@@ -65,7 +91,7 @@
       "target": "SMEs and entrepreneurs; specific programmes support Emirati founders.",
       "scope": "Dubai",
       "eligibility": "Eligibility depends on the chosen service. The membership portal is specifically for the government procurement programme.",
-      "limitations": "Membership is not a funding approval. Do not assume all residents qualify for Emirati-focused benefits."
+      "limitations": "Official Invest in Dubai overview and indexed procurement portal checked. Full current service eligibility could not be retrieved; confirm directly. Membership is not funding approval."
     },
     "ar": {
       "name": "دبي للمشاريع الصغيرة والمتوسطة",
@@ -74,8 +100,9 @@
       "target": "منشآت ورواد أعمال؛ برامج محددة للمؤسسين الإماراتيين.",
       "scope": "دبي",
       "eligibility": "الأهلية مرتبطة بالخدمة المختارة. بوابة العضوية تخص برنامج المشتريات الحكومية.",
-      "limitations": "العضوية لا تعني قبول التمويل. لا تفترض أهلية جميع المقيمين للمزايا المخصصة للإماراتيين."
-    }
+      "limitations": "رُوجعت النظرة الرسمية ونتيجة فهرسة بوابة المشتريات. تعذّر استرجاع شروط الخدمة الكاملة الحالية؛ أكّد مباشرة. العضوية ليست قبول تمويل."
+    },
+    "checked": "2026-11-07"
   },
   {
     "id": "sheraa",
@@ -101,7 +128,8 @@
       "scope": "الشارقة / الإمارات",
       "eligibility": "تشترط الصفحة نموذجاً قابلاً للتوسع والتزاماً بالعمل في الشارقة. تُذكر القطاعات ذات الأولوية رسمياً ويلزم الحضور في الإمارات لجلسات رئيسية.",
       "limitations": "التقويم المنشور لدفعة ٢٠٢٥–٢٠٢٦. لم يُتحقق من فتح تقديم حالي. لا تذكر الصفحة قيد جنسية عاماً."
-    }
+    },
+    "checked": "2026-11-07"
   },
   {
     "id": "edb",
@@ -127,7 +155,8 @@
       "scope": "الإمارات",
       "eligibility": "تذكر الصفحة الجدارة الائتمانية والجدوى والتوافق الاستراتيجي. تختلف الشروط حسب المشروع.",
       "limitations": "لا تحدد الصفحة المراجعة شروط جنسية أو أسعاراً أو مبالغ عامة. أكّد المنتج المحدد ووثائق الشركة المطلوبة."
-    }
+    },
+    "checked": "2026-11-07"
   },
   {
     "id": "mbrif",
@@ -153,39 +182,41 @@
       "scope": "الإمارات",
       "eligibility": "يقبل برنامج الضمانات جميع الجنسيات. تشمل معاييره شركة في الإمارات قابلة للتوسع تجاوزت مرحلة الفكرة. تخضع للأولويات والتقييم.",
       "limitations": "المسرّع لا يقدم تمويلاً مباشراً ولا يضمن الانضمام للضمانات. الإدراج لا يعني قبول الاستثمار."
-    }
+    },
+    "checked": "2026-11-07"
   },
   {
     "id": "ruwad",
     "category": "finance",
-    "url": "https://ruwad.ae/documents/32114/0/Industrial%2BDirectories%2B2025%2BEnglish%2BS.pdf/7b7bde49-a01c-c532-b04b-144113626f5b?t=1736921122096",
+    "url": "https://ruwad.ae/en/financing-program",
     "apply": "https://ruwad.ae/",
-    "verified": "2026-11-07",
-    "status": "verified",
+    "verified": null,
+    "status": "unverified",
     "en": {
       "name": "RUWAD",
       "description": "Sharjah SME financing and development support.",
       "support": "Direct and bank-mediated financing programmes.",
-      "target": "UAE-citizen-owned projects in Sharjah and its affiliated cities.",
+      "target": "Applicants must confirm current requirements with RUWAD.",
       "scope": "Sharjah",
-      "eligibility": "The official 2025 guide requires UAE-citizen ownership, Sharjah location and a feasibility study; it also specifies owner contribution and project-age conditions.",
-      "limitations": "The source is a dated 2025 guide. Reconfirm current criteria and application availability with RUWAD; no current amount or repayment term is assumed."
+      "eligibility": "Current eligibility could not be confirmed: the official programme page returned a gateway error. Ask RUWAD about ownership, location and current terms.",
+      "limitations": "Official search indexing describes direct and indirect finance, but current programme details and intake remain UNVERIFIED. Historical 2025 brochure is not used as current eligibility."
     },
     "ar": {
       "name": "روّاد",
       "description": "دعم وتمويل المنشآت الصغيرة والمتوسطة في الشارقة.",
       "support": "برامج تمويل مباشر وتمويل عبر البنوك.",
-      "target": "مشاريع مملوكة لمواطنين في الشارقة ومدنها التابعة.",
+      "target": "على المتقدمين تأكيد الشروط الحالية مع روّاد.",
       "scope": "الشارقة",
-      "eligibility": "يشترط الدليل الرسمي لعام ٢٠٢٥ الملكية لمواطنين والموقع في الشارقة ودراسة جدوى، ويحدّد مساهمة المالك وعمر المشروع.",
-      "limitations": "المصدر دليل مؤرّخ بعام ٢٠٢٥. أكّد الشروط والتقديم الحالي مع روّاد؛ لا يُفترض مبلغ أو سداد حالي."
-    }
+      "eligibility": "تعذّر تأكيد الأهلية الحالية بسبب خطأ بوابة الصفحة الرسمية. اسأل روّاد عن الملكية والموقع والشروط الحالية.",
+      "limitations": "تشير فهرسة المصدر الرسمي لتمويل مباشر وغير مباشر، لكن التفاصيل والتقديم الحالي غير مُتحقق منهما. لا يُستخدم كتيب 2025 كأهلية حالية."
+    },
+    "checked": "2026-11-07"
   },
   {
     "id": "uae-sme",
     "category": "government",
-    "url": "https://u.ae/en/information-and-services/business/small-and-medium-enterprises",
-    "apply": "https://www.sme.gov.ae/en",
+    "url": "https://www.uaesme.ae/en/about/about-program",
+    "apply": "https://www.uaesme.ae/en/",
     "verified": "2026-11-07",
     "status": "verified",
     "en": {
@@ -194,7 +225,7 @@
       "support": "Programme information, development support and signposting.",
       "target": "Entrepreneurs and SME owners; eligibility varies by initiative.",
       "scope": "UAE",
-      "eligibility": "National SME support includes initiatives for Emirati entrepreneurs. Follow each programme’s official eligibility process.",
+      "eligibility": "The National Programme supports Emirati entrepreneurs. Membership and each service have their own requirements; confirm with the programme.",
       "limitations": "This directory is a starting point and does not establish a grant entitlement, nationality eligibility or an open application window."
     },
     "ar": {
@@ -203,8 +234,13 @@
       "support": "معلومات وتطوير وإحالة للبرامج.",
       "target": "رواد الأعمال وأصحاب المنشآت؛ تختلف الأهلية حسب المبادرة.",
       "scope": "الإمارات",
-      "eligibility": "تشمل البرامج الوطنية مبادرات لرواد الأعمال الإماراتيين. اتبع مسار الأهلية الرسمي لكل برنامج.",
+      "eligibility": "يدعم البرنامج الوطني رواد الأعمال الإماراتيين. للعضوية وكل خدمة شروطها؛ أكّدها مع البرنامج.",
       "limitations": "هذا الدليل نقطة بداية ولا يثبت استحقاق منحة أو أهلية جنسية أو فتح تقديم."
-    }
+    },
+    "checked": "2026-11-07",
+    "sources": [
+      "https://www.uaesme.ae/en/about/about-program",
+      "https://www.moet.gov.ae/en/web/guest/w/smes"
+    ]
   }
 ]

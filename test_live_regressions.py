@@ -6,7 +6,8 @@ import unittest
 from copy import deepcopy
 from unittest.mock import Mock, patch
 
-os.environ["GROQ_API_KEY"] = "test-only-placeholder"
+from test_support import configure_mock_environment
+configure_mock_environment()
 import app as startsmart
 from test_browser_server import DIRTY_ADVISOR, fake_groq
 from pypdf import PdfReader

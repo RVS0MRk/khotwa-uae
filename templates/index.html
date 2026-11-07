@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='investment.css') }}">
 <script defer src="{{ url_for('static', filename='vendor/chart.umd.min.js') }}"></script>
 <script defer src="{{ url_for('static', filename='vendor/qrcode.min.js') }}"></script>
-{% for script in ['translations.js','scoring.js','app.js','startsmart.js','investment.js','workspace.js','events.js','bootstrap.js'] %}
+{% for script in ['translations.js','formatting.js','scoring.js','app.js','startsmart.js','investment.js','investment-details.js','funding-routes.js','investment-workspace.js','workspace.js','events.js','bootstrap.js'] %}
 <script defer src="{{ url_for('static', filename=script) }}"></script>
 {% endfor %}
 </head>
