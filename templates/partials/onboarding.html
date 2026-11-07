@@ -1,0 +1,53 @@
+
+  <div id="journey-home"><div id="journey-block"><nav class="journey" id="journey" aria-label="Founder journey"></nav><p class="journey-note" id="journey-note"></p></div></div>
+  <div class="card discovery-card" id="discovery-card" hidden>
+    <h2 id="discovery-title">Find three ideas to test</h2>
+    <p id="discovery-caveat">These are unvalidated suggestions. Test customer demand before spending.</p>
+    <div class="discovery-grid">
+      <label><span id="d-skills-label">Skills</span><input id="d-skills" type="text"></label>
+      <label><span id="d-interests-label">Interests</span><input id="d-interests" type="text"></label>
+      <label><span id="d-experience-label">Experience</span><input id="d-experience" type="text"></label>
+      <label><span id="d-budget-label">Approximate budget (AED)</span><input id="d-budget" type="number" min="0"></label>
+      <label><span id="d-region-label">UAE market</span><select id="d-region"></select></label>
+      <label><span id="d-context-label">Preferred business type</span><select id="d-context"></select></label>
+      <label><span id="d-time-label">Time available each week</span><input id="d-time" type="text"></label>
+    </div>
+    <button type="button" class="btn btn-primary" id="discover-btn" data-onclick="event-4">Suggest three ideas</button>
+    <p class="error" id="discover-error" role="status"></p>
+    <div class="discovery-results" id="discovery-results"></div>
+  </div>
+  <div class="card input-card" hidden>
+    <label id="lbl-idea" for="idea">What is your business idea?</label>
+    <textarea id="idea" maxlength="500" rows="3" placeholder="e.g. I want to start a mobile car-wash service"></textarea>
+    <div class="demo-row" id="demo-row"></div>
+    <div class="row">
+      <div>
+        <label id="lbl-cat" for="category">Category</label>
+        <select id="category" data-onchange="event-5"></select><small id="category-hint">Choose a category; suggestions appear as you type.</small>
+      </div>
+      <div>
+        <label id="lbl-usertype" for="user_type">Who are your customers?</label>
+        <select id="user_type"></select>
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label id="lbl-region" for="region">Which UAE market are you targeting?</label>
+        <select id="region"></select>
+      </div>
+      <div>
+        <label id="lbl-context" for="context">What type of business are you exploring?</label>
+        <select id="context"></select>
+      </div>
+    </div>
+    <div>
+      <div id="budget-label">Budget — 10,000 AED</div>
+      <input type="range" aria-labelledby="budget-label" id="budget" min="1000" max="100000" step="1000" value="10000" data-oninput="event-6">
+    </div>
+    <button class="btn btn-primary btn-full" id="genBtn" data-onclick="event-7">Get my first step</button>
+    <p class="error" id="error"></p>
+  </div>
+  <div class="loader-wrap" id="loader">
+
+    <div class="loader-text" id="loader-text"></div><div class="generation-steps" id="generation-steps" aria-hidden="true"></div><p class="generation-note" id="generation-note"></p>
+  </div>

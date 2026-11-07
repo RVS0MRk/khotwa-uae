@@ -1,6 +1,6 @@
 # Khotwa (خطوة) — From idea to first step.
 
-Khotwa is a bilingual English/Arabic Flask website for first-time UAE founders. It offers idea discovery, a seven-tab dashboard, Founder Journey, Proof Mode, the Khotwa Advisor powered by Groq, scoring and charts, and an English/Arabic PDF founder report. Business and regulatory guidance is a starting point; users should verify requirements with the appropriate UAE authority before operating or accepting payment.
+Khotwa is a bilingual English/Arabic Flask website for first-time UAE founders. V2 connects idea discovery, the original seven dashboard sections plus an Investment Guide, Founder Journey, Proof Mode, the Groq Advisor, transparent scoring, financial scenarios, and English/Arabic PDF and CSV exports. Business and regulatory guidance is a starting point; users should verify requirements with the appropriate UAE authority before operating or accepting payment.
 
 Generated plans request English and Arabic wording in the **same** Groq JSON response. The browser keeps both versions for language switching, so switching languages does not call Groq again or reset Proof Mode. If translated fields are missing or invalid, Khotwa uses cautious localized guidance and marks that plan with `_localization_status: fallback`. The business name, selected market, budget, score and recorded evidence remain tied to the same plan. Arabic prose quality still depends on the live model response and should be reviewed in the deployed site.
 
@@ -25,12 +25,15 @@ Open `http://127.0.0.1:5000/`. The `app.py` command is for local development onl
 ## Offline checks
 
 ```powershell
-.\.venv\Scripts\python.exe -m unittest discover -v
-node test_browser.cjs
-node test_redesign.cjs
+.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+npm ci
+npx playwright install chromium
+.\.venv\Scripts\python.exe scripts/run_tests.py
 ```
 
-The browser tests start an isolated Flask server with mocked Groq responses. They require Node.js, the `playwright` package, and Chrome. Install Python test dependencies with `.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt`; `pypdf` is test-only and is not installed by Render. `test_api.py` is a separate **live** Groq connection test; run it only when you intend to make a real API request:
+The single runner executes all Python tests and all three browser suites. For Python only, add `--python-only`. Run financial tests alone with `.\.venv\Scripts\python.exe -m unittest test_finance -v`. Node.js LTS and npm are development tools; Render does not need them because browser assets are self-hosted.
+
+The browser tests start an isolated Flask server with mocked Groq responses. They require Node.js, the `playwright` package, and Playwright-managed Chromium. A system Chrome installation is no longer required. Install Python test dependencies with `.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt`; `pypdf` is test-only and is not installed by Render. `test_api.py` is a separate **live** Groq connection test; run it only when you intend to make a real API request:
 
 ```powershell
 .\.venv\Scripts\python.exe test_api.py
@@ -88,3 +91,23 @@ Render Free currently has 512 MB RAM and limited CPU. It sleeps after 15 minutes
 - Check Render logs and usage for timeouts, memory pressure, and unexpected Groq request volume.
 
 If Groq is unavailable, plan generation can fall back to local guidance in the browser; idea discovery and live Advisor answers need Groq. The PDF report uses the bundled `fonts/Amiri-Regular.ttf` file under `fonts/OFL.txt` and does not download a font at runtime.
+
+## V2 scoring and Investment Guide
+
+Missing score dimensions receive **no points**, not the previous 3/5 fallback. A complete total out of 25 is shown only when all five dimensions have supported assessments. Otherwise the UI and PDF show **Incomplete**, assessed coverage, and the known subtotal in the data contract. AI judgments are provisional. Five or more recorded Proof Mode entries can update Customer Need under the existing evidence rule; these entries are user-reported and not independently verified. Legacy fallback scores are invalidated on recovery.
+
+The Investment Guide uses `finance.py`, a pure Decimal module, through `POST /finance`. JSON money inputs and outputs use decimal strings. Blank/null is unknown, while an explicit 0 is zero. Monetary inputs and reported outputs round to fils with ROUND_HALF_UP; internal arithmetic uses Decimal, ratios use four decimals and whole break-even units round upward. All calculations are independent of Groq. The financial specification and checked example are in [FINANCIAL_SPEC.md](docs/FINANCIAL_SPEC.md).
+
+The three scenarios begin with the same entered assumptions; labels do not invent pessimistic or optimistic sales forecasts. Copy current assumptions, edit each scenario independently, and reset to the first explicitly calculated assumptions. Sensitivity changes one input at a time by ±10%. Six stage budgets, self-reported completion, readiness checks and seven-day task progress recover in the current tab. Financial notes for the investor brief remain in memory only. A different business or New Idea resets its investment state. Clear resets customer evidence while retaining the current business's financial assumptions.
+
+The financial results feed Overview, Risks, Plan, Pitch and Advisor context. Founder PDFs include the optional financial summary when assumptions have been calculated; the separate investment PDF recomputes all figures. Neither PDF trusts submitted numerical results. CSVs use UTF-8 and guard against spreadsheet formula injection.
+
+The funding directory is stored in `static/funding.json` with official sources, eligibility caveats and review dates. It separates financing from mentorship and other support. Khalifa Fund official pages conflict on some detailed eligibility rules; confirm the chosen programme through TAMM. Sheraa's reviewed calendar and RUWAD's guide are dated; current intakes and financial terms are not asserted. Recheck directory information before a presentation or release.
+
+### Frontend and security
+
+`templates/index.html` composes landing, onboarding, dashboard, investment, Advisor and footer partials. `tokens.css` defines the palette and typography; `startsmart.css` and `investment.css` own component styles. Static scripts separate translations, scoring, existing application behavior, investment behavior, workspace integration, event binding and startup. No frontend build step is needed. Fonts, pinned Chart.js 4.5.1 and QRCode.js 1.0.0 are served locally with licenses. Charts have readable data alternatives; calculations, navigation and exports do not depend on a CDN.
+
+CSP allows scripts only from this origin. Static and dynamic controls use JavaScript event listeners rather than inline event attributes. Other headers protect against framing, MIME sniffing and unnecessary device permissions. JSON size limits apply to the new routes. The single-worker in-memory limiter remains basic cost protection; it is not shared across multiple workers or service instances. Cheap `/finance` recalculation is excluded from the costly Groq/PDF quota so editing a form does not exhaust it. PDF builds remain serialized. No analytics, database or third-party persistence was added.
+
+See [V2_REVIEW.md](docs/V2_REVIEW.md) for baseline, ticket coverage, evidence paths, security review and known limitations. Live Groq quality, Linux Gunicorn startup, real-phone readers and Render memory behavior still require a controlled release smoke test. This implementation does not deploy itself.

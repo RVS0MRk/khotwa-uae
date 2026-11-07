@@ -1,0 +1,25 @@
+<!-- Floating AI advisor -->
+<button class="chat-launcher" id="chatLauncher" data-onclick="event-17" aria-controls="chatPanel" aria-expanded="false" aria-label="Open Khotwa Advisor">
+  <span class="cl-icon" aria-hidden="true">↗</span>
+  <span class="cl-text" id="cl-text">Need help?</span>
+  <span class="cl-pulse" aria-hidden="true"></span>
+</button>
+
+<div class="chat-backdrop" id="chat-backdrop" hidden data-onclick="event-18"></div>
+<div class="chat-panel" inert id="chatPanel" role="dialog" aria-label="Khotwa Advisor" aria-hidden="true">
+  <div class="chat-head">
+    <div class="chat-flag" aria-hidden="true"><i class="cr"></i><i class="cg"></i><i class="cw"></i><i class="ck"></i></div>
+    <div class="chat-head-txt">
+      <div class="chat-title" id="chat-title">Khotwa Advisor</div>
+      <div class="chat-sub" id="chat-sub">Customers, risks, pricing, or licenses</div>
+    </div>
+    <button class="chat-close" id="chatClose" data-onclick="event-19" aria-label="Close advisor">✕</button>
+  </div>
+  <div class="suggested" id="suggested" style="padding:.75rem .9rem 0"></div>
+  <div class="chat-messages" id="chat-messages" aria-live="polite"></div>
+  <div class="chat-input-row">
+    <input type="text" id="chat-input" placeholder="Ask anything about your plan..." data-onkeydown="event-20" aria-label="Type your question">
+    <button class="btn" id="sendBtn" data-onclick="event-21" aria-label="Send">Send</button>
+  </div>
+  <div class="chat-foot" id="chat-foot">Guidance only — verify official requirements.</div>
+</div>

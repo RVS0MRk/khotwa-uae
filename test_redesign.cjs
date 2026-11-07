@@ -10,9 +10,9 @@ async function main(){
   const output=fs.mkdtempSync(path.join(os.tmpdir(),'startsmart-2-'));let browser;
   try{
     for(let i=0;i<60;i++){try{if((await fetch(base+'/health')).ok)break;}catch{}await new Promise(r=>setTimeout(r,100));}
-    browser=await chromium.launch({channel:'chrome',headless:true});
+    browser=await chromium.launch({headless:true});
     const page=await browser.newPage({viewport:{width:390,height:844}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
-    await page.goto(base);await page.waitForFunction(()=>typeof polishLanguage==='function');
+    await page.goto(base);await page.locator('#have-idea').click();await page.waitForFunction(()=>typeof polishLanguage==='function');
     assert.equal(await page.locator('#journey').getAttribute('data-stage'),'0');
     assert.equal((await page.request.get(base+'/static/favicon.svg')).status(),200);
     assert.equal(await page.locator('#chatPanel').evaluate(e=>e.inert),true);
@@ -25,7 +25,7 @@ async function main(){
     await page.waitForFunction(()=>currentPlan&&!document.getElementById('genBtn').disabled);
     await page.unroute('**/generate');await page.waitForTimeout(1000);
     assert.equal(await page.locator('#journey').getAttribute('data-stage'),'1');
-    assert.equal(await page.locator('#gauge-num').innerText(),String(await page.evaluate(()=>currentPlan.opportunity_score.total)));
+    assert.equal(await page.locator('#gauge-num').innerText(),await page.evaluate(()=>currentPlan.opportunity_score.total==null?'—':String(currentPlan.opportunity_score.total)));
     await page.evaluate(()=>selectPanel(1));await page.locator('.p-int').first().selectOption('yes');
     assert.equal(await page.locator('#journey').getAttribute('data-stage'),'2');
     assert.equal(await page.locator('#evidence-ladder').getAttribute('data-highest'),'0');
@@ -47,13 +47,13 @@ async function main(){
     await page.keyboard.press('Escape');assert.equal(await page.locator('#chatPanel').evaluate(e=>e.inert),true);
     await page.evaluate(()=>selectPanel(5));await page.locator('.pitch-copy').first().click();await page.waitForFunction(()=>document.querySelector('.pitch-copy').textContent.includes('✓'));
     await page.evaluate(()=>{selectPanel(1);window._testOpen=window.open;window.open=url=>{window._openedUrl=url;};});await page.locator('#waOpenBtn').click();assert.ok((await page.evaluate(()=>window._openedUrl)).startsWith('https://wa.me/?text='));await page.evaluate(()=>window.open=window._testOpen);
-    await page.emulateMedia({reducedMotion:'reduce'});await page.evaluate(()=>{countUp('gauge-num',currentPlan.opportunity_score.total,800);selectPanel(0);});
-    assert.equal(await page.locator('#gauge-num').innerText(),String(await page.evaluate(()=>currentPlan.opportunity_score.total)));
+    await page.emulateMedia({reducedMotion:'reduce'});await page.evaluate(()=>{refreshScoreDisplay();selectPanel(0);});
+    assert.equal(await page.locator('#gauge-num').innerText(),await page.evaluate(()=>currentPlan.opportunity_score.total==null?'—':String(currentPlan.opportunity_score.total)));
     assert.equal(await page.locator('.score-fill').first().evaluate(e=>getComputedStyle(e).animationName),'none');
-    await page.locator('#result-tab-0').focus();await page.keyboard.press('End');assert.equal(await page.locator('#result-tab-6').getAttribute('aria-selected'),'true');
+    await page.locator('#result-tab-0').focus();await page.keyboard.press('End');assert.equal(await page.locator('#result-tab-7').getAttribute('aria-selected'),'true');
     await page.evaluate(()=>{clearProof();selectPanel(0);});assert.equal(await page.locator('#journey').getAttribute('data-stage'),'1');
     // Capture every requested viewport × language × theme. All tabs receive a full panel capture.
-    const sizes=[[320,740],[375,812],[390,844],[430,932],[768,1024],[1024,768],[1366,768],[1920,1080]];
+    const sizes=[[320,740],[375,812],[390,844],[430,932],[768,1024],[1024,768],[1366,768],[1440,1000],[1920,1080]];
     for(const [width,height] of sizes){
       await page.setViewportSize({width,height});
       for(const language of ['en','ar'])for(const theme of ['light','dark']){
@@ -65,14 +65,14 @@ async function main(){
         assert.ok((await page.locator('#wa-text').innerText()).startsWith(language==='ar'?'خطوة —':'Khotwa —'));
         await page.evaluate(()=>window.scrollTo({top:0,behavior:'instant'}));
         await page.screenshot({path:path.join(output,prefix+'-hero.png')});
-        await page.locator('.input-card').screenshot({path:path.join(output,prefix+'-form.png')});
+        await page.locator('#editIdea').click();await page.locator('.input-card').screenshot({path:path.join(output,prefix+'-form.png')});
         await page.evaluate(()=>selectPanel(0));await page.locator('#dashboard-summary').screenshot({path:path.join(output,prefix+'-summary.png')});
-        for(let i=0;i<7;i++){
+        for(let i=0;i<8;i++){
           await page.evaluate(i=>selectPanel(i),i);await page.waitForFunction(i=>{const b=document.getElementById('result-tab-'+i).getBoundingClientRect(),n=document.getElementById('result-nav').getBoundingClientRect();return b.left>=n.left-1&&b.right<=n.right+1;},i);
           const overflow=await page.evaluate(()=>({page:document.documentElement.scrollWidth,width:innerWidth,items:[...document.querySelectorAll('body *')].filter(e=>{const r=e.getBoundingClientRect(),s=getComputedStyle(e);return r.right>innerWidth+2&&s.position!=='fixed'&&s.display!=='none'&&!e.closest('.journey')}).slice(0,20).map(e=>({tag:e.tagName,id:e.id,cls:e.className,right:Math.round(e.getBoundingClientRect().right)})),score:['main','.score-hero','.score-bars','.score-row','.score-top','.score-track','.score-top .val'].map(q=>{const e=document.querySelector(q),r=e.getBoundingClientRect();return [q,Math.round(r.left),Math.round(r.right),Math.round(r.width)]})}));
           assert.equal(overflow.page<=overflow.width,true,prefix+' panel '+i+' page overflow '+JSON.stringify(overflow));
           await page.locator('#panel-'+i).screenshot({path:path.join(output,prefix+'-tab'+i+'.png')});
-          if(width<600&&i===1)assert.equal(await page.locator('#proof-table tr').nth(1).evaluate(e=>getComputedStyle(e).display),'grid');
+          if(width<600&&i===1)assert.ok(await page.locator('.table-wrap:has(#proof-table)').evaluate(e=>e.scrollWidth>e.clientWidth));
         }
         await page.locator('#chatLauncher').click();await page.locator('#chat-input').fill(language==='ar'?'ما المخاطر؟':'What are the risks?');await page.locator('#sendBtn').click();await page.waitForFunction(()=>!_chatBusy);
         await page.locator('#chatPanel').screenshot({path:path.join(output,prefix+'-advisor.png')});await page.keyboard.press('Escape');

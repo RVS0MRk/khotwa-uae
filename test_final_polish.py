@@ -60,8 +60,10 @@ class FinalPolishTests(unittest.TestCase):
             outputs.append(values)
         self.assertNotEqual(outputs[0], outputs[1])
         fallback = self.generate(model_plan())["opportunity_score"]
-        self.assertEqual(fallback["source"], "fallback_or_mixed")
-        self.assertTrue(all(fallback[key]["source"] == "fallback" for key in KEYS))
+        self.assertEqual(fallback["source"], "missing")
+        self.assertIsNone(fallback["total"])
+        self.assertEqual(fallback["assessed_count"], 0)
+        self.assertTrue(all(fallback[key]["source"] == "missing" and fallback[key]["score"] is None for key in KEYS))
         self.assertNotIn('"total": 19', startsmart.SCHEMA)
 
     def test_contextual_execution_risk_and_customer_wording(self):

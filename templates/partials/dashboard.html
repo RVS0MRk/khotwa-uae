@@ -1,0 +1,197 @@
+  <div id="results">
+    <section class="dashboard-summary" id="dashboard-summary" hidden><div class="summary-heading"></div><div class="summary-stats"></div></section>
+    <div class="action-row"><button type="button" class="btn btn-light" id="editIdea" data-en="Edit idea" data-ar="تعديل الفكرة">Edit idea</button>
+      <button class="btn btn-light" id="pdfBtn" data-onclick="event-8">Download PDF</button>
+      <button class="btn btn-light" id="newBtn" data-onclick="event-9">New idea</button>
+    </div>
+    <div class="trust-row" id="trust-row">
+      <span class="trust-badge" id="tb1">No login</span>
+      <span class="trust-badge" id="tb2">No payment</span>
+      <span class="trust-badge" id="tb3">Test before spending</span>
+      <span class="trust-badge" id="tb4">PDF report included</span>
+    </div>
+    <nav class="result-nav" id="result-nav" role="tablist" aria-label="Plan sections"></nav>
+    {% include 'partials/investment.html' %}
+    <div class="source-legend" id="source-legend"></div>
+
+    <div class="overview-card">
+      <h2 id="lbl-overview">Business snapshot</h2>
+      <div id="overview-body"></div>
+    </div>
+
+    <div class="first-step">
+      <div class="section-label" id="lbl-firststep">Your first step today</div>
+      <p id="first-step-text"></p>
+      <button type="button" class="btn start-validation" id="start-validation" data-onclick="event-10">Start validation →</button>
+      <div class="badges">
+        <span class="fs-badge" id="fsb1">✓ Can be done today</span>
+        <span class="fs-badge" id="fsb2">✓ Before spending money</span>
+        <span class="fs-badge" id="fsb3">✓ Under 2 hours</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-label" id="lbl-score">Opportunity score</div>
+      <p class="score-note" id="score-note">Based on assumptions — update with real customer evidence.</p>
+      <div class="score-hero">
+        <div class="gauge" id="gauge"></div>
+        <div class="score-bars" id="score-bars"></div>
+      </div>
+      <div class="interp" id="score-interp"></div>
+    </div>
+
+    <div class="decision-card" id="decision-card">
+      <div class="section-label" id="lbl-decision">Founder decision</div>
+      <div class="decision-main" id="decision-main"></div>
+      <div class="decision-reason" id="decision-reason"></div>
+      <div class="decision-meta" id="decision-meta"></div>
+      <div class="decision-next" id="decision-next"></div>
+    </div>
+
+    <div class="bys-card" id="bys-card">
+      <div class="section-label" id="lbl-bys">Before you spend</div>
+      <div class="bys-grid">
+        <div class="bys-item"><div class="bys-l" id="bys-l1">You are planning to spend</div><div class="bys-v" id="bys-spend">—</div></div>
+        <div class="bys-item"><div class="bys-l" id="bys-l2">Recommended first test</div><div class="bys-v" id="bys-test">—</div></div>
+        <div class="bys-item bys-save"><div class="bys-l" id="bys-l3">Potential money protected</div><div class="bys-v" id="bys-protect">—</div></div>
+      </div>
+      <div class="financial-detail" id="financial-detail"></div>
+    </div>
+
+    <div class="passport-card" id="passport-card">
+      <div class="passport-head">
+        <div class="passport-flag" aria-hidden="true"><i class="pr"></i><i class="pg"></i><i class="pw"></i><i class="pk"></i></div>
+        <div class="passport-title" id="lbl-passport">Founder Passport</div>
+        <button class="passport-copy" id="passportCopyBtn" data-onclick="event-11">Copy</button>
+      </div>
+      <table class="passport-table" id="passport-table"></table>
+    </div>
+
+    <div class="card">
+      <h2 class="sec" id="lbl-test">Small test plan first</h2>
+      <div class="test-plan">
+        <div class="intro" id="test-intro"></div>
+        <ul class="clean" id="test-list"></ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="sec" id="lbl-proof">Proof mode — test with 10 people</h2>
+      <p style="font-size:14px;color:var(--muted);margin-bottom:1rem" id="proof-help">Fill in feedback from up to 10 potential customers. The verdict updates live.</p>
+      <div class="validation-progress"><div class="progress-label"><strong id="proof-progress-title"></strong><span id="proof-progress-count"></span></div><div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0"><span id="proof-progress" style="width:0%"></span></div></div>
+      <div class="proof-stats" id="proof-stats"></div>
+      <div class="evidence-ladder" id="evidence-ladder"></div><p class="evidence-philosophy" id="evidence-philosophy"></p><div class="evidence-strength" id="evidence-strength"></div>
+      <div class="proof-verdict" id="proof-verdict"></div>
+      <div class="proof-actions">
+        <button class="btn btn-light" id="proofCsvBtn" data-onclick="event-12">Download data (CSV)</button>
+        <button class="btn btn-light" id="proofClearBtn" data-onclick="event-13">Clear</button>
+      </div>
+      <div class="table-wrap" style="overflow-x:auto">
+        <table class="proof-table" id="proof-table"></table>
+      </div>
+
+    </div>
+
+    <div class="card">
+      <h2 class="sec" id="lbl-7day">Your first 7 days</h2>
+      <div class="day-grid" id="day-grid"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="sec" id="lbl-validate">Validate before you spend</h2>
+      <ul class="clean" id="validate-list"></ul>
+    </div>
+
+    <div class="card">
+      <h2 class="sec" id="lbl-questions">5 questions to ask customers</h2>
+      <ol class="qs" id="questions-list"></ol>
+    </div>
+
+    <div class="card">
+      <div class="section-label" id="lbl-wa">WhatsApp test message</div>
+      <div class="wa-box"><div class="msg" id="wa-text"></div><div style="display:flex;flex-direction:column;gap:.4rem"><button class="wa-copy" id="waBtn" data-onclick="event-14">Copy</button><button class="wa-copy" id="waOpenBtn" style="background:#128c7e" data-onclick="event-15">Open WhatsApp</button></div></div>
+    </div>
+
+    <div class="card">
+      <h2 class="sec" id="lbl-donot">What not to do yet</h2>
+      <div class="donot-grid">
+        <div class="donot-col">
+          <div class="donot-head donot-bad" id="lbl-donot-bad">Do not start with</div>
+          <ul class="donot-list bad" id="donot-list"></ul>
+        </div>
+        <div class="donot-col">
+          <div class="donot-head donot-good" id="lbl-donot-good">Instead, do this first</div>
+          <ul class="donot-list good" id="instead-list"></ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="sec" id="lbl-report">Founder readiness report</h2>
+      <table class="report-table" id="report-table"></table>
+    </div>
+
+    <div class="card">
+      <h2 class="sec" id="lbl-share">Shareable founder summary</h2>
+      <div class="wa-box" style="background:var(--blue-soft);border-color:#cfe0ff">
+        <div class="msg" id="share-text" style="color:#1d4299"></div>
+        <button class="wa-copy" id="shareBtn" style="background:var(--blue)" data-onclick="event-16">Copy</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="sec" id="lbl-fuller">The fuller path (when you're ready)</h2>
+      <div id="plan-meta" class="meta" style="margin-bottom:1rem"></div>
+      <div id="steps-list"></div>
+      <div class="charts" style="margin-top:1rem">
+        <div class="chart-box"><h3 id="lbl-timeline">Timeline per step (days)</h3><div style="position:relative;height:200px"><canvas id="timeline-chart" role="img" aria-label="Timeline per step"></canvas></div></div>
+        <div class="chart-box"><h3 id="lbl-cost">Cost breakdown (AED)</h3><div style="position:relative;height:200px"><canvas id="cost-chart" role="img" aria-label="Cost breakdown"></canvas></div></div>
+      </div>
+      <div class="tip" id="tip" style="margin-top:1rem"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="sec" id="lbl-personas">Potential customer segments</h2>
+      <p class="score-note" id="segments-note">Assumed segments to test — AI assumption</p>
+      <div class="persona-grid" id="persona-grid"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="sec" id="lbl-risks">Risk radar</h2>
+      <div id="risk-list"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="sec" id="lbl-pitches">Pitch generator</h2>
+      <div id="pitch-list"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="sec" id="lbl-map">Validation path</h2>
+      <div class="opp-map" id="opp-map"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="sec" id="lbl-qr">Validation QR code</h2>
+      <p style="font-size:14px;color:var(--muted);margin-bottom:1rem" id="qr-help">Show this to customers — they scan to open your WhatsApp test message.</p>
+      <div class="qr-wrap"><div id="qr-code"></div><div class="qr-cap" id="qr-cap">Scan to open the validation message</div></div>
+    </div>
+
+    <div class="local-card">
+      <h2 class="sec" id="lbl-why">Your selected market context</h2>
+      <p style="font-size:14px;color:#6b5a30;line-height:1.6" id="why-intro">Khotwa adapts the plan to the market and context you select.</p>
+      <div class="local-grid" id="why-grid"></div>
+    </div>
+
+    <div class="card resources">
+      <h2 class="sec" id="lbl-resources">Official UAE Resources</h2>
+      <div class="res-link"><span aria-hidden="true" style="color:var(--uae-green)">●</span><a id="federal-resource" href="https://u.ae/en/information-and-services/business" target="_blank" rel="noopener noreferrer">UAE Government — business services and guidance</a></div>
+      <div id="regional-resource"></div>
+      <p class="disclaimer" id="disclaimer">Requirements vary by activity and emirate. Confirm final licensing and regulatory requirements with the relevant official authority.</p>
+    </div>
+
+    <div class="card" id="chat-note-card">
+      <h2 class="sec" id="lbl-chat">Ask a follow-up question</h2>
+      <p style="font-size:14px;color:var(--muted)" id="chat-note">Use the floating <b>Khotwa Advisor</b> at the bottom-right to ask about customers, risks, pricing, or licenses.</p>
+    </div>
+  </div>

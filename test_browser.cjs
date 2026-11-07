@@ -22,7 +22,7 @@ async function main() {
       try { if ((await fetch(base + '/health')).ok) break; } catch {}
       await new Promise(resolve => setTimeout(resolve, 100));
     }
-    browser = await chromium.launch({channel: 'chrome', headless: true});
+    browser = await chromium.launch({headless: true});
     page = await browser.newPage({viewport: {width: 390, height: 844}});
     const errors = [];
     page.on('pageerror', error => {errors.push(error.message); console.error('Browser error:', error.message);});
@@ -33,6 +33,7 @@ async function main() {
     assert.equal(await page.locator('#title').innerText(), 'From idea to first step.');
     assert.equal(await page.locator('#foot-title').innerText(), 'Khotwa · خطوة');
     assert.ok((await page.locator('meta[name="description"]').getAttribute('content')).includes('Khotwa'));
+    await page.locator('#have-idea').click();
     await page.locator('#langBtn').click();
     assert.equal(await page.title(), 'خطوة — من الفكرة إلى الخطوة الأولى.');
     assert.equal(await page.locator('#brand-name').innerText(), 'خطوة');
@@ -117,7 +118,7 @@ async function main() {
     }
     assert.ok(await page.locator('#result-nav').evaluate(el=>el.scrollWidth>el.clientWidth));
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=390),true);
-    assert.ok((await page.locator('#score-interp').innerText()).includes('assumptions'));
+    assert.ok((await page.locator('#score-interp').innerText()).includes('Incomplete assessment'));
     assert.equal(await page.locator('#decision-main').innerText(), 'Validate more');
     await page.locator('#result-tab-3').click();
     const meta = await page.locator('#plan-meta').innerText();
@@ -204,6 +205,7 @@ async function main() {
     assert.ok((englishPdf.headers()['content-disposition']||'').includes('Khotwa_UAE_Founder_Report.pdf'));
     fs.writeFileSync(path.join(output,'english.pdf'),await englishPdf.body());
     await page.locator('#langBtn').click();
+    await page.locator('#editIdea').click();
     await page.locator('#genBtn').click();
     await page.waitForFunction(() => !document.getElementById('genBtn').disabled && currentPlan && document.getElementById('results').style.display === 'block');
     assert.equal(await page.locator('html').getAttribute('lang'), 'ar');
@@ -227,19 +229,20 @@ async function main() {
     fs.writeFileSync(path.join(output,'arabic.pdf'),await pdf.body());
     await page.locator('#langBtn').click();
     await page.locator('#newBtn').click();
+    await page.locator('#have-idea').click();
     await page.locator('#idea').fill('malformed <img src=x onerror=alert(1)>');
     await page.locator('#category').selectOption({index:1});
     await page.locator('#genBtn').click();
     await page.waitForFunction(() => currentPlan && currentPlan._local && document.getElementById('results').style.display==='block');
     assert.equal(await page.locator('#report-table img').count(), 0);
     assert.equal(await page.locator('#overview-body img').count(), 0);
-    assert.equal(new Set(await page.locator('#day-grid .day-card').evaluateAll(cards=>cards.map(c=>c.querySelector('.a:last-child')?.textContent))).size,7);
+    assert.equal(new Set(await page.locator('#day-grid .day-card').evaluateAll(cards=>cards.map(c=>[...c.querySelectorAll('.a')].at(-1)?.textContent))).size,7);
     assert.ok(new Set(await page.evaluate(()=>currentPlan.risk_radar.map(r=>r.level))).size>1);
     assert.equal(new Set(await page.evaluate(()=>currentPlan.customer_personas.map(p=>p.ask))).size,3);
     assert.equal(await page.evaluate(() => currentPlan.state.user_budget_aed), 10000);
     const recoveryContext = await browser.newContext();
     const recoveryPage = await recoveryContext.newPage();
-    await recoveryPage.goto(base, {waitUntil:'networkidle'});
+    await recoveryPage.goto(base, {waitUntil:'networkidle'});await recoveryPage.locator('#have-idea').click();
     await recoveryPage.locator('#idea').fill('Mobile car wash');
     await recoveryPage.locator('#category').selectOption({index:1});
     await recoveryPage.locator('#user_type').selectOption({index:1});
@@ -266,7 +269,7 @@ async function main() {
     for(const privateText of ['Every Thursday with Sara','Call me 0501234567','Private customer note'])assert.ok(!saved.includes(privateText),privateText);
     const isolatedContext = await browser.newContext();
     const isolatedPage = await isolatedContext.newPage();
-    await isolatedPage.goto(base,{waitUntil:'networkidle'});
+    await isolatedPage.goto(base,{waitUntil:'networkidle'});await isolatedPage.locator('#have-idea').click();
     assert.equal(await isolatedPage.locator('#results').isVisible(),false);
     assert.equal(await isolatedPage.locator('#idea').inputValue(),'');
     assert.equal(await isolatedPage.evaluate(()=>sessionStorage.getItem('khotwa-business-session-v1')),null);
@@ -310,7 +313,7 @@ async function main() {
     ]){
       const context=await browser.newContext();const journey=await context.newPage();
       try{
-        await journey.goto(base,{waitUntil:'networkidle'});
+        await journey.goto(base,{waitUntil:'networkidle'});await journey.locator('#have-idea').click();
         await journey.locator('#idea').fill(profile.idea);
         await journey.evaluate(category=>{document.getElementById('category').selectedIndex=T.en.categories.indexOf(category)+1;},profile.category);
         await journey.locator('#region').selectOption(profile.region);
@@ -324,7 +327,7 @@ async function main() {
         assert.equal(plan.state.user_budget_aed,Number(profile.budget));
         assert.ok(plan.risk_radar[3].reason.includes(profile.risk));
         assert.equal(new Set(plan.customer_personas.map(p=>p.ask)).size,3);
-        assert.equal(plan.opportunity_score.total,['local_fit','clear_customer','low_starting_cost','easy_first_step','growth_potential'].reduce((n,key)=>n+plan.opportunity_score[key].score,0));
+        assert.equal(plan.opportunity_score.assessed_sum,['local_fit','clear_customer','low_starting_cost','easy_first_step','growth_potential'].reduce((n,key)=>n+plan.opportunity_score[key].score,0));
         await journey.evaluate(()=>selectPanel(6));
         const resource=await journey.locator('#regional-resource').innerText();
         assert.equal(resource.includes('Abu Dhabi Department'),profile.region==='Abu Dhabi');
@@ -340,7 +343,7 @@ async function main() {
     }
     const arabicContext=await browser.newContext();const arabicPage=await arabicContext.newPage();
     try{
-      await arabicPage.goto(base,{waitUntil:'networkidle'});
+      await arabicPage.goto(base,{waitUntil:'networkidle'});await arabicPage.locator('#have-idea').click();
       await arabicPage.locator('#langBtn').click();
       await arabicPage.locator('#idea').fill('وجبات صحية للموظفين');
       await arabicPage.evaluate(()=>{document.getElementById('category').selectedIndex=T.en.categories.indexOf('Food & Catering')+1;});
@@ -364,7 +367,7 @@ async function main() {
     }finally{await arabicContext.close();}
     const proofContext=await browser.newContext();const proofPage=await proofContext.newPage();
     try{
-      await proofPage.goto(base,{waitUntil:'networkidle'});
+      await proofPage.goto(base,{waitUntil:'networkidle'});await proofPage.locator('#have-idea').click();
       await proofPage.locator('#idea').fill('Neighbourhood service concept');
       await proofPage.evaluate(()=>{document.getElementById('category').selectedIndex=T.en.categories.indexOf('Services & Maintenance')+1;});
       await proofPage.locator('#genBtn').click();
