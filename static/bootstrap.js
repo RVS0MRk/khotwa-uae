@@ -1,4 +1,9 @@
+setupPrivacy();
 setupV2();
+setupOnboarding();
+setupFinanceAdvanced();
+document.getElementById("example-plan-link").onclick = () =>
+  document.getElementById("preview-demo").click();
 applyLang();
 updateBudget(10000);
 restoreSession();

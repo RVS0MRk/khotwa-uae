@@ -1,2 +1,5 @@
 -r requirements.txt
-pypdf
+pypdf==7.0.0
+pip-audit==2.10.1
+fonttools[woff]==4.68.0
+black==26.10.1

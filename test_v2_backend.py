@@ -5,6 +5,7 @@ from unittest.mock import patch
 from pypdf import PdfReader
 
 from test_support import configure_mock_environment
+
 configure_mock_environment()
 import app as khotwa
 from test_finance import BASE
@@ -28,8 +29,11 @@ class V2BackendTests(unittest.TestCase):
         self.assertEqual(self.client.post("/finance", json={"inputs": BASE, "scenarios": []}).status_code, 400)
 
     def test_investment_pdf_recalculates_tampered_results(self):
-        payload = {"finance": {"inputs": BASE, "result": {"operating_profit": "99999999"}},
-                   "plan": {"state": {"idea": "Small booking service"}}, "notes": {"model": "Per booking"}}
+        payload = {
+            "finance": {"inputs": BASE, "result": {"operating_profit": "99999999"}},
+            "plan": {"state": {"idea": "Small booking service"}},
+            "notes": {"model": "Per booking"},
+        }
         for language in ("en", "ar"):
             response = self.client.post("/investment/pdf", json={**payload, "lang": language})
             self.assertEqual(response.status_code, 200)
@@ -50,13 +54,17 @@ class V2BackendTests(unittest.TestCase):
         self.assertNotIn("cdn.jsdelivr.net", html)
 
     def test_financial_context_recomputed_and_customer_notes_excluded(self):
-        context = khotwa._short_context({"_financial_inputs": BASE, "proof_summary": {
-            "total_responses": 1, "top_concern": "Private customer detail", "actual_payments": 0}})
+        context = khotwa._short_context(
+            {
+                "_financial_inputs": BASE,
+                "proof_summary": {"total_responses": 1, "top_concern": "Private customer detail", "actual_payments": 0},
+            }
+        )
         self.assertIn("1800.00", context)
         self.assertNotIn("Private customer detail", context)
 
     def test_pdf_limits_and_busy(self):
-        self.assertEqual(self.client.post("/investment/pdf", json={"notes": {"model": "x"*1001}}).status_code, 400)
+        self.assertEqual(self.client.post("/investment/pdf", json={"notes": {"model": "x" * 1001}}).status_code, 400)
         khotwa._pdf_lock.acquire()
         try:
             self.assertEqual(self.client.post("/investment/pdf", json={"finance": {"inputs": BASE}}).status_code, 503)
@@ -64,8 +72,12 @@ class V2BackendTests(unittest.TestCase):
             khotwa._pdf_lock.release()
 
     def test_founder_report_keeps_finance_when_using_language_variant(self):
-        plan = {"_content_lang": "en", "_financial_inputs": BASE, "state": {"idea": "Booking tool"},
-                "_alternate_plan": {"_content_lang": "ar", "state": {"idea": "Booking tool"}}}
+        plan = {
+            "_content_lang": "en",
+            "_financial_inputs": BASE,
+            "state": {"idea": "Booking tool"},
+            "_alternate_plan": {"_content_lang": "ar", "state": {"idea": "Booking tool"}},
+        }
         localized = khotwa._localize_pdf_plan(plan, "ar")
         self.assertEqual(localized["_financial_inputs"], BASE)
 

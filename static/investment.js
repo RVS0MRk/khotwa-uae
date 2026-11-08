@@ -296,7 +296,7 @@ function money(value) {
 function metricValue(key, value) {
   if (value == null) return uiText("Unknown", "غير معلوم");
   if (key.includes("ratio") || key === "gross_margin")
-    return new Intl.NumberFormat(lang === "ar" ? "ar-AE" : "en", {
+    return new Intl.NumberFormat(lang === "ar" ? "ar-AE-u-nu-latn" : "en", {
       style: "percent",
       maximumFractionDigits: 2,
     }).format(Number(value));
@@ -304,6 +304,10 @@ function metricValue(key, value) {
 }
 function investmentRecovery() {
   return {
+    fundingFilters: investment.fundingFilters || null,
+    version: 2,
+    notes: investment.notes || {},
+    risksReviewed: !!investment.risksReviewed,
     key: investment.key,
     section: investment.section || 0,
     inputs: investment.inputs,
@@ -354,9 +358,40 @@ function restoreInvestment(value) {
     )
   )
     return;
+  value.inputs.cash_mode ||= "entered";
+  const notes =
+    value.notes && typeof value.notes === "object"
+      ? Object.fromEntries(
+          Object.entries(value.notes).filter(
+            ([k, v]) =>
+              ["model", "differentiation", "use_of_funds"].includes(k) &&
+              typeof v === "string" &&
+              v.length <= 1000,
+          ),
+        )
+      : {};
   investment = {
     ...investment,
     ...value,
+    notes,
+    risksReviewed: value.risksReviewed === true,
+    fundingFilters:
+      value.fundingFilters && typeof value.fundingFilters === "object"
+        ? {
+            emirate: String(value.fundingFilters.emirate || "UAE-wide"),
+            founder: ["emirati", "resident"].includes(
+              value.fundingFilters.founder,
+            )
+              ? value.fundingFilters.founder
+              : "not_sure",
+            stage: ["idea", "early_revenue", "growth"].includes(
+              value.fundingFilters.stage,
+            )
+              ? value.fundingFilters.stage
+              : "all",
+          }
+        : null,
+    legacyLicensing: value.version !== 2 && value.inputs.licensing == null,
     section:
       Number.isInteger(value.section) && value.section >= 0 && value.section < 7
         ? value.section
@@ -385,6 +420,9 @@ function restoreInvestment(value) {
     );
 }
 function resetInvestment() {
+  document
+    .querySelectorAll("#investor-fields textarea")
+    .forEach((n) => (n.value = ""));
   investmentStatuses.export = "";
   investmentStatuses.error = "";
   renderInvestmentStatuses();
@@ -422,6 +460,8 @@ function financeField(key, value, onchange, prefix) {
   label.htmlFor = input.id;
   input.addEventListener("input", () => {
     input.removeAttribute("aria-invalid");
+    if (key === "price" && (!prefix || prefix === "fin" || prefix === "quick"))
+      investment.aiPricePrefill = false;
     onchange(input.value);
     scheduleFinance();
   });
@@ -433,6 +473,13 @@ function initInvestment() {
   if (investment.key !== currentPlan.state.idea) {
     resetInvestment();
     investment.key = currentPlan.state.idea;
+    investment.inputs.cash_mode = "simplified";
+    if (Number(currentPlan.state.suggested_test_price_aed) > 0) {
+      investment.inputs.price = String(
+        currentPlan.state.suggested_test_price_aed,
+      );
+      investment.aiPricePrefill = true;
+    }
     investment.inputs.available_capital = String(
       currentPlan.state.user_budget_aed,
     );
@@ -497,6 +544,8 @@ function initInvestment() {
   renderStages();
   renderReadiness();
   renderInvestorFields();
+  renderFinanceStarter();
+  moveAdvancedFields();
   renderFunding();
   setTxt(
     "finance-business-context",
@@ -589,6 +638,9 @@ async function calculateFinance(captureOriginal = false) {
 }
 function table(target, headers, rows) {
   const wrap = document.getElementById(target);
+  wrap.tabIndex = 0;
+  wrap.setAttribute("role", "region");
+  wrap.setAttribute("aria-label", headers.join(" · "));
   wrap.replaceChildren();
   const t = uiNode("table", "data-table"),
     head = uiNode("thead"),
@@ -621,7 +673,7 @@ function breakLabel(result) {
       )
     : result.break_even_units == null
       ? uiText("Unknown", "غير معلوم")
-      : new Intl.NumberFormat(lang === "ar" ? "ar-AE" : "en").format(
+      : new Intl.NumberFormat(lang === "ar" ? "ar-AE-u-nu-latn" : "en").format(
           result.break_even_units,
         ) +
         " " +
@@ -641,7 +693,7 @@ function runwayLabel(result) {
             "مدخلات التدفق النقدي غير مكتملة",
           )
         : Number(result.runway_months).toLocaleString(
-            lang === "ar" ? "ar-AE" : "en",
+            lang === "ar" ? "ar-AE-u-nu-latn" : "en",
           ) +
           " " +
           uiText("months", "شهر");
@@ -686,51 +738,77 @@ function renderFinance() {
   const r = financeResult.base,
     metrics = document.getElementById("finance-metrics");
   metrics.replaceChildren();
-  for (const key of [
-    "startup_capital",
-    "revenue",
-    "operating_profit",
-    "funding_gap",
-    "contribution_per_unit",
-    "contribution_ratio",
-  ]) {
-    const spec = METRICS[key],
-      box = uiNode("article", "finance-metric");
-    box.dataset.metric = key;
-    box.append(
-      uiNode("span", "metric-label", ft(spec)),
-      uiNode("strong", "", metricValue(key, r[key])),
-      uiNode("small", "", spec[lang === "ar" ? 3 : 2]),
-    );
-    metrics.append(box);
+  const computable = beginnerFinanceResults(r);
+  if (computable) {
+    for (const key of [
+      "startup_capital",
+      "revenue",
+      "operating_profit",
+      "funding_gap",
+      "contribution_per_unit",
+      "contribution_ratio",
+    ]) {
+      if (r[key] === null) continue;
+      const spec = METRICS[key],
+        box = uiNode("article", "finance-metric");
+      box.dataset.metric = key;
+      box.append(
+        uiNode(
+          "span",
+          "metric-label",
+          key === "startup_capital" &&
+            r.warnings.includes("licensing_not_provided")
+            ? uiText(
+                "Known startup subtotal (licensing missing)",
+                "مجموع التأسيس المعروف (الترخيص ناقص)",
+              )
+            : ft(spec),
+        ),
+        uiNode(
+          "strong",
+          "",
+          key === "funding_gap"
+            ? fundingGapLabel(r[key])
+            : metricValue(key, r[key]),
+        ),
+      );
+      if (key === "funding_gap")
+        box.classList.add(
+          Number(r[key]) > 0 ? "finance-warning" : "finance-success",
+        );
+      metrics.append(box);
+    }
+    for (const [label, value, formula] of [
+      [
+        uiText("Break-even", "التعادل"),
+        breakLabel(r),
+        uiText(
+          "Ceiling(fixed costs ÷ contribution / unit). Continuous units: ",
+          "تقريب لأعلى (الثابتة ÷ مساهمة الوحدة). الوحدات الرياضية: ",
+        ) + (r.break_even_continuous_units ?? "—"),
+      ],
+      [
+        uiText("Cash runway", "المدة النقدية"),
+        runwayLabel(r),
+        uiText(
+          "Operating cash ÷ monthly cash burn. Accounting profit is separate.",
+          "السيولة التشغيلية ÷ الاستنزاف النقدي الشهري. الربح المحاسبي منفصل.",
+        ),
+      ],
+    ]) {
+      const box = uiNode("article", "finance-metric");
+      box.append(
+        uiNode("span", "metric-label", label),
+        uiNode("strong", "", value),
+      );
+      metrics.append(box);
+    }
   }
-  for (const [label, value, formula] of [
-    [
-      uiText("Break-even", "التعادل"),
-      breakLabel(r),
-      uiText(
-        "Ceiling(fixed costs ÷ contribution / unit). Continuous units: ",
-        "تقريب لأعلى (الثابتة ÷ مساهمة الوحدة). الوحدات الرياضية: ",
-      ) + (r.break_even_continuous_units ?? "—"),
-    ],
-    [
-      uiText("Cash runway", "المدة النقدية"),
-      runwayLabel(r),
-      uiText(
-        "Operating cash ÷ monthly cash burn. Accounting profit is separate.",
-        "السيولة التشغيلية ÷ الاستنزاف النقدي الشهري. الربح المحاسبي منفصل.",
-      ),
-    ],
-  ]) {
-    const box = uiNode("article", "finance-metric");
-    box.append(
-      uiNode("span", "metric-label", label),
-      uiNode("strong", "", value),
-      uiNode("small", "", formula),
-    );
-    metrics.append(box);
-  }
-  renderFinanceBasis(r);
+  if (computable) {
+    renderFinanceBasis(r);
+    compactFinanceMethods();
+  } else document.getElementById("finance-basis")?.remove();
+  document.getElementById("expense-chart").hidden = !computable;
   const evidence = currentPlan.proof_summary?.total_responses || 0;
   setTxt(
     "finance-next",
@@ -769,30 +847,7 @@ function renderFinance() {
     ],
   );
   const names = Object.keys(SCENARIOS);
-  table(
-    "scenario-comparison",
-    [
-      uiText("Scenario", "السيناريو"),
-      ft(METRICS.revenue),
-      ft(METRICS.operating_profit),
-      uiText("Break-even", "التعادل"),
-      ft(METRICS.startup_capital),
-      uiText("Funding gap", "فجوة التمويل"),
-      uiText("Runway", "المدة النقدية"),
-    ],
-    names.map((k) => {
-      const s = financeResult.scenarios[k];
-      return [
-        ft(SCENARIOS[k]),
-        money(s.revenue),
-        money(s.operating_profit),
-        breakLabel(s),
-        money(s.startup_capital),
-        money(s.funding_gap),
-        runwayLabel(s),
-      ];
-    }),
-  );
+  renderScenarioComparison();
   bars(
     "scenario-chart",
     uiText(
@@ -814,13 +869,12 @@ function renderFinance() {
     ],
     financeResult.sensitivity.map((s) => [
       ft(FINANCE_FIELDS[s.field]),
-      s.baseline +
+      (s.discrete ? formatUnits(s.baseline) : money(s.baseline)) +
         " → " +
-        s.comparison +
-        (s.discrete ? " " + uiText("units", "وحدة") : " AED"),
+        (s.discrete ? formatUnits(s.comparison) : money(s.comparison)),
       s.actual_percent == null
         ? uiText("Not defined from zero", "غير معرّف من الصفر")
-        : s.actual_percent + "%",
+        : formatChangePercent(s.actual_percent),
       money(s.profit_impact),
     ]),
   );
@@ -843,21 +897,11 @@ function renderFinance() {
         "No non-zero modeled profit impact is available.",
         "لا يتوفر أثر ربح محسوب غير صفري.",
       );
-  bars(
-    "sensitivity-chart",
-    uiText(
-      "Ranked profit impacts · same order as table",
-      "آثار الربح مرتبة · بترتيب الجدول نفسه",
-    ),
-    financeResult.sensitivity.map((s) => [
-      ft(FINANCE_FIELDS[s.field]) + " " + s.baseline + " → " + s.comparison,
-      s.profit_impact,
-    ]),
-  );
+  renderSensitivityChart();
   const unit = (value) =>
     value == null
       ? uiText("Unknown", "غير معلوم")
-      : Number(value).toLocaleString(lang === "ar" ? "ar-AE" : "en") +
+      : Number(value).toLocaleString(lang === "ar" ? "ar-AE-u-nu-latn" : "en") +
         " " +
         uiText("units", "وحدة");
   bars(
@@ -916,6 +960,7 @@ function renderFinance() {
     .getElementById("allocation-status")
     .classList.toggle("finance-warning", a.over_budget);
   renderFinanceIntegration();
+  updateReadiness();
 }
 function illustrativeInputs(name, base) {
   const v = structuredClone(base);
@@ -1030,7 +1075,7 @@ function renderStages() {
   const root = document.getElementById("investment-stages");
   root.replaceChildren();
   STAGES.forEach((s, i) => {
-    const box = uiNode("article", "investment-stage");
+    const box = uiNode("details", "investment-stage");
     box.append(
       uiNode("span", "step-index", String(i + 1).padStart(2, "0")),
       uiNode("h4", "", s[lang === "ar" ? 1 : 0]),
@@ -1075,11 +1120,11 @@ function renderStages() {
         uiText("Completed · my assessment", "مكتمل · بتقييمي"),
       ),
     );
-    box.append(
-      label,
-      status,
-      uiNode("p", "", uiText("Next: ", "التالي: ") + s[lang === "ar" ? 3 : 2]),
-    );
+    box.append(label, status);
+    const heading = uiNode("summary");
+    heading.append(box.querySelector(".step-index"), box.querySelector("h4"));
+    box.prepend(heading);
+    box.open = innerWidth >= 768 || i === 0;
     root.append(box);
   });
 }
@@ -1098,17 +1143,33 @@ function renderReadiness() {
       updateReadiness();
       saveSession();
     };
-    label.append(check, document.createTextNode(ft(pair)));
+    label.dataset.readiness = String(i);
+    label.append(
+      check,
+      document.createTextNode(uiText("I confirm: ", "أؤكد: ") + ft(pair)),
+    );
     root.append(label);
   });
   updateReadiness();
 }
 function updateReadiness() {
+  const detected = detectedReadiness();
+  document.querySelectorAll("[data-readiness]").forEach((label) => {
+    label.querySelector(".detected-status")?.remove();
+    if (detected.has(Number(label.dataset.readiness)))
+      label.append(
+        uiNode(
+          "span",
+          "source-badge detected-status",
+          uiText("Detected from your entries", "مكتشف من إدخالاتك"),
+        ),
+      );
+  });
   setTxt(
     "readiness-status",
     uiText(
-      `${investment.readiness.length} of 12 preparation items reported complete.`,
-      `${investment.readiness.length} من 12 بند استعداد أُقرّ باكتماله.`,
+      `${investment.readiness.length} of 12 self-reported; ${detected.size} detected from inputs. Not independently verified.`,
+      `${investment.readiness.length} من 12 بإقرارك؛ ${detected.size} مكتشف من المدخلات. دون تحقق مستقل.`,
     ),
   );
   const root = document.getElementById("readiness-next");
@@ -1220,8 +1281,8 @@ function updateReadiness() {
       6,
     ],
   ];
-  const gaps = READINESS.map((_, i) => i)
-    .filter((i) => !investment.readiness.includes(i))
+  const gaps = [0, 2, 3, 4, 5, 6, 9, 11, 1, 7, 8, 10]
+    .filter((i) => !investment.readiness.includes(i) && !detected.has(i))
     .slice(0, 3);
   if (!gaps.length)
     root.append(
@@ -1263,6 +1324,16 @@ function updateReadiness() {
     link.onclick = () => {
       selectPanel(d[4]);
       if (d[4] === 7) showInvestmentSection(d[5], true);
+      const selector = {
+        2: ".p-int",
+        3: ".p-pre",
+        4: "#fin-price",
+        5: "#fin-equipment",
+        6: "#fin-fixed_cost",
+        9: "#regional-resource",
+        11: "#investor-use_of_funds",
+      }[i];
+      if (selector) document.querySelector(selector)?.focus();
     };
     card.append(link);
     root.append(card);
@@ -1285,7 +1356,12 @@ function renderInvestorFields() {
     input.maxLength = 1000;
     input.dataset.key = key;
     input.id = "investor-" + key;
-    input.value = values[key] || "";
+    input.value = investment.notes?.[key] ?? values[key] ?? "";
+    input.oninput = () => {
+      investment.notes ||= {};
+      investment.notes[key] = input.value;
+      saveSession();
+    };
     input.placeholder = uiText("Not yet provided", "لم يُقدّم بعد");
     label.append(input);
     root.append(label);
@@ -1315,8 +1391,8 @@ function renderFinanceIntegration() {
                 "أضف التكاليف في دليل الاستثمار.",
               )) +
           uiText(
-            ". The 25-point score is unchanged.",
-            ". لا تتغير درجة التقييم من 25.",
+            " The 25-point score is unchanged.",
+            " لا تتغير درجة التقييم من 25.",
           ),
       ),
     );
@@ -1475,10 +1551,11 @@ function renderFinanceIntegration() {
       el.append(button);
     }
   }
+  compactInvestmentLink();
 }
 async function loadFunding() {
   try {
-    const response = await fetch("/static/funding.json");
+    const response = await fetch(document.body.dataset.fundingSrc);
     fundingData = await response.json();
     renderFunding();
   } catch {
@@ -1490,104 +1567,6 @@ async function loadFunding() {
       ),
     );
   }
-}
-function renderFunding() {
-  renderFinancingRoutes();
-  const search = document.getElementById("funding-search"),
-    filter = document.getElementById("funding-filter"),
-    selected = filter.value;
-  search.placeholder = uiText(
-    "Search support, emirate or institution…",
-    "ابحث عن الدعم أو الإمارة أو المؤسسة…",
-  );
-  filter.replaceChildren();
-  [
-    ["all", "All support", "كل أنواع الدعم"],
-    ["government", "Government support", "دعم حكومي"],
-    ["finance", "Loans & guarantees", "قروض وضمانات"],
-    ["accelerator", "Incubators & accelerators", "حاضنات ومسرّعات"],
-  ].forEach(([value, en, ar]) => {
-    const o = uiNode("option", "", uiText(en, ar));
-    o.value = value;
-    filter.append(o);
-  });
-  filter.value = selected || "all";
-  const root = document.getElementById("funding-results");
-  root.replaceChildren();
-  fundingData
-    .filter(
-      (e) =>
-        (filter.value === "all" || e.category === filter.value) &&
-        JSON.stringify(e).toLowerCase().includes(search.value.toLowerCase()),
-    )
-    .forEach((entry) => {
-      const d = entry[lang],
-        card = uiNode("article", "funding-card");
-      card.append(
-        uiNode(
-          "span",
-          "source-badge",
-          entry.status === "verified"
-            ? uiText("OFFICIAL SOURCE CHECKED", "رُوجع المصدر الرسمي")
-            : entry.status === "partial"
-              ? uiText("PARTIAL · CONFIRM TERMS", "مراجعة جزئية · أكّد الشروط")
-              : uiText("UNVERIFIED", "غير مُتحقق"),
-        ),
-        uiNode("h4", "", d.name),
-        uiNode("p", "", d.description),
-      );
-      const dl = uiNode("dl");
-      [
-        ["support", "Support", "الدعم"],
-        ["target", "Applicants", "المتقدمون"],
-        ["scope", "Geography", "النطاق"],
-        ["eligibility", "Eligibility & nationality", "الأهلية والجنسية"],
-        ["limitations", "Limitations", "القيود"],
-      ].forEach(([key, en, ar]) =>
-        dl.append(uiNode("dt", "", uiText(en, ar)), uiNode("dd", "", d[key])),
-      );
-      card.append(dl);
-      if (entry.programs) {
-        const list = uiNode("ul", "funding-programs");
-        entry.programs[lang].forEach((name) =>
-          list.append(uiNode("li", "", name)),
-        );
-        card.append(list);
-      }
-      for (const [url, label] of [
-        [entry.url, uiText("Official information ↗", "المعلومات الرسمية ↗")],
-        [
-          entry.apply,
-          uiText("Application starting point ↗", "بداية التقديم ↗"),
-        ],
-      ]) {
-        if (!/^https:\/\//.test(url)) continue;
-        const a = uiNode("a", "", label);
-        a.href = url;
-        a.target = "_blank";
-        a.rel = "noopener noreferrer";
-        card.append(a);
-      }
-      card.append(
-        uiNode(
-          "small",
-          "",
-          uiText("Last checked: ", "آخر مراجعة: ") +
-            (entry.checked ||
-              entry.verified ||
-              uiText("Not verified", "غير مُتحقق")),
-        ),
-      );
-      root.append(card);
-    });
-  if (!root.childElementCount)
-    root.append(
-      uiNode(
-        "p",
-        "finance-empty",
-        uiText("No matching resources.", "لا توجد موارد مطابقة."),
-      ),
-    );
 }
 async function exportInvestment() {
   if (!currentPlan) return;
@@ -1611,13 +1590,18 @@ async function exportInvestment() {
         notes,
       }),
     });
+    checkServiceResponse(response);
     if (!response.ok) throw Error();
     downloadBlob(
       await response.blob(),
       "Khotwa_Investment_" + exportLang + ".pdf",
     );
     setInvestmentStatus("downloaded");
-  } catch {
+  } catch (error) {
+    if (error.retrySeconds) {
+      setInvestmentStatus("rate_limited", error.retrySeconds);
+      return;
+    }
     setInvestmentStatus("failed");
   } finally {
     clearTimeout(timeout);

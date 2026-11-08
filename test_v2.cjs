@@ -4,6 +4,21 @@ const assert = require("node:assert/strict"),
   path = require("node:path");
 const { spawn } = require("node:child_process"),
   { chromium } = require("playwright");
+
+async function openActions(page) {
+  const menu = page.locator(".dashboard-actions");
+  if (
+    (await menu.count()) &&
+    !((await menu.getAttribute("open")) !== null) &&
+    (await menu.locator("summary").isVisible())
+  )
+    await menu.locator("summary").click();
+}
+async function revealProof(page) {
+  while (await page.locator("#proof-add").isVisible())
+    await page.locator("#proof-add").click();
+}
+
 async function main() {
   const port = process.env.V2_TEST_PORT || "5003",
     base = "http://127.0.0.1:" + port,
@@ -107,6 +122,7 @@ async function main() {
     await page
       .locator("#score-bars")
       .screenshot({ path: path.join(output, "after-score-1440-en.png") });
+    await openActions(page);
     await page.locator("#editIdea").click();
     assert.equal(
       await page.locator("#idea").inputValue(),
@@ -157,6 +173,13 @@ async function main() {
           ),
         key,
       );
+      if (key === "cogs_per_unit" || key.startsWith("cash_")) {
+        if (key.startsWith("cash_"))
+          await page.locator("#cash-mode").selectOption("entered");
+        await page
+          .locator("#finance-advanced")
+          .evaluate((e) => (e.open = true));
+      }
       await page.locator("#fin-" + key).fill(value);
     }
     await page.evaluate(() => showInvestmentSection(1));
@@ -214,11 +237,11 @@ async function main() {
     await page.evaluate(() => showInvestmentSection(6));
     await page
       .locator("#investor-use_of_funds")
-      .fill("Private draft not retained");
+      .fill("Use funds for a measured customer experiment");
     const stored = await page.evaluate(() =>
       sessionStorage.getItem(SESSION_KEY),
     );
-    assert.ok(!stored.includes("Private draft not retained"));
+    assert.ok(stored.includes("Use funds for a measured customer experiment"));
     await page.reload({ waitUntil: "networkidle" });
     await page.waitForFunction(
       () => financeResult?.base?.operating_profit === "1800.00",
@@ -228,7 +251,10 @@ async function main() {
       await page.locator("#readiness-checks input").first().isChecked(),
       true,
     );
-    assert.equal(await page.locator("#investor-use_of_funds").inputValue(), "");
+    assert.equal(
+      await page.locator("#investor-use_of_funds").inputValue(),
+      "Use funds for a measured customer experiment",
+    );
     assert.equal(await page.evaluate(() => investment.tasks[0]), 0);
     checks++;
     const before = await page.evaluate(() => JSON.stringify(investment.inputs));
@@ -249,8 +275,10 @@ async function main() {
     checks++;
     await page.locator("#langBtn").click();
     await page.evaluate(() => showInvestmentSection(5));
+    await page.locator("#funding-emirate").selectOption("UAE-wide");
     await page.locator("#funding-search").fill("Khalifa");
     assert.equal(await page.locator(".funding-card").count(), 1);
+    await page.locator(".funding-card summary").click();
     assert.ok(
       (await page.locator(".funding-card").innerText()).includes("100%"),
     );
@@ -385,7 +413,6 @@ async function main() {
       sessionStorage.clear();
       resetApp();
     });
-    await page.locator("#have-idea").click();
     await page
       .locator("#idea")
       .fill('<img src=x onerror="window.xssExecuted=true">');
@@ -408,6 +435,7 @@ async function main() {
     await fallback.locator("#preview-demo").click();
     await fallback.waitForFunction(() => currentPlan);
     await fallback.evaluate(() => selectPanel(3));
+    await fallback.locator("#fuller-path").evaluate((e) => (e.open = true));
     assert.ok(
       (await fallback.locator("#timeline-fallback").innerText()).length > 10,
     );

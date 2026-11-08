@@ -11,25 +11,29 @@ function aggregateScores(sc) {
     sum = 0;
   for (const k of SCORE_KEYS) {
     const item = sc[k] || {};
-    if (
-      item.source === "fallback" ||
-      /insufficient information|لا توجد معلومات كافية/.test(item.reason || "")
-    ) {
+    const reason = typeof item.reason === "string" ? item.reason.trim() : "";
+    const valid =
+      item.source !== "fallback" &&
+      typeof item.score === "number" &&
+      Number.isInteger(item.score) &&
+      item.score >= 0 &&
+      item.score <= 5 &&
+      reason.length >= 12 &&
+      !["one line", "one-line reason"].includes(reason.toLowerCase()) &&
+      !/insufficient information|not assessed|لا توجد معلومات كافية/i.test(
+        reason,
+      );
+    if (valid) {
+      n++;
+      sum += item.score;
+    } else {
       item.score = null;
       item.status = "not_assessed";
       item.source = "missing";
     }
-    if (
-      typeof item.score === "number" &&
-      Number.isInteger(item.score) &&
-      item.score >= 0 &&
-      item.score <= 5
-    ) {
-      n++;
-      sum += item.score;
-    } else item.score = null;
     sc[k] = item;
   }
+  sc.maximum = 25;
   sc.assessed_count = n;
   sc.assessed_sum = sum;
   sc.total = n === 5 ? sum : null;
@@ -80,7 +84,7 @@ function renderScores(sc) {
   );
   value.id = "gauge-num";
   const center = uiNode("div", "gv");
-  center.append(value, uiNode("small", "", ar ? "من ٢٥" : "out of 25"));
+  center.append(value, uiNode("small", "", ar ? "من 25" : "out of 25"));
   g.append(center);
   const bars = document.getElementById("score-bars");
   bars.replaceChildren();
@@ -181,6 +185,7 @@ function renderScores(sc) {
           ? "درجة مبدئية وليست احتمال نجاح تجاري."
           : "Provisional assessment, not a probability of business success."),
   );
+  drawScoreArc(sc);
 }
 function refreshScoreDisplay() {
   if (!currentPlan) return;
@@ -193,12 +198,5 @@ function refreshScoreDisplay() {
     .map((r) => r.cells[0].textContent + ": " + r.cells[1].textContent)
     .join("\n");
   const share = document.getElementById("share-text");
-  share.textContent =
-    (lang === "ar" ? "خطوة — " : "Khotwa — ") +
-    (currentPlan.state?.idea || "") +
-    "\n" +
-    (currentPlan.first_step_today || "") +
-    "\n" +
-    (lang === "ar" ? "التقييم: " : "Assessment: ") +
-    scoreLabel(sc);
+  share.textContent = composeFounderShare();
 }

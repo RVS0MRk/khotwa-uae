@@ -5,6 +5,20 @@ const fs = require("node:fs"),
 const { spawn } = require("node:child_process");
 const { chromium } = require("playwright");
 
+async function openActions(page) {
+  const menu = page.locator(".dashboard-actions");
+  if (
+    (await menu.count()) &&
+    !((await menu.getAttribute("open")) !== null) &&
+    (await menu.locator("summary").isVisible())
+  )
+    await menu.locator("summary").click();
+}
+async function revealProof(page) {
+  while (await page.locator("#proof-add").isVisible())
+    await page.locator("#proof-add").click();
+}
+
 async function main() {
   const base = "http://127.0.0.1:5004",
     output = path.resolve("outputs/v21-review/after");
@@ -81,6 +95,13 @@ async function main() {
               : 1),
         )
         .click();
+      if (key === "cogs_per_unit" || key.startsWith("cash_")) {
+        if (key.startsWith("cash_"))
+          await page.locator("#cash-mode").selectOption("entered");
+        await page
+          .locator("#finance-advanced")
+          .evaluate((e) => (e.open = true));
+      }
       await page.locator("#fin-" + key).fill(value);
     }
     await page.locator("#cash-mode").selectOption("simplified");
@@ -100,6 +121,7 @@ async function main() {
       sensitivity.map((s) => Number(s.comparison)).sort(),
       [2, 4],
     );
+    await page.locator("#sensitivity-table-details summary").click();
     assert.ok(
       (await page.locator("#sensitivity-table").innerText()).includes("33.33%"),
     );
@@ -331,6 +353,7 @@ async function main() {
             await page.evaluate(
               () => document.documentElement.scrollWidth <= innerWidth,
             ),
+            `${width} ${language} investment ${section}: page overflow`,
           );
         }
         await page.locator("#investment-tab-0").focus();
@@ -420,11 +443,14 @@ async function main() {
       showInvestmentSection(5);
     });
     assert.equal(await page.locator("#financing-routes details").count(), 8);
+    await page.locator("#funding-emirate").selectOption("UAE-wide");
     assert.equal(await page.locator(".funding-card").count(), 8);
     assert.ok(
       (await page.locator(".funding-card").nth(6).innerText()).includes(
         await page.evaluate(() =>
-          lang === "ar" ? "غير مُتحقق" : "UNVERIFIED",
+          lang === "ar"
+            ? "رسمي مؤرخ · أكّد الشروط الحالية"
+            : "DATED OFFICIAL · CONFIRM CURRENT TERMS",
         ),
       ),
     );

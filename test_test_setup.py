@@ -24,6 +24,7 @@ import test_support
 import app
 assert app.API_KEY == test_support.TEST_KEY
 """
-        result = subprocess.run([sys.executable, "-c", code], cwd=Path(__file__).parent,
-                                env=env, capture_output=True, text=True)
+        result = subprocess.run(
+            [sys.executable, "-c", code], cwd=Path(__file__).parent, env=env, capture_output=True, text=True
+        )
         self.assertEqual(result.returncode, 0, result.stderr)

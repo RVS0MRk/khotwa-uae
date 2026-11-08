@@ -1,12 +1,12 @@
 @font-face {
   font-family: Inter;
-  src: url("/static/fonts/inter-latin.ttf") format("truetype");
+  src: url("/static/fonts/inter-latin.woff2?v=72f95e3de357") format("woff2");
   font-display: swap;
   font-weight: 100 900;
 }
 @font-face {
   font-family: Arabic;
-  src: url("/static/fonts/arabic.ttf") format("truetype");
+  src: url("/static/fonts/arabic.woff2?v=62454e1ec6b5") format("woff2");
   font-display: swap;
   font-weight: 100 900;
 }

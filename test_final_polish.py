@@ -1,4 +1,5 @@
 """Targeted final correctness regressions, using only mocked provider output."""
+
 import json
 import os
 import unittest
@@ -7,6 +8,7 @@ from unittest.mock import patch
 from pypdf import PdfReader
 
 from test_support import configure_mock_environment
+
 configure_mock_environment()
 import app as startsmart
 
@@ -14,15 +16,23 @@ KEYS = ("local_fit", "clear_customer", "low_starting_cost", "easy_first_step", "
 
 
 def model_plan(costs=(0, 0, 0, 0, 100, 300, 0)):
-    return {"business_name_suggestion": "Content service", "summary": "A planning assumption.",
-            "steps": [{"step_number": i+1, "action": "Validation", "estimated_cost_aed": cost} for i, cost in enumerate(costs)],
-            "total_estimated_cost_aed": 5000, "readiness_report": {"target_customer": "Restaurant owners/marketing managers with 1-20 seats"}}
+    return {
+        "business_name_suggestion": "Content service",
+        "summary": "A planning assumption.",
+        "steps": [
+            {"step_number": i + 1, "action": "Validation", "estimated_cost_aed": cost} for i, cost in enumerate(costs)
+        ],
+        "total_estimated_cost_aed": 5000,
+        "readiness_report": {"target_customer": "Restaurant owners/marketing managers with 1-20 seats"},
+    }
 
 
 class FinalPolishTests(unittest.TestCase):
     def generate(self, raw, idea="Social-media content service", budget=200, lang="en"):
         with patch.object(startsmart, "call_groq", return_value=json.dumps(raw)):
-            response = startsmart.app.test_client().post("/generate", json={"idea": idea, "budget": budget, "lang": lang})
+            response = startsmart.app.test_client().post(
+                "/generate", json={"idea": idea, "budget": budget, "lang": lang}
+            )
         self.assertEqual(response.status_code, 200)
         return response.get_json()
 
@@ -40,19 +50,42 @@ class FinalPolishTests(unittest.TestCase):
                 plan = self.generate(model_plan([0, 0, 0, 0, 100, invalid, 0]))
                 self.assertIsNone(plan["total_estimated_cost_aed"])
                 self.assertIsNone(plan["estimated_budget_gap_aed"])
-        zero = self.generate(model_plan([0]*7))
+        zero = self.generate(model_plan([0] * 7))
         self.assertEqual(zero["total_estimated_cost_aed"], 0)
         decimal = self.generate(model_plan([0, 0, 0, 0, 23.25, 30.5, 0]))
         self.assertEqual(decimal["total_estimated_cost_aed"], 53.75)
 
     def test_two_businesses_keep_distinct_reasoned_model_scores(self):
         examples = [
-            ("Social-media content service", [4, 3, 5, 4, 3], ["Founder has restaurant content experience", "Restaurants' willingness to change suppliers is unknown", "Content interviews need few tools", "A sample content calendar can be shown this week", "Client approvals limit content capacity"]),
-            ("Cold-chain delivery fleet", [2, 4, 1, 2, 4], ["Founder lacks refrigerated fleet experience", "Perishable-goods buyers have a defined delivery problem", "Refrigerated vehicles exceed the entered budget", "Cold-chain logistics need careful preparation", "Repeat delivery routes may support expansion"])]
+            (
+                "Social-media content service",
+                [4, 3, 5, 4, 3],
+                [
+                    "Founder has restaurant content experience",
+                    "Restaurants' willingness to change suppliers is unknown",
+                    "Content interviews need few tools",
+                    "A sample content calendar can be shown this week",
+                    "Client approvals limit content capacity",
+                ],
+            ),
+            (
+                "Cold-chain delivery fleet",
+                [2, 4, 1, 2, 4],
+                [
+                    "Founder lacks refrigerated fleet experience",
+                    "Perishable-goods buyers have a defined delivery problem",
+                    "Refrigerated vehicles exceed the entered budget",
+                    "Cold-chain logistics need careful preparation",
+                    "Repeat delivery routes may support expansion",
+                ],
+            ),
+        ]
         outputs = []
         for idea, values, reasons in examples:
             raw = model_plan()
-            raw["opportunity_score"] = {key: {"score": value, "reason": reason} for key, value, reason in zip(KEYS, values, reasons)}
+            raw["opportunity_score"] = {
+                key: {"score": value, "reason": reason} for key, value, reason in zip(KEYS, values, reasons)
+            }
             score = self.generate(raw, idea)["opportunity_score"]
             self.assertEqual([score[key]["score"] for key in KEYS], values)
             self.assertEqual(score["total"], sum(values))
@@ -68,9 +101,11 @@ class FinalPolishTests(unittest.TestCase):
         self.assertNotIn('"total": 19', startsmart.SCHEMA)
 
     def test_contextual_execution_risk_and_customer_wording(self):
-        for idea, expected in (("Social-media content service", "Content-production"),
-                               ("Mobile car wash", "Travel time"),
-                               ("Digital scheduling software", "Development effort")):
+        for idea, expected in (
+            ("Social-media content service", "Content-production"),
+            ("Mobile car wash", "Travel time"),
+            ("Digital scheduling software", "Development effort"),
+        ):
             with self.subTest(idea=idea):
                 plan = self.generate(model_plan(), idea)
                 self.assertIn(expected, plan["risk_radar"][3]["reason"])
@@ -94,7 +129,7 @@ class FinalPolishTests(unittest.TestCase):
             self.assertIn("26.5", text)
             self.assertNotIn("■", text)
         self.assertEqual(plan, before)
-        unknown = self.generate(model_plan([None]*7))
+        unknown = self.generate(model_plan([None] * 7))
         text = "\n".join(page.extract_text() for page in PdfReader(startsmart.build_pdf(unknown)).pages)
         self.assertIn("Not estimated yet", text)
         self.assertIn("Estimated gap: Not available", text)

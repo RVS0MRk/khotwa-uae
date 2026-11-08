@@ -54,8 +54,14 @@ function renderFinancingRoutes() {
   if (!root) {
     root = uiNode("section", "financing-routes");
     root.id = "financing-routes";
-    document.getElementById("funding-directory").prepend(root);
+    const disclosure = uiNode("details", "financing-directory-explainer");
+    disclosure.id = "financing-route-guide";
+    disclosure.open = innerWidth >= 768;
+    disclosure.append(uiNode("summary"), root);
+    document.getElementById("funding-directory").prepend(disclosure);
   }
+  document.querySelector("#financing-route-guide > summary").textContent =
+    uiText("Compare financing routes", "قارن مسارات التمويل");
   root.replaceChildren(
     uiNode("h3", "", uiText("Choose a financing route", "اختر مسار التمويل")),
     uiNode(

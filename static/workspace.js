@@ -1,8 +1,21 @@
 // Workspace navigation and integration. Existing endpoint and feature IDs remain stable.
+matchMedia("(max-width: 767px)").addEventListener("change", (event) => {
+  for (const id of ["fuller-path", "financing-route-guide"]) {
+    const detail = document.getElementById(id);
+    if (detail) detail.open = !event.matches;
+  }
+});
 function localizeV2() {
   document
     .querySelectorAll("[data-en][data-ar]")
     .forEach((node) => (node.textContent = node.dataset[lang]));
+  document
+    .querySelectorAll("[data-placeholder-en]")
+    .forEach(
+      (n) =>
+        (n.placeholder =
+          lang === "ar" ? n.dataset.placeholderAr : n.dataset.placeholderEn),
+    );
   document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
   document
     .getElementById("investment-nav")
@@ -17,13 +30,22 @@ function localizeV2() {
       uiText("Open Khotwa Advisor", "افتح مستشار خطوة"),
     );
   const preview = document.getElementById("actual-preview");
-  preview.src = "/static/product-preview-" + lang + ".webp";
+  if (preview.tagName === "IMG")
+    preview.src = "/static/product-preview-" + lang + ".webp";
   preview.alt = uiText(
     "Actual Khotwa dashboard · illustrative business, no customer evidence recorded",
     "لوحة خطوة الفعلية · مشروع توضيحي بلا أدلة عملاء مسجّلة",
   );
 }
 function enterWorkspace() {
+  const fuller = document.getElementById("fuller-path");
+  fuller.open = innerWidth >= 768;
+  fuller.ontoggle = () => {
+    if (fuller.open && currentPlan) requestPlanCharts();
+  };
+  if (!fundingData.length) loadFunding();
+  document.body.classList.remove("focused-entry");
+  document.getElementById("entry-back").hidden = true;
   document.body.classList.add("has-plan");
   document.querySelector(".input-card").hidden = true;
   document.getElementById("discovery-card").hidden = true;
@@ -65,19 +87,6 @@ function decoratePlanTasks() {
   });
 }
 function decorateRiskDimensions() {
-  document.querySelectorAll("#risk-list .risk-item").forEach((item, i) => {
-    item.querySelector(".risk-dimensions")?.remove();
-    item.append(
-      uiNode(
-        "p",
-        "risk-dimensions",
-        uiText(
-          "Likelihood: not assessed. Impact/severity: provisional ",
-          "الاحتمال: لم يُقيّم. الأثر أو الشدة: تقدير مبدئي ",
-        ) + fixedLabel(currentPlan.risk_radar?.[i]?.level || "Unknown"),
-      ),
-    );
-  });
   let data = document.getElementById("path-data");
   if (!data) {
     data = uiNode("div", "table-wrap");
@@ -168,5 +177,4 @@ function setupV2() {
     setEntry(null);
     localizeV2();
   });
-  loadFunding();
 }

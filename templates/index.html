@@ -10,13 +10,11 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='tokens.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='startsmart.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='investment.css') }}">
-<script defer src="{{ url_for('static', filename='vendor/chart.umd.min.js') }}"></script>
-<script defer src="{{ url_for('static', filename='vendor/qrcode.min.js') }}"></script>
-{% for script in ['translations.js','formatting.js','scoring.js','app.js','startsmart.js','investment.js','investment-details.js','funding-routes.js','investment-workspace.js','workspace.js','events.js','bootstrap.js'] %}
+{% for script in ['translations.js','formatting.js','request-status.js','privacy.js','scoring.js','onboarding.js','app.js','dashboard-polish.js','chart-loader.js','proof.js','startsmart.js','investment.js','investment-details.js','finance-beginner.js','finance-analysis.js','funding-routes.js','funding-directory.js','investment-workspace.js','workspace.js','events.js','bootstrap.js'] %}
 <script defer src="{{ url_for('static', filename=script) }}"></script>
 {% endfor %}
 </head>
-<body id="body">
+<body id="body" data-chart-src="{{ url_for('static', filename='vendor/chart.umd.min.js') }}" data-qr-src="{{ url_for('static', filename='vendor/qrcode.min.js') }}" data-funding-src="{{ url_for('static', filename='funding.json') }}">
 <a class="skip-link" href="#main">Skip to content / انتقل إلى المحتوى</a>
 {% include 'partials/landing.html' %}
 <main id="main">

@@ -28,8 +28,9 @@ function clearFinanceResults() {
   }
   setTxt("sensitivity-explanation", "");
 }
-function setInvestmentStatus(value) {
+function setInvestmentStatus(value, retrySeconds = 0) {
   investmentStatuses.export = value;
+  investmentStatuses.retrySeconds = retrySeconds;
   renderInvestmentStatuses();
 }
 function renderInvestmentStatuses() {
@@ -43,7 +44,9 @@ function renderInvestmentStatuses() {
   };
   setTxt(
     "investment-export-status",
-    ft(messages[investmentStatuses.export] || ["", ""]),
+    investmentStatuses.export === "rate_limited"
+      ? rateLimitMessage(investmentStatuses.retrySeconds)
+      : ft(messages[investmentStatuses.export] || ["", ""]),
   );
   setTxt(
     "finance-error",
@@ -58,8 +61,8 @@ function renderInvestmentStatuses() {
 function cashBasisLabel(r) {
   return r.cash_flow_basis === "simplified_user_assumption"
     ? uiText(
-        "Simplified user-approved assumption: all revenue collected and variable + fixed expenses paid in the same month.",
-        "افتراض مبسط اختاره المستخدم: تحصيل كل الإيراد وسداد المصروفات المتغيرة والثابتة في الشهر نفسه.",
+        "Simplified assumption (selected by default for new plans; review/edit): all revenue collected and variable + fixed expenses paid in the same month.",
+        "افتراض مبسط (افتراضي للخطط الجديدة؛ راجعه وعدّله): تحصيل كل الإيراد وسداد المصروفات المتغيرة والثابتة في الشهر نفسه.",
       )
     : r.cash_flow_basis === "entered_cash_flow"
       ? uiText(
@@ -111,7 +114,19 @@ function renderFinanceBasis(r) {
       ),
     ),
   );
-  if (r.warnings.includes("licensing_not_provided"))
+  if (r.rounded_fields?.length)
+    root.append(
+      uiNode(
+        "p",
+        "finance-warning",
+        uiText("Rounded to fils: ", "قُرّب إلى الفلس: ") +
+          r.rounded_fields.map((k) => ft(FINANCE_FIELDS[k])).join(", "),
+      ),
+    );
+  if (
+    investment.legacyLicensing &&
+    r.warnings.includes("licensing_not_provided")
+  )
     root.append(
       uiNode(
         "p",

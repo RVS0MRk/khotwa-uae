@@ -113,7 +113,7 @@ document
     askQuestion();
   });
 document.addEventListener("input", (event) => {
-  if (event.target.matches(".p-price,.p-freq,.p-concern")) calcProof();
+  if (event.target.matches(".p-price,.p-freq,.p-concern,.p-note")) calcProof();
 });
 document.addEventListener("change", (event) => {
   if (event.target.matches(".p-int,.p-pre")) calcProof();

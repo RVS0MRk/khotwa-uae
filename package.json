@@ -3,8 +3,11 @@
   "private": true,
   "scripts": {
     "test": "python scripts/run_tests.py",
-    "test:browser": "node test_browser.cjs && node test_redesign.cjs && node test_v2.cjs && node test_v21.cjs",
+    "test:browser": "node test_browser.cjs && node test_redesign.cjs && node test_v2.cjs && node test_v21.cjs && node test_v22.cjs",
     "test:finance": "python -m unittest test_finance -v"
   },
-  "devDependencies": {"playwright": "1.62.1"}
+  "devDependencies": {
+    "playwright": "1.62.1",
+    "axe-core": "4.14.0"
+  }
 }

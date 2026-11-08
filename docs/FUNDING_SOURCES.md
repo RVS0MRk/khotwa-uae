@@ -1,4 +1,18 @@
-# Funding-source checks for V2.1
+# Funding-source checks for V2.2
+
+Review date: 8 November 2026. Current application eligibility and a dated announcement are different things. Programme benefits, launch announcements and past cohort terms do not establish an open intake or this visitor's eligibility. The directory's English and Arabic fields carry those distinctions, eligibility tags and dated links; it does not invent a current grant.
+
+| Entry / dated source | Actual lookup this round | Treatment |
+|---|---|---|
+| Khalifa Fund — [Abu Dhabi Media Office, 20 July 2026](https://www.mediaoffice.abudhabi/en/economy/khalifa-fund-for-enterprise-development-strengthens-financing-ecosystem-with-7-integrated-programmes-to-support-enterprise-growth/) | Official article retrieved. | The announcement identifies the First-time Founders Loan as Emirati-focused; it supplies no eligibility/terms for the other named programmes. Existing current funding-page ownership criteria and FAQ conflicts are retained separately. Confirm with TAMM/Khalifa Fund. |
+| Hub71 — [WAM, 4 June 2026](https://www.wam.ae/en/article/c0k0vxp-hub71-selects-startups-for-cohort-first) | Official article retrieved. | Cohort 18 benefits (12 months, up to AED 250,000 in-kind plus AED 250,000 cash via SAFE) are explicitly historical, conditional and not raw-idea support. Current cohort terms require confirmation. |
+| RUWAD — [Ministry reference](https://www.moet.gov.ae/en/sharjah-foundation-to-support-pioneering-entrepreneurs-ruwad-), [WAM, 31 December 2024](https://www.wam.ae/en/article/b6yweop-ruwad-launches-industrial-sector-financing) | Ministry URL timed out; its user-supplied terms were not independently refreshed. The dated WAM article was retrieved. | `dated_official`, rather than current verification: source-attributed direct/bank figures, Emirati focus and historical industrial support are distinguished. The Ministry reference has no invented publication date and `retrieved:false`. Current intake/terms remain unverified. |
+| MBRIF — [Ministry programme page](https://www.moet.gov.ae/en/mohammed-bin-rashid-innovation-fund) | Official page retrieved. | UAE-registered firms across nationalities, innovation-sector focus and post-ideation fit; nationality access is not acceptance. The guarantee route is not a grant. |
+| Dubai SME / Hi2 — [WAM, 13 July 2026](https://www.wam.ae/en/article/c178s4m-dubai-sme-integrates-hamdan-innovation-incubator) | Official article retrieved. | Historical 16-week idea-to-MVP cohort for Emirati technology founders. The published August 2026 deadline is past on this review date: closed intake, watch for a future cohort; none assumed open. |
+
+Sheraa, EDB and National SME retain the 7 November source checks below; their dates were not advanced without new checks. Every listing still links official information/application starting points, and emirate/founder/stage filters are guidance from recorded criteria, not an eligibility determination. Latin programme names and dates remain readable in RTL.
+
+## Previous round's current-page checks (7 November 2026)
 
 Review date: 7 November 2026. Each row records an individual official-source lookup in this round. This is the check date, not an invented publication date. Source availability and application windows can change. `checked` and `verified` are separate fields; RUWAD has no current verification date.
 

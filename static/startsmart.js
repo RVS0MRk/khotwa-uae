@@ -199,6 +199,8 @@ function renderDashboardSummary() {
   const s = currentPlan.state || {},
     p = currentPlan.proof_summary || {};
   const heading = root.querySelector(".summary-heading");
+  const existingActions = document.querySelector(".action-row");
+  if (existingActions) root.append(existingActions);
   heading.replaceChildren();
   const title = uiNode("div");
   title.append(
@@ -216,10 +218,31 @@ function renderDashboardSummary() {
   );
   const market = uiNode("div", "summary-market");
   market.append(
-    uiNode("b", "", T[lang].regions[s.region] || s.region || ""),
+    uiNode(
+      "b",
+      "",
+      s.region === "UAE-wide"
+        ? uiText("UAE-wide", "الإمارات")
+        : T[lang].regions[s.region] || s.region || "",
+    ),
     uiNode("span", "", T[lang].contexts[s.context] || s.context || ""),
   );
-  heading.append(title, market);
+  const subtitle = uiNode(
+    "p",
+    "ai-business-name",
+    uiText("AI suggestion: ", "اقتراح ذكاء اصطناعي: ") +
+      (currentPlan.business_name_suggestion || ""),
+  );
+  title.append(subtitle);
+  for (const child of [...market.children])
+    if (/^(?:Not sure|غير متأكد|لست متأكداً)$/.test(child.textContent.trim()))
+      child.remove();
+  const actions = document.querySelector(".action-row");
+  const menu = uiNode("details", "dashboard-actions"),
+    summary = uiNode("summary", "btn btn-light", uiText("Actions", "إجراءات"));
+  menu.open = innerWidth >= 769;
+  menu.append(summary, actions);
+  heading.append(title, market, menu);
   let evidence = uiText("No evidence recorded", "لا توجد أدلة مسجّلة");
   if (p.total_responses)
     evidence = uiText(
@@ -298,6 +321,7 @@ function renderDashboardSummary() {
   renderFinancialGuardrail();
   styleCharts();
   renderFinanceIntegration();
+  compactInvestmentLink();
 }
 function renderFinancialGuardrail() {
   if (!currentPlan) return;
@@ -432,6 +456,7 @@ function renderProofPolish() {
     -1,
   );
   const ladder = document.getElementById("evidence-ladder");
+  ladder.setAttribute("aria-label", uiText("Evidence strength", "قوة الدليل"));
   ladder.replaceChildren();
   ladder.dataset.highest = String(highest);
   defs.forEach(([, en, ar], i) => {
@@ -705,13 +730,22 @@ function styleCharts() {
 }
 
 function chooseEntry(mode) {
+  history.pushState(
+    { khotwaEntry: mode },
+    "",
+    location.pathname + "#start-" + mode,
+  );
   setEntry(mode);
-  const target =
-    mode === "discover"
-      ? document.getElementById("discovery-card")
-      : document.querySelector(".input-card");
-  target.scrollIntoView({ behavior: motionBehavior(), block: "start" });
-  target.querySelector("input,textarea")?.focus({ preventScroll: true });
+  window.scrollTo({ top: 0, behavior: "instant" });
+  (mode === "discover"
+    ? document.getElementById("d-skills")
+    : document.getElementById("idea")
+  ).focus({ preventScroll: true });
 }
 
 motionPreference.addEventListener("change", styleCharts);
+
+window.addEventListener("resize", () => {
+  const menu = document.querySelector(".dashboard-actions");
+  if (menu) menu.open = innerWidth >= 769;
+});

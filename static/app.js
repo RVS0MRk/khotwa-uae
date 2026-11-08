@@ -209,6 +209,7 @@ function escapePlan(value) {
   return typeof value === "string" ? escapeHtml(value) : value;
 }
 function setEntry(mode) {
+  focusedEntry(mode);
   document
     .getElementById("need-idea")
     .setAttribute("aria-pressed", String(mode === "discover"));
@@ -241,18 +242,13 @@ async function discoverIdeas() {
     profile = discoveryFields();
   localizedStatus("discover-error", "", "");
   if (
-    [
-      profile.skills,
-      profile.interests,
-      profile.experience,
-      profile.budget,
-      profile.time_available,
-    ].some((v) => !String(v).trim())
+    (!profile.skills && !profile.interests) ||
+    !String(profile.budget).trim()
   ) {
     localizedStatus(
       "discover-error",
-      "Complete all founder profile fields first.",
-      "أكمل جميع حقول ملفك أولاً.",
+      "Add Skills or Interests and a budget first.",
+      "أضف مهارات أو اهتمامات وميزانية أولاً.",
     );
     return;
   }
@@ -268,6 +264,7 @@ async function discoverIdeas() {
       body: JSON.stringify(profile),
       signal: ctrl.signal,
     });
+    checkServiceResponse(resp);
     const data = await resp.json();
     if (!resp.ok || !Array.isArray(data.ideas) || data.ideas.length !== 3)
       throw Error("unavailable");
@@ -337,6 +334,10 @@ async function discoverIdeas() {
       box.appendChild(card);
     });
   } catch (e) {
+    if (e.retrySeconds) {
+      showRateLimit("discover-error", e.retrySeconds);
+      return;
+    }
     localizedStatus(
       "discover-error",
       "Idea suggestions are unavailable right now. Please try again.",
@@ -435,7 +436,7 @@ function updateDashboardLabels() {
           "نظرة عامة",
           "التحقق",
           "العملاء",
-          "خطة ٧ أيام",
+          "خطة 7 أيام",
           "المخاطر",
           "العرض",
           "المصادر",
@@ -450,6 +451,11 @@ function updateDashboardLabels() {
     .forEach((p, i) => p.setAttribute("aria-label", names[i]));
 }
 function selectPanel(index) {
+  if (index === 3) requestPlanCharts();
+  if (index === 4 && currentPlan) {
+    investment.risksReviewed = true;
+    updateReadiness();
+  }
   if (index === 7) {
     initInvestment();
     if (!financeResult) calculateFinance();
@@ -574,30 +580,6 @@ function fillSelects() {
     );
     target.value = previous || source.value;
   });
-}
-function suggestCategory() {
-  const c = document.getElementById("category");
-  if (c.dataset.touched) return;
-  const idea = document.getElementById("idea").value.toLowerCase(),
-    context = document.getElementById("context").value;
-  let key = "";
-  if (
-    /wash|clean|repair|maintenance|غسيل|تنظيف|صيانة/.test(idea) ||
-    context === "Local service"
-  )
-    key = "Services & Maintenance";
-  else if (context === "Food & beverage") key = "Food & Catering";
-  else if (context === "Online") key = "Technology & Digital";
-  else if (context === "Retail") key = "Retail & Trading";
-  const i = T.en.categories.indexOf(key);
-  if (i >= 0) c.selectedIndex = i + 1;
-  document.getElementById("category-hint").textContent = key
-    ? lang === "ar"
-      ? "اقتراح تلقائي — يمكنك تغييره."
-      : "Suggested from your idea — you can change it."
-    : lang === "ar"
-      ? "اختر الفئة المناسبة."
-      : "Choose the category that fits your idea.";
 }
 document.getElementById("idea").addEventListener("input", suggestCategory);
 document.getElementById("context").addEventListener("change", suggestCategory);
@@ -874,7 +856,9 @@ function applyLang() {
               ? lang === "ar"
                 ? "قوة الدليل"
                 : "Evidence strength"
-              : t.proofCols[i] || ""),
+              : i === 6
+                ? uiText("Optional note", "ملاحظة اختيارية")
+                : t.proofCols[i] || ""),
       );
     proof.querySelectorAll(".p-int").forEach((el) => {
       el.querySelector("[value=yes]").textContent = t.interested;
@@ -969,6 +953,7 @@ async function generate() {
       signal: ctrl.signal,
     });
     clearTimeout(to);
+    checkServiceResponse(resp);
     var plan = null;
     try {
       plan = await resp.json();
@@ -1002,6 +987,10 @@ async function generate() {
     buildProof();
     if (plan._local) localizedStatus("error", T.en.chatFail, T.ar.chatFail);
   } catch (e) {
+    if (e.retrySeconds) {
+      showRateLimit("error", e.retrySeconds);
+      return;
+    }
     console.warn("generate failed, using local plan:", e && e.name);
     try {
       currentPlan = ensurePlanState(
@@ -1938,7 +1927,7 @@ function showPlan(rawPlan) {
   });
   const jb = document.getElementById("overview-body");
   jb.replaceChildren();
-  const js = p.idea_overview || {};
+  const js = rawPlan.idea_overview || {};
   [
     [lang === "ar" ? "الفكرة" : "Idea", state.idea],
     [
@@ -2023,8 +2012,13 @@ function showPlan(rawPlan) {
     jb.appendChild(row);
   }
   Object.keys(t.jk).forEach((k) => {
-    if (js[k])
-      jb.innerHTML += `<div class="overview-row"><span class="jk">${t.jk[k]}</span><span class="jv" ${k === "evidence" ? 'id="overview-evidence"' : ""}>${js[k]}</span></div>`;
+    if (js[k]) {
+      const row = uiNode("div", "overview-row"),
+        value = uiNode("span", "jv", js[k]);
+      if (k === "evidence") value.id = "overview-evidence";
+      row.append(uiNode("span", "jk", t.jk[k]), value);
+      jb.append(row);
+    }
   });
   if (state.idea_source === "ai_suggestion_selected") {
     const badge = jb.querySelector(".overview-row .source-badge");
@@ -2041,55 +2035,56 @@ function showPlan(rawPlan) {
   const sc = rawPlan.opportunity_score || {};
   aggregateScores(sc);
   renderScores(sc);
-  const tp = p.small_test_plan || {};
+  const tp = rawPlan.small_test_plan || {};
   document.getElementById("test-intro").textContent =
     (rawPlan.small_test_plan || {}).intro || "";
   const tl = document.getElementById("test-list");
   tl.replaceChildren();
   (tp.points || []).forEach((x) => {
-    tl.innerHTML += `<li>${x}</li>`;
+    tl.append(uiNode("li", "", x));
   });
   const dg = document.getElementById("day-grid");
   dg.replaceChildren();
-  (p.seven_day_plan || []).forEach((d) => {
-    var extra = "";
-    if (d.output)
-      extra += `<div class="a" style="margin-top:.3rem"><b>${t.dayOut}:</b> ${d.output}</div>`;
-    if (d.success_check)
-      extra += `<div class="a" style="color:var(--uae-green)"><b>${t.daySucc}:</b> ${d.success_check}</div>`;
-    var tm = d.time_needed
-      ? `<span style="float:right;font-size:14px;color:var(--muted)">${d.time_needed}</span>`
-      : "";
-    dg.innerHTML += `<div class="day-card"><div class="d">${lang === "ar" ? "اليوم" : "Day"} ${d.day}</div>${tm}<div class="f">${d.focus}</div><div class="a">${d.action}</div>${extra}</div>`;
+  (rawPlan.seven_day_plan || []).forEach((d, i) => {
+    const card = uiNode("details", "day-card"),
+      summary = uiNode("summary");
+    card.open = innerWidth >= 768 || i === 0;
+    summary.append(
+      uiNode("span", "d", uiText("Day ", "اليوم ") + d.day),
+      uiNode("span", "f", d.focus),
+    );
+    card.append(summary, uiNode("p", "a", d.action));
+    for (const [label, value] of [
+      [t.dayOut, d.output],
+      [t.daySucc, d.success_check],
+      [uiText("Time estimate", "تقدير الوقت"), d.time_needed],
+    ])
+      if (value) card.append(uiNode("p", "a", label + ": " + value));
+    dg.append(card);
   });
   const vl = document.getElementById("validate-list");
   vl.replaceChildren();
-  (p.validation_before_spending || []).forEach((x) => {
-    vl.innerHTML += `<li>${x}</li>`;
+  (rawPlan.validation_before_spending || []).forEach((x) => {
+    vl.append(uiNode("li", "", x));
   });
   const ql = document.getElementById("questions-list");
   ql.replaceChildren();
-  (p.validation_questions || []).forEach((q) => {
-    ql.innerHTML += `<li>${q}</li>`;
+  (rawPlan.validation_questions || []).forEach((q) => {
+    ql.append(uiNode("li", "", q));
   });
   let waMsg = rawPlan.whatsapp_message || "";
   const ideaVal = document.getElementById("idea").value.trim();
   if (ideaVal && waMsg.includes("[idea]"))
     waMsg = waMsg.replace("[idea]", ideaVal);
-  else if (
-    ideaVal &&
-    !waMsg.toLowerCase().includes(ideaVal.toLowerCase().slice(0, 12))
-  )
-    waMsg = waMsg + " (" + ideaVal + ")";
-  document.getElementById("wa-text").textContent =
-    (lang === "ar"
-      ? "خطوة — من الفكرة إلى الخطوة الأولى.\n"
-      : "Khotwa — From idea to first step.\n") + waMsg;
+  document.getElementById("wa-text").textContent = waMsg.replace(
+    /^(?:Khotwa|خطوة)\s*[—–-].*?\n/,
+    "",
+  );
   const rt = document.getElementById("report-table");
   rt.replaceChildren();
   const r = p.readiness_report || {};
   Object.keys(t.rkeys).forEach((k) => {
-    let val = k === "idea" ? escapeHtml(state.idea) : r[k];
+    let val = k === "idea" ? state.idea : (rawPlan.readiness_report || {})[k];
     let label = t.rkeys[k];
     if (k === "target_customer")
       label +=
@@ -2109,95 +2104,67 @@ function showPlan(rawPlan) {
         formatAED(state.estimated_test_cost_aed || val) +
         " · " +
         (lang === "ar" ? "تقدير ذكاء اصطناعي" : "AI ESTIMATE");
-    rt.innerHTML += `<tr><td class="k">${label}</td><td class="v">${val || "-"}</td></tr>`;
+    {
+      const row = uiNode("tr");
+      row.append(uiNode("td", "k", label), uiNode("td", "v", val || "-"));
+      rt.append(row);
+    }
   });
-  rt.innerHTML +=
-    '<tr id="readiness-evidence"><td class="k">' +
-    (lang === "ar" ? "أدلة العملاء" : "CUSTOMER EVIDENCE") +
-    '</td><td class="v" id="readiness-evidence-text">' +
-    escapeHtml(
+  {
+    const row = uiNode("tr");
+    row.id = "readiness-evidence";
+    const text = uiNode(
+      "td",
+      "v",
       (rawPlan.idea_overview || {}).evidence ||
-        (lang === "ar"
-          ? "لم تُجمع أدلة من العملاء بعد."
-          : "No customer evidence collected yet."),
-    ) +
-    "</td></tr>";
+        uiText(
+          "No customer evidence collected yet.",
+          "لم تُجمع أدلة من العملاء بعد.",
+        ),
+    );
+    text.id = "readiness-evidence-text";
+    row.append(
+      uiNode("td", "k", uiText("Customer evidence", "أدلة العملاء")),
+      text,
+    );
+    rt.append(row);
+  }
   const list = document.getElementById("steps-list");
   list.replaceChildren();
-  (p.steps || []).forEach((s) => {
-    const duration =
-      lang === "ar"
-        ? Number(s.timeline_days) === 1
-          ? "يوم"
-          : "أيام"
-        : Number(s.timeline_days) === 1
-          ? "day"
-          : "days";
-    list.innerHTML += `<div class="step-card"><div class="step-num">${s.step_number}</div><div class="step-body"><h3>${s.action}</h3><p>${s.description}</p><div class="tags"><span class="tag">${s.location}</span><span class="tag">${s.who_to_contact}</span><span class="tag">${s.estimated_cost_aed == null ? (lang === "ar" ? "لم تُقدر التكلفة بعد" : "Cost not estimated yet") : formatAED(s.estimated_cost_aed) + " · " + (lang === "ar" ? "تقدير ذكاء اصطناعي" : "AI ESTIMATE")}</span><span class="tag">${s.timeline_days} ${duration} · ${lang === "ar" ? "تقدير تخطيطي" : "planning estimate"}</span></div></div></div>`;
+  (rawPlan.steps || []).forEach((s) => {
+    const card = uiNode("article", "step-card"),
+      body = uiNode("div", "step-body"),
+      tags = uiNode("div", "tags");
+    body.append(uiNode("h3", "", s.action), uiNode("p", "", s.description));
+    for (const text of [
+      s.location,
+      s.who_to_contact,
+      s.estimated_cost_aed == null
+        ? uiText("Cost not estimated yet", "لم تقدر التكلفة بعد")
+        : money(s.estimated_cost_aed) +
+          " · " +
+          uiText("AI ESTIMATE", "تقدير ذكاء اصطناعي"),
+      s.timeline_days +
+        " " +
+        uiText("days · planning estimate", "أيام · تقدير تخطيطي"),
+    ])
+      tags.append(uiNode("span", "tag", text));
+    body.append(tags);
+    card.append(uiNode("div", "step-num", s.step_number), body);
+    list.append(card);
   });
   renderPathCosts(rawPlan);
-  document.getElementById("tip").innerHTML =
-    `<strong>${t.firstTip}:</strong> ${p.first_customer_tip}`;
-  if (timelineChart) {
-    timelineChart.destroy();
-    timelineChart = null;
-  }
-  if (costChart) {
-    costChart.destroy();
-    costChart = null;
-  }
-  if (typeof Chart !== "undefined") {
-    timelineChart = new Chart(document.getElementById("timeline-chart"), {
-      type: "bar",
-      data: {
-        labels: p.steps.map(
-          (s) => (lang === "ar" ? "خطوة " : "Step ") + s.step_number,
-        ),
-        datasets: [
-          {
-            data: p.steps.map((s) => s.timeline_days),
-            backgroundColor: "#378ADD",
-            borderRadius: 6,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-      },
-    });
-    if (
-      rawPlan.total_estimated_cost_aed !== null &&
-      rawPlan.total_estimated_cost_aed > 0
-    )
-      costChart = new Chart(document.getElementById("cost-chart"), {
-        type: "doughnut",
-        data: {
-          labels: p.steps.map((s) => s.action),
-          datasets: [
-            {
-              data: p.steps.map((s) => s.estimated_cost_aed),
-              backgroundColor: [
-                "#534AB7",
-                "#1D9E75",
-                "#D85A30",
-                "#378ADD",
-                "#BA7517",
-              ],
-              borderWidth: 0,
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { position: "bottom", labels: { font: { size: 12 } } },
-          },
-        },
-      });
-  }
+  document
+    .getElementById("tip")
+    .replaceChildren(
+      uiNode("strong", "", t.firstTip + ": "),
+      document.createTextNode(rawPlan.first_customer_tip || ""),
+    );
+  if (
+    document.getElementById("result-tab-3")?.getAttribute("aria-selected") ===
+    "true"
+  )
+    requestPlanCharts();
   // decision engine
   var de = p.decision_engine || {};
   var dm = document.getElementById("decision-main");
@@ -2211,25 +2178,42 @@ function showPlan(rawPlan) {
     ).next_test_action
       ? t.nexttest + ": " + rawPlan.decision_engine.next_test_action
       : "";
-    var dmeta = "";
-    if (de.risk_level)
-      dmeta += `<span><b>${t.risklevel}:</b> ${fixedLabel(de.risk_level)}</span>`;
-    if (de.recommended_test_budget_aed)
-      dmeta += `<span><b>${t.testbudget} · ${lang === "ar" ? "تقدير ذكاء اصطناعي" : "AI ESTIMATE"}:</b> ${formatAED(de.recommended_test_budget_aed)}</span>`;
-    document.getElementById("decision-meta").innerHTML = dmeta;
+    const meta = document.getElementById("decision-meta");
+    meta.replaceChildren();
+    const rawDecision = rawPlan.decision_engine || {};
+    if (rawDecision.risk_level)
+      meta.append(
+        uiNode(
+          "span",
+          "",
+          t.risklevel + ": " + fixedLabel(rawDecision.risk_level),
+        ),
+      );
+    if (rawDecision.recommended_test_budget_aed)
+      meta.append(
+        uiNode(
+          "span",
+          "",
+          t.testbudget +
+            " · " +
+            uiText("AI ESTIMATE", "تقدير ذكاء اصطناعي") +
+            ": " +
+            money(rawDecision.recommended_test_budget_aed),
+        ),
+      );
   } else {
     document.getElementById("decision-card").style.display = "none";
   }
   // do not start / instead
   var dnl = document.getElementById("donot-list");
   dnl.replaceChildren();
-  (p.do_not_start_with || []).forEach((x) => {
-    dnl.innerHTML += `<li>${x}</li>`;
+  (rawPlan.do_not_start_with || []).forEach((x) => {
+    dnl.append(uiNode("li", "", x));
   });
   var inl = document.getElementById("instead-list");
   inl.replaceChildren();
-  (p.instead_do || []).forEach((x) => {
-    inl.innerHTML += `<li>${x}</li>`;
+  (rawPlan.instead_do || []).forEach((x) => {
+    inl.append(uiNode("li", "", x));
   });
   // shareable summary
   var sc2 = p.opportunity_score || {};
@@ -2246,7 +2230,7 @@ function showPlan(rawPlan) {
     )
     .replace("{score}", st)
     .replace("{verdict}", verdict.replace(/[.!؟\s]+$/g, ""));
-  document.getElementById("share-text").textContent = shareTxt;
+  document.getElementById("share-text").textContent = composeFounderShare();
   var wg = document.getElementById("why-grid");
   if (wg) {
     wg.replaceChildren();
@@ -2336,29 +2320,42 @@ function renderExtras(rawPlan, r, st) {
   }
   // Founder Passport
   try {
-    var pp = p.founder_passport || {};
+    var pp = rawPlan.founder_passport || {};
     var de = p.decision_engine || {};
     var rows = [
-      [t.ppIdea, r.idea || p.summary || ""],
+      [
+        t.ppIdea,
+        (rawPlan.readiness_report || {}).idea || rawPlan.summary || "",
+      ],
       [t.ppStatus, fixedLabel(pp.status || "Ready to validate")],
-      [t.ppFirst, pp.first_action || p.first_step_today || ""],
+      [t.ppFirst, pp.first_action || rawPlan.first_step_today || ""],
       [t.ppScore, scoreLabel(rawPlan.opportunity_score)],
       [t.ppDecision, fixedLabel(de.decision || "")],
-      [t.ppChannel, r.first_customer_channel || ""],
+      [
+        t.ppChannel,
+        (rawPlan.readiness_report || {}).first_customer_channel || "",
+      ],
       [
         t.ppCost,
-        r.estimated_first_test_cost_aed != null
-          ? formatAED(r.estimated_first_test_cost_aed) +
+        (rawPlan.readiness_report || {}).estimated_first_test_cost_aed != null
+          ? formatAED(
+              (rawPlan.readiness_report || {}).estimated_first_test_cost_aed,
+            ) +
             " · " +
             (lang === "ar" ? "تقدير ذكاء اصطناعي" : "AI ESTIMATE")
           : "-",
       ],
-      [t.ppNext, pp.next_step || r.next_step || ""],
+      [
+        t.ppNext,
+        pp.next_step || (rawPlan.readiness_report || {}).next_step || "",
+      ],
     ];
     var ptbl = document.getElementById("passport-table");
     ptbl.replaceChildren();
     rows.forEach(function (rw) {
-      ptbl.innerHTML += `<tr><td class="pk2">${rw[0]}</td><td class="pv2">${rw[1] || "-"}</td></tr>`;
+      const row = uiNode("tr");
+      row.append(uiNode("td", "pk2", rw[0]), uiNode("td", "pv2", rw[1] || "-"));
+      ptbl.append(row);
     });
     window._passportText = rows
       .map(function (rw) {
@@ -2382,35 +2379,68 @@ function renderExtras(rawPlan, r, st) {
   try {
     var rl = document.getElementById("risk-list");
     rl.replaceChildren();
-    (p.risk_radar || []).forEach(function (rk) {
-      var lv = (rk.level || "").toLowerCase();
-      var cls = /(high|مرتفع)/.test(lv)
-        ? "rl-high"
-        : /(med|متوسط)/.test(lv)
-          ? "rl-medium"
-          : /(low|منخفض)/.test(lv)
-            ? "rl-low"
-            : "rl-unknown";
-      rl.innerHTML += `<div class="risk-item"><span class="risk-name">${fixedLabel(rk.name || "")}</span><span class="risk-level ${cls}">${fixedLabel(rk.level || "")}</span><span class="risk-detail"><b>${rk.reason || ""}</b><span class="risk-next">${lang === "ar" ? "الخطوة التالية: " : "Next action: "}${rk.fix || ""}</span></span></div>`;
+    (rawPlan.risk_radar || []).forEach((rk) => {
+      const item = uiNode("article", "risk-item"),
+        head = uiNode("div", "risk-heading");
+      const level = String(rk.level || "Unknown"),
+        css =
+          { High: "rl-high", Medium: "rl-medium", Low: "rl-low" }[level] ||
+          "rl-unknown";
+      head.append(
+        uiNode("h3", "risk-name", fixedLabel(rk.name || "")),
+        uiNode("span", "risk-level " + css, fixedLabel(level)),
+      );
+      item.append(
+        head,
+        uiNode("p", "risk-detail", rk.reason || ""),
+        uiNode(
+          "p",
+          "risk-next",
+          uiText("Next action: ", "الإجراء التالي: ") + (rk.fix || ""),
+        ),
+      );
+      rl.append(item);
     });
   } catch (e) {
     console.warn("risks", e);
   }
   // Pitches
   try {
-    var pit = p.pitches || {};
-    var pl = document.getElementById("pitch-list");
+    const pit = rawPlan.pitches || {},
+      pl = document.getElementById("pitch-list");
     pl.replaceChildren();
-    var defs = [
+    [
       ["10s", pit.ten_sec],
       ["30s", pit.thirty_sec],
       ["WhatsApp", pit.whatsapp],
       ["Instagram", pit.instagram],
-    ];
-    defs.forEach(function (d) {
-      if (!d[1]) return;
-      var id = "pitch-" + d[0];
-      pl.innerHTML += `<div class="pitch-item"><div class="pitch-body"><div class="pitch-label">${lang === "ar" ? { "10s": "10 ثوانٍ", "30s": "30 ثانية", WhatsApp: "واتساب", Instagram: "إنستغرام" }[d[0]] : d[0]}</div><div class="pitch-text" id="${id}">${d[1]}</div></div><button class="pitch-copy" data-copy="${id}">${t.copy}</button></div>`;
+    ].forEach(([key, text]) => {
+      if (!text) return;
+      const item = uiNode("article", "pitch-item"),
+        body = uiNode("div", "pitch-body"),
+        copy = uiNode("button", "pitch-copy", "⧉ " + t.copy),
+        value = uiNode("p", "pitch-text", text);
+      value.id = "pitch-" + key;
+      copy.dataset.copy = value.id;
+      copy.type = "button";
+      copy.setAttribute("aria-label", uiText("Copy ", "نسخ ") + key);
+      body.append(
+        uiNode(
+          "h3",
+          "pitch-label",
+          lang === "ar"
+            ? {
+                "10s": "10 ثوانٍ",
+                "30s": "30 ثانية",
+                WhatsApp: "واتساب",
+                Instagram: "إنستغرام",
+              }[key]
+            : key,
+        ),
+        value,
+      );
+      item.append(body, copy);
+      pl.append(item);
     });
   } catch (e) {
     console.warn("pitches", e);
@@ -2477,7 +2507,19 @@ function renderQR() {
       height: 140,
       correctLevel: QRCode.CorrectLevel.M,
     });
+    box
+      .querySelectorAll("img")
+      .forEach(
+        (img) =>
+          (img.alt = uiText(
+            "QR code that opens the WhatsApp test message",
+            "رمز QR يفتح رسالة اختبار واتساب",
+          )),
+      );
   } else {
+    loadQRCodeLibrary().then((ok) => {
+      if (ok && currentPlan) renderQR();
+    });
     const link = uiNode(
       "a",
       "",
@@ -2533,30 +2575,6 @@ function copyPassport() {
   } else if (fallbackCopy(txt)) done();
 }
 
-function buildProof() {
-  const t = T[lang];
-  const tbl = document.getElementById("proof-table");
-  let head = "<tr>";
-  t.proofCols.forEach(
-    (c, i) =>
-      (head += `<th>${i === 5 ? (lang === "ar" ? "قوة الدليل" : "Evidence strength") : c}</th>`),
-  );
-  head += "</tr>";
-  let rows = "";
-  for (let i = 1; i <= 10; i++) {
-    rows += `<tr>
-<td>${i}</td>
-<td><select class="p-int"><option value="">-</option><option value="yes">${t.interested}</option><option value="maybe">${t.maybe}</option><option value="no">${t.no}</option></select></td>
-<td><input type="number" min="0" step="0.1" class="p-price" placeholder="0"></td>
-<td><input type="text" class="p-freq" maxlength="500" placeholder="${lang === "ar" ? "أسبوعياً" : "weekly"}"></td>
-<td><input type="text" class="p-concern" maxlength="500" placeholder="-"></td>
-<td><select class="p-pre"><option value="">-</option><option value="interest">${lang === "ar" ? "اهتمام فقط" : "Sounds interesting"}</option><option value="intent">${lang === "ar" ? "نية شراء معلنة" : "Stated intent to buy"}</option><option value="reservation">${lang === "ar" ? "حجز بلا دفع" : "No-payment reservation"}</option><option value="payment">${lang === "ar" ? "دفع فعلي" : "Actual payment"}</option><option value="repeat">${lang === "ar" ? "عميل متكرر" : "Repeat customer"}</option></select></td>
-</tr>`;
-  }
-  tbl.innerHTML = head + rows;
-  calcProof();
-}
-
 function calcProof() {
   const t = T[lang];
   const ints = [...document.querySelectorAll(".p-int")].map((s) => s.value);
@@ -2590,7 +2608,8 @@ function calcProof() {
         pres[i] ||
         validPrices[i] ||
         document.querySelectorAll(".p-concern")[i].value.trim() ||
-        document.querySelectorAll(".p-freq")[i].value.trim(),
+        document.querySelectorAll(".p-freq")[i].value.trim() ||
+        document.querySelectorAll(".p-note")[i]?.value.trim(),
     )
     .filter(Boolean).length;
   const avg = prices.length
@@ -2607,10 +2626,19 @@ function calcProof() {
     topConcern = Object.keys(freq).sort((a, b) => freq[b] - freq[a])[0];
   }
   const stats = document.getElementById("proof-stats");
-  stats.innerHTML = `<div class="stat-card"><div class="v" data-target="${nYes}">${nYes}</div><div class="l">${t.stInterested} /10</div></div>
-<div class="stat-card"><div class="v" data-target="${nMaybe}">${nMaybe}</div><div class="l">${t.stMaybe} /10</div></div>
-<div class="stat-card"><div class="v" data-target="${avg}">${avg}</div><div class="l">${t.stAvg}</div></div>
-<div class="stat-card"><div class="v" data-target="${nPre}">${nPre}</div><div class="l">${lang === "ar" ? "حجوزات بلا دفع" : "No-payment reservations"} /10</div></div>`;
+  stats.replaceChildren();
+  for (const [value, label] of [
+    [nYes, t.stInterested + " /10"],
+    [nMaybe, t.stMaybe + " /10"],
+    [prices.length ? money(avg) : uiText("Not provided", "لم يقدم"), t.stAvg],
+    [nPre, t.stPre + " /10"],
+  ]) {
+    const card = uiNode("div", "stat-card"),
+      number = uiNode("div", "v", value);
+    number.dataset.target = String(value);
+    card.append(number, uiNode("div", "l", label));
+    stats.append(card);
+  }
   animateCounters();
   const verdict = document.getElementById("proof-verdict");
   let vtext;
@@ -2708,9 +2736,14 @@ function syncEvidencePresentation(total, purchases, verdict) {
   if (p.idea_overview) p.idea_overview.evidence = evidence;
   setTxt("overview-evidence", evidence);
   setTxt("readiness-evidence-text", evidence);
-  if (p.risk_radar && p.risk_radar[0]) p.risk_radar[0].reason = evidence;
-  const riskReason = document.querySelector("#risk-list .risk-detail b");
-  if (riskReason) riskReason.textContent = evidence;
+  if (!p._preEvidenceRisk && p.risk_radar?.[0])
+    p._preEvidenceRisk = structuredClone(p.risk_radar[0]);
+  if (p.risk_radar?.[0])
+    p.risk_radar[0].reason = total ? evidence : p._preEvidenceRisk.reason;
+  const riskReason = document.querySelector("#risk-list .risk-detail");
+  if (riskReason)
+    riskReason.textContent = p.risk_radar?.[0]?.reason || evidence;
+  p._preEvidenceDecision ||= structuredClone(p.decision_engine || {});
   const de = p.decision_engine || {};
   de.decision = purchases
     ? ar
@@ -2731,6 +2764,7 @@ function syncEvidencePresentation(total, purchases, verdict) {
     : ar
       ? "قابل خمسة عملاء محتملين واجمع نوايا بلا دفع."
       : "Interview five potential customers and collect no-payment intent.";
+  if (!total) Object.assign(de, p._preEvidenceDecision);
   p.decision_engine = de;
   p.state.decision = de.decision;
   setTxt("decision-main", de.decision);
@@ -2746,6 +2780,10 @@ function syncEvidencePresentation(total, purchases, verdict) {
 }
 
 function clearProof() {
+  investment.notes = {};
+  document
+    .querySelectorAll("#investor-fields textarea")
+    .forEach((n) => (n.value = ""));
   buildProof();
   if (currentPlan) delete currentPlan.proof_summary;
   saveSession();
@@ -2764,7 +2802,8 @@ function exportCSV() {
     if (/^[\s\uFEFF]*[=+@-]/.test(text)) text = "'" + text;
     return '"' + text.replace(/"/g, '""') + '"';
   };
-  let csv = "row,interested,price_aed,frequency,concern,evidence_strength\r\n";
+  let csv =
+    "row,interested,price_aed,frequency,concern,evidence_strength,note\r\n";
   for (let i = 0; i < 10; i++) {
     const cells = [
       i + 1,
@@ -2773,6 +2812,7 @@ function exportCSV() {
       freqs[i] || "",
       concs[i] || "",
       pres[i] || "",
+      document.querySelectorAll(".p-note")[i]?.value || "",
     ];
     csv += cells.map(csvCell).join(",") + "\r\n";
   }
@@ -2939,13 +2979,17 @@ async function askQuestion() {
   box.appendChild(ai);
   box.scrollTop = box.scrollHeight;
   var answered = false;
-  function finish(answer) {
+  function finish(answer, signature) {
     if (answered) return;
     answered = true;
     renderAdvisorCard(ai, answer);
     chatHistory.push(
       { role: "user", content: q },
-      { role: "assistant", content: JSON.stringify(answer) },
+      {
+        role: "assistant",
+        content: JSON.stringify(answer),
+        signature: signature || "",
+      },
     );
     chatHistory = chatHistory.slice(-8);
     box.scrollTop = box.scrollHeight;
@@ -2979,6 +3023,7 @@ async function askQuestion() {
       signal: ctrl.signal,
     });
     clearTimeout(to);
+    checkServiceResponse(resp);
     var data = null;
     try {
       data = await resp.json();
@@ -2989,8 +3034,21 @@ async function askQuestion() {
       resp.ok && data && data.answer && typeof data.answer === "object"
         ? data.answer
         : null;
-    finish(ans || advisorFallback());
+    finish(ans || advisorFallback(), data?.assistant_signature);
   } catch (e) {
+    if (e.retrySeconds) {
+      finish({
+        title: uiText("Please try again shortly", "حاول مجدداً بعد قليل"),
+        summary: rateLimitMessage(e.retrySeconds),
+        points: [],
+        next_action: uiText(
+          "Wait before sending another question.",
+          "انتظر قبل إرسال سؤال آخر.",
+        ),
+        caution: "",
+      });
+      return;
+    }
     console.error("ask error (using local advisor):", e && e.name);
     finish(advisorFallback());
   }
@@ -3011,6 +3069,7 @@ async function exportPDF() {
       body: JSON.stringify(Object.assign({}, currentPlan, { _lang: lang })),
       signal: ctrl.signal,
     });
+    checkServiceResponse(resp);
     if (!resp.ok) throw new Error("pdf failed");
     const blob = await resp.blob();
     const url = URL.createObjectURL(blob);
@@ -3023,7 +3082,7 @@ async function exportPDF() {
     URL.revokeObjectURL(url);
   } catch (e) {
     console.error("PDF error", e);
-    alert(T[lang].error);
+    alert(e.retrySeconds ? rateLimitMessage(e.retrySeconds) : T[lang].error);
   } finally {
     clearTimeout(timer);
     btn.textContent = T[lang].pdf;

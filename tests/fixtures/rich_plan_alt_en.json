@@ -1,0 +1,320 @@
+{
+  "business_name_suggestion": "SkillBridge coding clubs",
+  "summary": "Evening coding clubs for students in Sharjah.",
+  "idea_overview": {
+    "problem": "Parents of secondary-school students in Sharjah may find consistent coding practice difficult to arrange.",
+    "target_user": "parents of secondary-school students in Sharjah",
+    "solution": "Small guided coding projects with flexible evening sessions.",
+    "impact": "Potential benefit: make coding practice easier to arrange; test this assumption.",
+    "evidence": "No customer interviews are recorded; these are assumptions to test.",
+    "why_market": "The selected market contains the proposed segment; interview parents of secondary-school students in Sharjah to test local fit."
+  },
+  "first_step_today": "Ask five parents of secondary-school students in Sharjah about their last coding practice choice and its current alternative.",
+  "suggested_test_price_aed": 50,
+  "opportunity_score": {
+    "local_fit": {
+      "score": 1,
+      "reason": "SkillBridge coding clubs needs a specific check of local fit with parents of secondary-school students in Sharjah.",
+      "improve": "Compare one coding practice assumption with the proposed parents of secondary-school students in Sharjah."
+    },
+    "clear_customer": {
+      "score": 2,
+      "reason": "SkillBridge coding clubs needs a specific check of clear customer with parents of secondary-school students in Sharjah.",
+      "improve": "Compare one coding practice assumption with the proposed parents of secondary-school students in Sharjah."
+    },
+    "low_starting_cost": {
+      "score": 3,
+      "reason": "SkillBridge coding clubs needs a specific check of low starting cost with parents of secondary-school students in Sharjah.",
+      "improve": "Compare one coding practice assumption with the proposed parents of secondary-school students in Sharjah."
+    },
+    "easy_first_step": {
+      "score": 4,
+      "reason": "SkillBridge coding clubs needs a specific check of easy first step with parents of secondary-school students in Sharjah.",
+      "improve": "Compare one coding practice assumption with the proposed parents of secondary-school students in Sharjah."
+    },
+    "growth_potential": {
+      "score": 5,
+      "reason": "SkillBridge coding clubs needs a specific check of growth potential with parents of secondary-school students in Sharjah.",
+      "improve": "Compare one coding practice assumption with the proposed parents of secondary-school students in Sharjah."
+    },
+    "total": 15
+  },
+  "small_test_plan": {
+    "intro": "Test a SkillBridge coding clubs offer message before committing funds.",
+    "points": [
+      "Define one segment for SkillBridge coding clubs.",
+      "Interview parents of secondary-school students in Sharjah about current alternatives.",
+      "Draft a coding practice offer message without selling.",
+      "Collect no-payment waitlist intent for SkillBridge coding clubs.",
+      "Review objections about coding practice before spending."
+    ]
+  },
+  "do_not_start_with": [
+    "Avoid a large coding practice inventory before learning.",
+    "Do not start operating before official requirements are confirmed.",
+    "Avoid paid promotion for SkillBridge coding clubs before testing the message."
+  ],
+  "instead_do": [
+    "Interview parents of secondary-school students in Sharjah about recurring frustrations.",
+    "Create an illustrative coding practice offer without selling.",
+    "Collect no-payment reservations for SkillBridge coding clubs."
+  ],
+  "seven_day_plan": [
+    {
+      "day": 1,
+      "focus": "Define target customer",
+      "action": "Define the parents of secondary-school students in Sharjah segment and its coding practice alternative.",
+      "output": "SkillBridge coding clubs day 1 experiment record.",
+      "time_needed": "One to two hours, planning estimate",
+      "success_check": "Record actual SkillBridge coding clubs responses and remaining gaps without assuming success."
+    },
+    {
+      "day": 2,
+      "focus": "Arrange customer interviews",
+      "action": "Interview five parents of secondary-school students in Sharjah about the last time they chose coding practice.",
+      "output": "SkillBridge coding clubs day 2 experiment record.",
+      "time_needed": "One to two hours, planning estimate",
+      "success_check": "Record actual SkillBridge coding clubs responses and remaining gaps without assuming success."
+    },
+    {
+      "day": 3,
+      "focus": "Test the offer",
+      "action": "Test a SkillBridge coding clubs offer message without selling.",
+      "output": "SkillBridge coding clubs day 3 experiment record.",
+      "time_needed": "One to two hours, planning estimate",
+      "success_check": "Record actual SkillBridge coding clubs responses and remaining gaps without assuming success."
+    },
+    {
+      "day": 4,
+      "focus": "Collect no-payment intent",
+      "action": "Invite parents of secondary-school students in Sharjah to a no-payment waitlist for SkillBridge coding clubs.",
+      "output": "SkillBridge coding clubs day 4 experiment record.",
+      "time_needed": "One to two hours, planning estimate",
+      "success_check": "Record actual SkillBridge coding clubs responses and remaining gaps without assuming success."
+    },
+    {
+      "day": 5,
+      "focus": "Review evidence",
+      "action": "Review recorded objections about coding practice and price.",
+      "output": "SkillBridge coding clubs day 5 experiment record.",
+      "time_needed": "One to two hours, planning estimate",
+      "success_check": "Record actual SkillBridge coding clubs responses and remaining gaps without assuming success."
+    },
+    {
+      "day": 6,
+      "focus": "Verify requirements",
+      "action": "Check what approvals apply to SkillBridge coding clubs before selling.",
+      "output": "SkillBridge coding clubs day 6 experiment record.",
+      "time_needed": "One to two hours, planning estimate",
+      "success_check": "Record actual SkillBridge coding clubs responses and remaining gaps without assuming success."
+    },
+    {
+      "day": 7,
+      "focus": "Decide",
+      "action": "Decide whether to adjust SkillBridge coding clubs based on recorded responses.",
+      "output": "SkillBridge coding clubs day 7 experiment record.",
+      "time_needed": "One to two hours, planning estimate",
+      "success_check": "Record actual SkillBridge coding clubs responses and remaining gaps without assuming success."
+    }
+  ],
+  "validation_before_spending": [
+    "Define one segment for SkillBridge coding clubs.",
+    "Interview parents of secondary-school students in Sharjah about current alternatives.",
+    "Draft a coding practice offer message without selling.",
+    "Collect no-payment waitlist intent for SkillBridge coding clubs."
+  ],
+  "validation_questions": [
+    "What coding practice alternative did you use in situation 1, and why?",
+    "What coding practice alternative did you use in situation 2, and why?",
+    "What coding practice alternative did you use in situation 3, and why?",
+    "What coding practice alternative did you use in situation 4, and why?",
+    "What coding practice alternative did you use in situation 5, and why?"
+  ],
+  "whatsapp_message": "Hi, I am testing SkillBridge coding clubs. What do you use for coding practice now, and would a no-payment waitlist interest you?",
+  "readiness_report": {
+    "idea": "Evening coding clubs for students in Sharjah.",
+    "target_customer": "parents of secondary-school students in Sharjah",
+    "best_first_action": "Ask five parents of secondary-school students in Sharjah about their last coding practice choice and its current alternative.",
+    "estimated_first_test_cost_aed": 200,
+    "what_not_to_start_with": "Avoid a large coding practice inventory before learning.",
+    "main_risk": "The proposed coding practice schedule may not fit parents of secondary-school students in Sharjah.",
+    "first_customer_channel": "Ask relevant parents of secondary-school students in Sharjah coordinators for voluntary interview introductions.",
+    "next_step": "Interview five parents of secondary-school students in Sharjah about the last time they chose coding practice."
+  },
+  "decision_engine": {
+    "decision": "Validate more",
+    "reason": "This looks promising if interviews confirm demand for SkillBridge coding clubs.",
+    "next_test_action": "Ask five parents of secondary-school students in Sharjah about their last coding practice choice and its current alternative.",
+    "risk_level": "Medium",
+    "recommended_test_budget_aed": 200
+  },
+  "customer_personas": [
+    {
+      "name": "Parents of secondary-school students in Sharjah in proposed segment 1",
+      "cares_about": "Predictable timing and practical coding practice choices.",
+      "reach_through": "Voluntary interviews through relevant parents of secondary-school students in Sharjah coordinators.",
+      "ask": "What coding practice alternative did you use in situation 1, and why?"
+    },
+    {
+      "name": "Parents of secondary-school students in Sharjah in proposed segment 2",
+      "cares_about": "Predictable timing and practical coding practice choices.",
+      "reach_through": "Voluntary interviews through relevant parents of secondary-school students in Sharjah coordinators.",
+      "ask": "What coding practice alternative did you use in situation 2, and why?"
+    },
+    {
+      "name": "Parents of secondary-school students in Sharjah in proposed segment 3",
+      "cares_about": "Predictable timing and practical coding practice choices.",
+      "reach_through": "Voluntary interviews through relevant parents of secondary-school students in Sharjah coordinators.",
+      "ask": "What coding practice alternative did you use in situation 3, and why?"
+    }
+  ],
+  "risk_radar": [
+    {
+      "name": "Customer Demand",
+      "level": "Medium",
+      "reason": "SkillBridge coding clubs faces an unverified customer demand assumption about coding practice.",
+      "fix": "Check the customer demand assumption for SkillBridge coding clubs before operating."
+    },
+    {
+      "name": "Cost / Financial",
+      "level": "Medium",
+      "reason": "SkillBridge coding clubs faces an unverified cost / financial assumption about coding practice.",
+      "fix": "Check the cost / financial assumption for SkillBridge coding clubs before operating."
+    },
+    {
+      "name": "Trust / Adoption",
+      "level": "Medium",
+      "reason": "SkillBridge coding clubs faces an unverified trust / adoption assumption about coding practice.",
+      "fix": "Check the trust / adoption assumption for SkillBridge coding clubs before operating."
+    },
+    {
+      "name": "Execution",
+      "level": "Medium",
+      "reason": "SkillBridge coding clubs faces an unverified execution assumption about coding practice.",
+      "fix": "Check the execution assumption for SkillBridge coding clubs before operating."
+    },
+    {
+      "name": "Regulation / Compliance",
+      "level": "Medium",
+      "reason": "SkillBridge coding clubs faces an unverified regulation / compliance assumption about coding practice.",
+      "fix": "Check the regulation / compliance assumption for SkillBridge coding clubs before operating."
+    }
+  ],
+  "pitches": {
+    "ten_sec": "SkillBridge coding clubs explores flexible coding practice choices. We welcome honest feedback before selling.",
+    "thirty_sec": "Parents of secondary-school students in Sharjah may find coding practice difficult to arrange. SkillBridge coding clubs is testing a flexible offer through interviews and no-payment intent. We would value your honest view.",
+    "whatsapp": "Hi, I am testing SkillBridge coding clubs. What do you use for coding practice now, and would a no-payment waitlist interest you?",
+    "instagram": "SkillBridge coding clubs is exploring coding practice alternatives. What would make your current choice easier?"
+  },
+  "founder_passport": {
+    "status": "Ready for non-selling interviews",
+    "first_action": "Ask five parents of secondary-school students in Sharjah about their last coding practice choice and its current alternative.",
+    "next_step": "Interview five parents of secondary-school students in Sharjah about the last time they chose coding practice."
+  },
+  "steps": [
+    {
+      "step_number": 1,
+      "action": "Interview five parents of secondary-school students in Sharjah about the last time they chose coding practice.",
+      "description": "Interview five parents of secondary-school students in Sharjah about the last time they chose coding practice.",
+      "estimated_cost_aed": 0,
+      "timeline_days": 1,
+      "who_to_contact": "Voluntary participants from parents of secondary-school students in Sharjah",
+      "location": "Sharjah"
+    },
+    {
+      "step_number": 2,
+      "action": "Invite parents of secondary-school students in Sharjah to a no-payment waitlist for SkillBridge coding clubs.",
+      "description": "Invite parents of secondary-school students in Sharjah to a no-payment waitlist for SkillBridge coding clubs.",
+      "estimated_cost_aed": 0,
+      "timeline_days": 1,
+      "who_to_contact": "Voluntary participants from parents of secondary-school students in Sharjah",
+      "location": "Sharjah"
+    },
+    {
+      "step_number": 3,
+      "action": "Review recorded objections about coding practice and price.",
+      "description": "Review recorded objections about coding practice and price.",
+      "estimated_cost_aed": 0,
+      "timeline_days": 1,
+      "who_to_contact": "Voluntary participants from parents of secondary-school students in Sharjah",
+      "location": "Sharjah"
+    },
+    {
+      "step_number": 4,
+      "action": "Check what approvals apply to SkillBridge coding clubs before selling.",
+      "description": "Check what approvals apply to SkillBridge coding clubs before selling.",
+      "estimated_cost_aed": 0,
+      "timeline_days": 1,
+      "who_to_contact": "Voluntary participants from parents of secondary-school students in Sharjah",
+      "location": "Sharjah"
+    },
+    {
+      "step_number": 5,
+      "action": "Prepare a SkillBridge coding clubs pilot plan only after official checks.",
+      "description": "Prepare a SkillBridge coding clubs pilot plan only after official checks.",
+      "estimated_cost_aed": null,
+      "timeline_days": 1,
+      "who_to_contact": "Voluntary participants from parents of secondary-school students in Sharjah",
+      "location": "Sharjah"
+    },
+    {
+      "step_number": 6,
+      "action": "Run a SkillBridge coding clubs pilot only after confirming required approvals are in place.",
+      "description": "Run a SkillBridge coding clubs pilot only after confirming required approvals are in place.",
+      "estimated_cost_aed": null,
+      "timeline_days": 1,
+      "who_to_contact": "Voluntary participants from parents of secondary-school students in Sharjah",
+      "location": "Sharjah"
+    },
+    {
+      "step_number": 7,
+      "action": "Decide whether to adjust SkillBridge coding clubs based on recorded responses.",
+      "description": "Decide whether to adjust SkillBridge coding clubs based on recorded responses.",
+      "estimated_cost_aed": null,
+      "timeline_days": 1,
+      "who_to_contact": "Voluntary participants from parents of secondary-school students in Sharjah",
+      "location": "Sharjah"
+    }
+  ],
+  "total_estimated_cost_aed": null,
+  "total_timeline_days": 7,
+  "first_customer_tip": "Ask one relevant parents of secondary-school students in Sharjah coordinator whether voluntary interview invitations are welcome.",
+  "bilingual_text": {
+    "en": {
+      "summary": "Evening coding clubs for students in Sharjah.",
+      "problem": "Parents of secondary-school students in Sharjah may find consistent coding practice difficult to arrange.",
+      "target_user": "parents of secondary-school students in Sharjah",
+      "solution": "Small guided coding projects with flexible evening sessions.",
+      "why_market": "The selected market contains the proposed segment; interview parents of secondary-school students in Sharjah to test local fit.",
+      "first_customer_channel": "Ask relevant parents of secondary-school students in Sharjah coordinators for voluntary interview introductions.",
+      "local_fit_reason": "SkillBridge coding clubs needs a specific check of local fit with parents of secondary-school students in Sharjah.",
+      "local_fit_improve": "Compare one coding practice assumption with the proposed parents of secondary-school students in Sharjah.",
+      "clear_customer_reason": "SkillBridge coding clubs needs a specific check of clear customer with parents of secondary-school students in Sharjah.",
+      "clear_customer_improve": "Compare one coding practice assumption with the proposed parents of secondary-school students in Sharjah.",
+      "low_starting_cost_reason": "SkillBridge coding clubs needs a specific check of low starting cost with parents of secondary-school students in Sharjah.",
+      "low_starting_cost_improve": "Compare one coding practice assumption with the proposed parents of secondary-school students in Sharjah.",
+      "easy_first_step_reason": "SkillBridge coding clubs needs a specific check of easy first step with parents of secondary-school students in Sharjah.",
+      "easy_first_step_improve": "Compare one coding practice assumption with the proposed parents of secondary-school students in Sharjah.",
+      "growth_potential_reason": "SkillBridge coding clubs needs a specific check of growth potential with parents of secondary-school students in Sharjah.",
+      "growth_potential_improve": "Compare one coding practice assumption with the proposed parents of secondary-school students in Sharjah."
+    },
+    "ar": {
+      "summary": "نص ملخص يحتاج إلى اختبار مع الشريحة المختارة.",
+      "problem": "نص ملخص يحتاج إلى اختبار مع الشريحة المختارة.",
+      "target_user": "نص ملخص يحتاج إلى اختبار مع الشريحة المختارة.",
+      "solution": "نص ملخص يحتاج إلى اختبار مع الشريحة المختارة.",
+      "why_market": "نص ملخص يحتاج إلى اختبار مع الشريحة المختارة.",
+      "first_customer_channel": "نص ملخص يحتاج إلى اختبار مع الشريحة المختارة.",
+      "local_fit_reason": "نص ملخص يحتاج إلى اختبار مع الشريحة المختارة.",
+      "local_fit_improve": "نص ملخص يحتاج إلى اختبار مع الشريحة المختارة.",
+      "clear_customer_reason": "نص ملخص يحتاج إلى اختبار مع الشريحة المختارة.",
+      "clear_customer_improve": "نص ملخص يحتاج إلى اختبار مع الشريحة المختارة.",
+      "low_starting_cost_reason": "نص ملخص يحتاج إلى اختبار مع الشريحة المختارة.",
+      "low_starting_cost_improve": "نص ملخص يحتاج إلى اختبار مع الشريحة المختارة.",
+      "easy_first_step_reason": "نص ملخص يحتاج إلى اختبار مع الشريحة المختارة.",
+      "easy_first_step_improve": "نص ملخص يحتاج إلى اختبار مع الشريحة المختارة.",
+      "growth_potential_reason": "نص ملخص يحتاج إلى اختبار مع الشريحة المختارة.",
+      "growth_potential_improve": "نص ملخص يحتاج إلى اختبار مع الشريحة المختارة."
+    }
+  }
+}

@@ -8,23 +8,23 @@
     "status": "verified",
     "en": {
       "name": "Khalifa Fund",
-      "description": "Seven loan programmes for Emirati-owned businesses in Abu Dhabi.",
+      "description": "Seven financing programmes; the July 2026 announcement specifically identifies the First-time Founders Loan for Emiratis.",
       "support": "Loans; not an automatic grant.",
       "target": "Emirati entrepreneurs and eligible MSMEs.",
       "scope": "Abu Dhabi",
-      "eligibility": "100% UAE-national ownership; Abu Dhabi; approved activity; credit assessment. Programme rules vary.",
-      "limitations": "Funding page: owner aged 18–65; some programmes accept startups. FAQ differs on age/business age. Confirm through TAMM; no approval promised."
+      "eligibility": "Current funding page: 100% UAE-national ownership in Abu Dhabi. The dated announcement alone gives no eligibility limits or terms for the other loans.",
+      "limitations": "Official pages differ. Confirm current programme eligibility and terms through TAMM / Khalifa Fund; the announcement is historical, not an approval."
     },
     "ar": {
       "name": "صندوق خليفة",
-      "description": "سبعة برامج قروض للمشاريع الإماراتية في أبوظبي.",
+      "description": "سبعة برامج تمويل؛ يخص إعلان يوليو 2026 قرض المؤسسين لأول مرة بالإماراتيين.",
       "support": "قروض وليست منحة تلقائية.",
       "target": "رواد الأعمال الإماراتيون والمنشآت المؤهلة.",
       "scope": "أبوظبي",
-      "eligibility": "ملكية إماراتية 100٪؛ أبوظبي؛ نشاط معتمد؛ تقييم ائتماني. تختلف شروط البرامج.",
-      "limitations": "صفحة التمويل: عمر 18–65؛ بعض البرامج تقبل التأسيس. تختلف الأسئلة الرسمية في العمر وعمر المشروع. أكّد عبر تم دون ضمان قبول."
+      "eligibility": "الصفحة الحالية: ملكية إماراتية 100٪ في أبوظبي. الإعلان المؤرخ وحده لا يحدد أهلية أو شروط القروض الأخرى.",
+      "limitations": "تختلف الصفحات الرسمية. أكد الأهلية والشروط الحالية عبر TAMM / Khalifa Fund؛ الإعلان تاريخي وليس موافقة."
     },
-    "checked": "2026-11-07",
+    "checked": "2026-11-08",
     "programs": {
       "en": [
         "First-time Founders Loan",
@@ -48,7 +48,38 @@
     "sources": [
       "https://www.khalifafund.ae/services/funding-scheme/",
       "https://www.khalifafund.ae/faq/"
-    ]
+    ],
+    "eligibility_tags": [
+      "emirati_only",
+      "idea_stage_ok"
+    ],
+    "emirates": [
+      "Abu Dhabi"
+    ],
+    "stages": [
+      "idea",
+      "early_revenue",
+      "growth"
+    ],
+    "dated_sources": [
+      {
+        "url": "https://www.khalifafund.ae/services/funding-scheme/",
+        "published": null,
+        "checked": "2026-11-07",
+        "kind": "programme_page"
+      },
+      {
+        "url": "https://www.mediaoffice.abudhabi/en/economy/khalifa-fund-for-enterprise-development-strengthens-financing-ecosystem-with-7-integrated-programmes-to-support-enterprise-growth/",
+        "published": "2026-07-20",
+        "checked": "2026-11-08",
+        "kind": "historical_announcement",
+        "retrieved": true
+      }
+    ],
+    "fit": {
+      "en": "Emirati founders; programme-specific stage fit",
+      "ar": "مؤسسون إماراتيون؛ المرحلة حسب البرنامج"
+    }
   },
   {
     "id": "hub71",
@@ -60,22 +91,55 @@
     "en": {
       "name": "Hub71",
       "description": "Technology-startup ecosystem and programme application.",
-      "support": "Programme incentives and cash in exchange for equity through a SAFE; mentorship and ecosystem access.",
-      "target": "Technology founders building a scalable startup.",
+      "support": "Cohort 18 (June 2026): 12 months; up to 250,000.00 AED in-kind and 250,000.00 AED cash via a SAFE note. Historical cohort terms.",
+      "target": "Tech startups, pre-seed to Series A; not a raw idea-stage route.",
       "scope": "Abu Dhabi",
       "eligibility": "Application asks about product, traction, team and whether a co-founder will live in or relocate to Abu Dhabi.",
-      "limitations": "The application requests founder nationalities but this page does not establish a universal nationality restriction. Review current cohort terms and any equity terms."
+      "limitations": "Cash involves equity/SAFE terms. This cohort announcement does not establish current incentives or intake. Confirm the current Access terms."
     },
     "ar": {
-      "name": "هب ٧١",
+      "name": "Hub71 · Access",
       "description": "منظومة للمشاريع التقنية والتقديم للبرامج.",
-      "support": "حوافز ونقد مقابل ملكية عبر SAFE؛ إرشاد وشبكات.",
-      "target": "مؤسسو المشاريع التقنية القابلة للتوسع.",
+      "support": "الدفعة 18 (يونيو 2026): 12 شهراً؛ حتى 250,000.00 AED مزايا عينية و250,000.00 AED نقداً عبر SAFE. شروط دفعة تاريخية.",
+      "target": "مشاريع تقنية من ما قبل البذرة إلى Series A؛ ليس مساراً لفكرة أولية.",
       "scope": "أبوظبي",
       "eligibility": "يسأل الطلب عن المنتج والأدلة والفريق وإقامة مؤسس مشارك في أبوظبي أو انتقاله إليها.",
-      "limitations": "يسأل الطلب عن الجنسيات دون تحديد قيد جنسية عام في الصفحة. راجع شروط الدفعة الحالية وأي شروط للملكية."
+      "limitations": "النقد مرتبط بملكية وشروط SAFE. الإعلان لا يثبت الحوافز أو التقديم الحالي. أكد شروط Access الحالية."
     },
-    "checked": "2026-11-07"
+    "checked": "2026-11-08",
+    "eligibility_tags": [
+      "any_nationality",
+      "tech_only"
+    ],
+    "emirates": [
+      "Abu Dhabi"
+    ],
+    "stages": [
+      "early_revenue",
+      "growth"
+    ],
+    "sources": [
+      "https://www.hub71.com/program/access-programme/apply"
+    ],
+    "dated_sources": [
+      {
+        "url": "https://www.hub71.com/program/access-programme/apply",
+        "published": null,
+        "checked": "2026-11-07",
+        "kind": "programme_page"
+      },
+      {
+        "url": "https://www.wam.ae/en/article/c0k0vxp-hub71-selects-startups-for-cohort-first",
+        "published": "2026-06-04",
+        "checked": "2026-11-08",
+        "kind": "historical_announcement",
+        "retrieved": true
+      }
+    ],
+    "fit": {
+      "en": "Technology startups with a developed offer",
+      "ar": "مشاريع تقنية لديها عرض مطوّر"
+    }
   },
   {
     "id": "dubai-sme",
@@ -83,26 +147,62 @@
     "url": "https://www.investindubai.gov.ae/en/why-dubai/start-ups-and-smes",
     "apply": "https://www.mysme.ae/",
     "verified": "2026-11-07",
-    "status": "partial",
+    "status": "dated_official",
     "en": {
-      "name": "Dubai SME",
-      "description": "Entrepreneurship support and government-procurement membership starting point.",
-      "support": "Learning, setup support and programme-specific services.",
+      "name": "Dubai SME · Hi2",
+      "description": "Hi2 at Dubai Founders HQ: announced 16-week incubator for 20 Emirati entrepreneurs, idea to MVP.",
+      "support": "Incubation, mentorship and ecosystem access; no cash amount is promised.",
       "target": "SMEs and entrepreneurs; specific programmes support Emirati founders.",
       "scope": "Dubai",
-      "eligibility": "Eligibility depends on the chosen service. The membership portal is specifically for the government procurement programme.",
-      "limitations": "Official Invest in Dubai overview and indexed procurement portal checked. Full current service eligibility could not be retrieved; confirm directly. Membership is not funding approval."
+      "eligibility": "The July 2026 announcement targets Emirati founders of technology ideas and early MVPs.",
+      "limitations": "The announced deadline was August 2026 and programme start October 2026. Closed intake — watch for the next cohort; do not assume current availability."
     },
     "ar": {
-      "name": "دبي للمشاريع الصغيرة والمتوسطة",
-      "description": "دعم ريادة الأعمال وبداية عضوية المشتريات الحكومية.",
-      "support": "تعلّم ودعم تأسيس وخدمات وفق البرنامج.",
+      "name": "Dubai SME · Hi2",
+      "description": "Hi2 في Dubai Founders HQ: حاضنة معلنة لمدة 16 أسبوعاً لـ20 رائد أعمال إماراتياً، من الفكرة إلى MVP.",
+      "support": "احتضان وإرشاد وشبكات؛ لا يُوعد بمبلغ نقدي.",
       "target": "منشآت ورواد أعمال؛ برامج محددة للمؤسسين الإماراتيين.",
       "scope": "دبي",
-      "eligibility": "الأهلية مرتبطة بالخدمة المختارة. بوابة العضوية تخص برنامج المشتريات الحكومية.",
-      "limitations": "رُوجعت النظرة الرسمية ونتيجة فهرسة بوابة المشتريات. تعذّر استرجاع شروط الخدمة الكاملة الحالية؛ أكّد مباشرة. العضوية ليست قبول تمويل."
+      "eligibility": "يستهدف إعلان يوليو 2026 مؤسسين إماراتيين لأفكار تقنية ونماذج MVP أولية.",
+      "limitations": "كان موعد الإغلاق المعلن أغسطس 2026 والبدء أكتوبر 2026. الدفعة مغلقة — تابع الدفعة التالية ولا تفترض التوفر الحالي."
     },
-    "checked": "2026-11-07"
+    "checked": "2026-11-08",
+    "eligibility_tags": [
+      "emirati_only",
+      "tech_only",
+      "idea_stage_ok"
+    ],
+    "emirates": [
+      "Dubai"
+    ],
+    "stages": [
+      "idea",
+      "early_revenue",
+      "growth"
+    ],
+    "sources": [
+      "https://www.investindubai.gov.ae/en/why-dubai/start-ups-and-smes"
+    ],
+    "dated_sources": [
+      {
+        "url": "https://www.investindubai.gov.ae/en/why-dubai/start-ups-and-smes",
+        "published": null,
+        "checked": "2026-11-07",
+        "kind": "programme_page"
+      },
+      {
+        "url": "https://www.wam.ae/en/article/c178s4m-dubai-sme-integrates-hamdan-innovation-incubator",
+        "published": "2026-07-13",
+        "checked": "2026-11-08",
+        "kind": "historical_announcement",
+        "retrieved": true
+      }
+    ],
+    "fit": {
+      "en": "Emirati technology founders, idea to MVP",
+      "ar": "مؤسسون إماراتيون للتقنية، من الفكرة إلى MVP"
+    },
+    "intake": "closed"
   },
   {
     "id": "sheraa",
@@ -121,15 +221,40 @@
       "limitations": "The published cohort calendar is for 2025–2026. A current open intake is NOT verified. No universal nationality restriction was stated on this page."
     },
     "ar": {
-      "name": "شراع · استوديو الشارقة للمشاريع",
+      "name": "Sheraa · S3",
       "description": "دعم نمو المشاريع عبر برنامج S3.",
       "support": "إرشاد ومساحة وموارد وتعارف؛ ليس تمويلاً نقدياً مباشراً.",
       "target": "مشاريع تقنية لديها عملاء وإيراد مبكر ومؤسس متفرغ.",
       "scope": "الشارقة / الإمارات",
       "eligibility": "تشترط الصفحة نموذجاً قابلاً للتوسع والتزاماً بالعمل في الشارقة. تُذكر القطاعات ذات الأولوية رسمياً ويلزم الحضور في الإمارات لجلسات رئيسية.",
-      "limitations": "التقويم المنشور لدفعة ٢٠٢٥–٢٠٢٦. لم يُتحقق من فتح تقديم حالي. لا تذكر الصفحة قيد جنسية عاماً."
+      "limitations": "التقويم المنشور لدفعة 2025–2026. لم يُتحقق من فتح تقديم حالي. لا تذكر الصفحة قيد جنسية عاماً."
     },
-    "checked": "2026-11-07"
+    "checked": "2026-11-07",
+    "eligibility_tags": [
+      "tech_only"
+    ],
+    "emirates": [
+      "Sharjah"
+    ],
+    "stages": [
+      "early_revenue",
+      "growth"
+    ],
+    "sources": [
+      "https://www.asc.sheraa.ae/s3-program"
+    ],
+    "dated_sources": [
+      {
+        "url": "https://www.asc.sheraa.ae/s3-program",
+        "published": null,
+        "checked": "2026-11-07",
+        "kind": "programme_page"
+      }
+    ],
+    "fit": {
+      "en": "Tech-enabled startups with early customers, revenue and a full-time founder.",
+      "ar": "مشاريع تقنية لديها عملاء وإيراد مبكر ومؤسس متفرغ."
+    }
   },
   {
     "id": "edb",
@@ -156,7 +281,32 @@
       "eligibility": "تذكر الصفحة الجدارة الائتمانية والجدوى والتوافق الاستراتيجي. تختلف الشروط حسب المشروع.",
       "limitations": "لا تحدد الصفحة المراجعة شروط جنسية أو أسعاراً أو مبالغ عامة. أكّد المنتج المحدد ووثائق الشركة المطلوبة."
     },
-    "checked": "2026-11-07"
+    "checked": "2026-11-07",
+    "eligibility_tags": [
+      "uae_registered_company"
+    ],
+    "emirates": [
+      "UAE"
+    ],
+    "stages": [
+      "early_revenue",
+      "growth"
+    ],
+    "sources": [
+      "https://edb.gov.ae/en/solutions/digitization-finance"
+    ],
+    "dated_sources": [
+      {
+        "url": "https://edb.gov.ae/en/solutions/digitization-finance",
+        "published": null,
+        "checked": "2026-11-07",
+        "kind": "programme_page"
+      }
+    ],
+    "fit": {
+      "en": "Businesses aligned with EDB strategic objectives and focus areas.",
+      "ar": "مشاريع متوافقة مع أهداف المصرف ومجالات تركيزه."
+    }
   },
   {
     "id": "mbrif",
@@ -171,7 +321,7 @@
       "support": "Accelerator: non-financial support. Guarantee Scheme: access to bank debt backed by a guarantee.",
       "target": "Innovative companies based in, or willing to establish in, the UAE.",
       "scope": "UAE",
-      "eligibility": "Guarantee Scheme accepts any nationality. Its criteria include a UAE-based scalable business beyond ideation. Innovation priorities and selection still apply.",
+      "eligibility": "MoET: UAE-registered innovation projects regardless of owners’ nationality; priority sectors include technology, education, renewable energy, water, health, space and transportation. Each pathway still assesses eligibility.",
       "limitations": "Accelerator membership supplies no direct funding and does not guarantee admission to the Guarantee Scheme. No investment approval is implied."
     },
     "ar": {
@@ -180,37 +330,111 @@
       "support": "المسرّع دعم غير مالي؛ الضمانات تتيح تمويلاً مصرفياً بضمان.",
       "target": "شركات مبتكرة في الإمارات أو مستعدة للتأسيس فيها.",
       "scope": "الإمارات",
-      "eligibility": "يقبل برنامج الضمانات جميع الجنسيات. تشمل معاييره شركة في الإمارات قابلة للتوسع تجاوزت مرحلة الفكرة. تخضع للأولويات والتقييم.",
+      "eligibility": "MoET: مشاريع ابتكارية مسجلة في الإمارات بغض النظر عن جنسية المالكين؛ تشمل الأولويات التقنية والتعليم والطاقة المتجددة والمياه والصحة والفضاء والنقل. تُقيّم أهلية كل مسار.",
       "limitations": "المسرّع لا يقدم تمويلاً مباشراً ولا يضمن الانضمام للضمانات. الإدراج لا يعني قبول الاستثمار."
     },
-    "checked": "2026-11-07"
+    "checked": "2026-11-08",
+    "eligibility_tags": [
+      "any_nationality",
+      "uae_registered_company"
+    ],
+    "emirates": [
+      "UAE"
+    ],
+    "stages": [
+      "early_revenue",
+      "growth"
+    ],
+    "sources": [
+      "https://mbrif.ae/faq-2/"
+    ],
+    "dated_sources": [
+      {
+        "url": "https://mbrif.ae/faq-2/",
+        "published": null,
+        "checked": "2026-11-07",
+        "kind": "programme_page"
+      },
+      {
+        "url": "https://www.moet.gov.ae/en/mohammed-bin-rashid-innovation-fund",
+        "published": null,
+        "checked": "2026-11-08",
+        "kind": "ministry_page",
+        "retrieved": true
+      }
+    ],
+    "fit": {
+      "en": "Innovative companies based in, or willing to establish in, the UAE.",
+      "ar": "شركات مبتكرة في الإمارات أو مستعدة للتأسيس فيها."
+    }
   },
   {
     "id": "ruwad",
     "category": "finance",
-    "url": "https://ruwad.ae/en/financing-program",
+    "url": "https://www.moet.gov.ae/en/sharjah-foundation-to-support-pioneering-entrepreneurs-ruwad-",
     "apply": "https://ruwad.ae/",
-    "verified": null,
-    "status": "unverified",
+    "verified": "2026-11-08",
+    "status": "dated_official",
     "en": {
       "name": "RUWAD",
       "description": "Sharjah SME financing and development support.",
-      "support": "Direct and bank-mediated financing programmes.",
+      "support": "Ministry reference: direct financing up to 400,000.00 AED; bank-mediated up to 2,000,000.00 AED. WAM, 31 December 2024: industrial-sector financing up to 800,000.00 AED.",
       "target": "Applicants must confirm current requirements with RUWAD.",
       "scope": "Sharjah",
-      "eligibility": "Current eligibility could not be confirmed: the official programme page returned a gateway error. Ask RUWAD about ownership, location and current terms.",
-      "limitations": "Official search indexing describes direct and indirect finance, but current programme details and intake remain UNVERIFIED. Historical 2025 brochure is not used as current eligibility."
+      "eligibility": "The Ministry reference describes Emirati entrepreneurs. Current programme eligibility must be confirmed with RUWAD.",
+      "limitations": "Dated official information, not current terms. Ministry page was unavailable in this check; its supplied reference is not independently refreshed. Confirm rates, amounts, intake and eligibility with RUWAD."
     },
     "ar": {
       "name": "روّاد",
       "description": "دعم وتمويل المنشآت الصغيرة والمتوسطة في الشارقة.",
-      "support": "برامج تمويل مباشر وتمويل عبر البنوك.",
+      "support": "مرجع الوزارة: تمويل مباشر حتى 400,000.00 AED وعبر البنوك حتى 2,000,000.00 AED. WAM في 31 ديسمبر 2024: تمويل صناعي حتى 800,000.00 AED.",
       "target": "على المتقدمين تأكيد الشروط الحالية مع روّاد.",
       "scope": "الشارقة",
-      "eligibility": "تعذّر تأكيد الأهلية الحالية بسبب خطأ بوابة الصفحة الرسمية. اسأل روّاد عن الملكية والموقع والشروط الحالية.",
-      "limitations": "تشير فهرسة المصدر الرسمي لتمويل مباشر وغير مباشر، لكن التفاصيل والتقديم الحالي غير مُتحقق منهما. لا يُستخدم كتيب 2025 كأهلية حالية."
+      "eligibility": "يصف مرجع الوزارة رواد أعمال إماراتيين. يلزم تأكيد أهلية البرنامج الحالية مع RUWAD.",
+      "limitations": "معلومات رسمية مؤرخة وليست شروطاً حالية. تعذرت صفحة الوزارة في هذه المراجعة ولم يُحدّث المرجع المقدم مستقلاً. أكد المبالغ والتقديم والأهلية مع RUWAD."
     },
-    "checked": "2026-11-07"
+    "checked": "2026-11-08",
+    "eligibility_tags": [
+      "emirati_only",
+      "idea_stage_ok"
+    ],
+    "emirates": [
+      "Sharjah"
+    ],
+    "stages": [
+      "idea",
+      "early_revenue",
+      "growth"
+    ],
+    "sources": [
+      "https://ruwad.ae/en/financing-program"
+    ],
+    "dated_sources": [
+      {
+        "url": "https://ruwad.ae/en/financing-program",
+        "published": null,
+        "checked": "2026-11-07",
+        "kind": "programme_page"
+      },
+      {
+        "url": "https://www.moet.gov.ae/en/sharjah-foundation-to-support-pioneering-entrepreneurs-ruwad-",
+        "published": null,
+        "checked": "2026-11-08",
+        "kind": "ministry_reference",
+        "retrieved": false
+      },
+      {
+        "url": "https://www.wam.ae/en/article/b6yweop-ruwad-launches-industrial-sector-financing",
+        "published": "2024-12-31",
+        "checked": "2026-11-08",
+        "kind": "historical_announcement",
+        "retrieved": true
+      }
+    ],
+    "fit": {
+      "en": "Emirati entrepreneurs considering Sharjah",
+      "ar": "رواد أعمال إماراتيون يدرسون الشارقة"
+    }
   },
   {
     "id": "uae-sme",
@@ -241,6 +465,30 @@
     "sources": [
       "https://www.uaesme.ae/en/about/about-program",
       "https://www.moet.gov.ae/en/web/guest/w/smes"
-    ]
+    ],
+    "eligibility_tags": [
+      "emirati_only",
+      "idea_stage_ok"
+    ],
+    "emirates": [
+      "UAE"
+    ],
+    "stages": [
+      "idea",
+      "early_revenue",
+      "growth"
+    ],
+    "dated_sources": [
+      {
+        "url": "https://www.uaesme.ae/en/about/about-program",
+        "published": null,
+        "checked": "2026-11-07",
+        "kind": "programme_page"
+      }
+    ],
+    "fit": {
+      "en": "Entrepreneurs and SME owners; eligibility varies by initiative.",
+      "ar": "رواد الأعمال وأصحاب المنشآت؛ تختلف الأهلية حسب المبادرة."
+    }
   }
 ]

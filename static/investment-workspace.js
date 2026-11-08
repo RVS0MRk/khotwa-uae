@@ -61,13 +61,13 @@ function setupInvestmentWorkspace() {
   [
     [
       "entered",
-      "Use separately entered cash receipts and payments",
-      "استخدم المقبوضات والمدفوعات المدخلة",
+      "I'll enter cash in/out separately (advanced)",
+      "سأدخل المقبوضات والمدفوعات بشكل منفصل (متقدم)",
     ],
     [
       "simplified",
-      "I assume cash collected = revenue, cash paid = variable + fixed costs",
-      "أفترض أن المقبوضات = الإيراد والمدفوعات = المتغيرة + الثابتة",
+      "Assume customers pay in the same month (simple)",
+      "أفترض دفع العملاء في الشهر نفسه (بسيط)",
     ],
   ].forEach(([v, en, ar]) => {
     const o = uiNode("option");
@@ -78,6 +78,8 @@ function setupInvestmentWorkspace() {
   });
   mode.onchange = () => {
     investment.inputs.cash_mode = mode.value;
+    if (mode.value === "entered")
+      document.getElementById("finance-advanced").open = true;
     scheduleFinance();
   };
   const cashHelp = uiNode("p", "finance-notice");

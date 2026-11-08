@@ -1,4 +1,5 @@
 """Offline reproductions of the live report; no provider or font downloads."""
+
 import io
 import json
 import os
@@ -7,6 +8,7 @@ from copy import deepcopy
 from unittest.mock import Mock, patch
 
 from test_support import configure_mock_environment
+
 configure_mock_environment()
 import app as startsmart
 from test_browser_server import DIRTY_ADVISOR, fake_groq
@@ -14,8 +16,13 @@ from pypdf import PdfReader
 
 
 def example_plan():
-    inputs = {"idea": "Mobile Car‑Interior Ergonomic Consulting", "category": "Services & Maintenance",
-              "budget": 4000, "region": "Abu Dhabi", "context": "Local service"}
+    inputs = {
+        "idea": "Mobile Car‑Interior Ergonomic Consulting",
+        "category": "Services & Maintenance",
+        "budget": 4000,
+        "region": "Abu Dhabi",
+        "context": "Local service",
+    }
     return startsmart._normalize_plan(json.loads(fake_groq("plan", inputs["idea"])), inputs, "en")
 
 
@@ -29,9 +36,16 @@ class LiveRegressions(unittest.TestCase):
         self.assertEqual(post.call_args.kwargs["json"]["response_format"], {"type": "json_object"})
         self.assertEqual(response.headers["X-StartSmart-Advisor"], "structured-v2")
         answer = response.get_json()["answer"]
-        self.assertEqual(answer, {"title": "Test customer demand first", "summary": "No new evidence.",
-            "points": [{"title": "Demand:", "text": "Interview five potential customers."}],
-            "next_action": "Record interviews.", "caution": "Regulatory requirements are unverified."})
+        self.assertEqual(
+            answer,
+            {
+                "title": "Test customer demand first",
+                "summary": "No new evidence.",
+                "points": [{"title": "Demand:", "text": "Interview five potential customers."}],
+                "next_action": "Record interviews.",
+                "caution": "Regulatory requirements are unverified.",
+            },
+        )
 
     def test_nested_entities_all_fields_and_all_success_paths(self):
         dirty = deepcopy(DIRTY_ADVISOR)
@@ -46,12 +60,16 @@ class LiveRegressions(unittest.TestCase):
 
     def test_context_segments_and_cautious_benefit(self):
         plan = example_plan()
-        self.assertEqual([p["name"] for p in plan["customer_personas"]],
-                         ["Daily commuters", "Ride-hailing drivers", "Fleet / company vehicle managers"])
+        self.assertEqual(
+            [p["name"] for p in plan["customer_personas"]],
+            ["Daily commuters", "Ride-hailing drivers", "Fleet / company vehicle managers"],
+        )
         self.assertIn("Potential benefit to test", plan["idea_overview"]["impact"])
         self.assertNotIn("injury", plan["idea_overview"]["impact"])
         specific = [{"name": n} for n in ("Long-distance taxi drivers", "Delivery van drivers", "Company fleet buyers")]
-        self.assertEqual(startsmart._segment_names("Car consulting", "", "", "en", specific), [p["name"] for p in specific])
+        self.assertEqual(
+            startsmart._segment_names("Car consulting", "", "", "en", specific), [p["name"] for p in specific]
+        )
         self.assertIn("Office lunch buyers", startsmart._segment_names("Lunch catering", "", "", "en"))
 
     def test_english_pdf_portable_punctuation(self):
@@ -74,17 +92,32 @@ class LiveRegressions(unittest.TestCase):
         self.assertEqual(arabic["founder_passport"]["status"], "جاهز للتحقق، لا للتشغيل")
         self.assertEqual(arabic["seven_day_plan"][0]["focus"], "حدد العميل المستهدف")
         self.assertEqual(arabic["customer_personas"][0]["name"], "المتنقلون يومياً")
-        self.assertTrue(all(any("\u0600" <= c <= "\u06ff" for c in d["success_check"]) for d in arabic["seven_day_plan"]))
+        self.assertTrue(
+            all(any("\u0600" <= c <= "\u06ff" for c in d["success_check"]) for d in arabic["seven_day_plan"])
+        )
         self.assertEqual(arabic["risk_radar"][0]["name"], "طلب العملاء")
         self.assertEqual(arabic["steps"][0]["estimated_cost_aed"], plan["steps"][0]["estimated_cost_aed"])
         pdf = startsmart.build_pdf(plan, "ar")
         reader = PdfReader(pdf)
         self.assertEqual(reader.metadata.title, "خطوة — تقرير الخطوة الأولى")
         text = "\n".join(page.extract_text() for page in reader.pages)
-        for bad in ("■", "\ufffd", "AI ESTIMATE", "USER INPUT", "Define target customer", "Ready to validate", "Customer Demand"):
+        for bad in (
+            "■",
+            "\ufffd",
+            "AI ESTIMATE",
+            "USER INPUT",
+            "Define target customer",
+            "Ready to validate",
+            "Customer Demand",
+        ):
             self.assertNotIn(bad, text)
-        self.assertTrue(any("Amiri" in str(font.get_object().get("/BaseFont"))
-                            for page in reader.pages for font in page["/Resources"]["/Font"].values()))
+        self.assertTrue(
+            any(
+                "Amiri" in str(font.get_object().get("/BaseFont"))
+                for page in reader.pages
+                for font in page["/Resources"]["/Font"].values()
+            )
+        )
 
     def test_arabic_export_preserves_entered_proof(self):
         plan = example_plan()

@@ -1,0 +1,320 @@
+{
+  "business_name_suggestion": "DeskFresh lunch boxes",
+  "summary": "Healthy pre-ordered lunch boxes for office workers in Abu Dhabi.",
+  "idea_overview": {
+    "problem": "Office workers in Abu Dhabi may find consistent healthy lunches difficult to arrange.",
+    "target_user": "office workers in Abu Dhabi",
+    "solution": "Customers pre-order lunch boxes weekly with flexible ingredients and collection times.",
+    "impact": "Potential benefit: make healthy lunches easier to arrange; test this assumption.",
+    "evidence": "No customer interviews are recorded; these are assumptions to test.",
+    "why_market": "The selected market contains the proposed segment; interview office workers in Abu Dhabi to test local fit."
+  },
+  "first_step_today": "Ask five office workers in Abu Dhabi about their last healthy lunches choice and its current alternative.",
+  "suggested_test_price_aed": 30,
+  "opportunity_score": {
+    "local_fit": {
+      "score": 1,
+      "reason": "DeskFresh lunch boxes needs a specific check of local fit with office workers in Abu Dhabi.",
+      "improve": "Compare one healthy lunches assumption with the proposed office workers in Abu Dhabi."
+    },
+    "clear_customer": {
+      "score": 2,
+      "reason": "DeskFresh lunch boxes needs a specific check of clear customer with office workers in Abu Dhabi.",
+      "improve": "Compare one healthy lunches assumption with the proposed office workers in Abu Dhabi."
+    },
+    "low_starting_cost": {
+      "score": 3,
+      "reason": "DeskFresh lunch boxes needs a specific check of low starting cost with office workers in Abu Dhabi.",
+      "improve": "Compare one healthy lunches assumption with the proposed office workers in Abu Dhabi."
+    },
+    "easy_first_step": {
+      "score": 4,
+      "reason": "DeskFresh lunch boxes needs a specific check of easy first step with office workers in Abu Dhabi.",
+      "improve": "Compare one healthy lunches assumption with the proposed office workers in Abu Dhabi."
+    },
+    "growth_potential": {
+      "score": 5,
+      "reason": "DeskFresh lunch boxes needs a specific check of growth potential with office workers in Abu Dhabi.",
+      "improve": "Compare one healthy lunches assumption with the proposed office workers in Abu Dhabi."
+    },
+    "total": 15
+  },
+  "small_test_plan": {
+    "intro": "Test a DeskFresh lunch boxes offer message before committing funds.",
+    "points": [
+      "Define one segment for DeskFresh lunch boxes.",
+      "Interview office workers in Abu Dhabi about current alternatives.",
+      "Draft a healthy lunches offer message without selling.",
+      "Collect no-payment waitlist intent for DeskFresh lunch boxes.",
+      "Review objections about healthy lunches before spending."
+    ]
+  },
+  "do_not_start_with": [
+    "Avoid a large healthy lunches inventory before learning.",
+    "Do not start operating before official requirements are confirmed.",
+    "Avoid paid promotion for DeskFresh lunch boxes before testing the message."
+  ],
+  "instead_do": [
+    "Interview office workers in Abu Dhabi about recurring frustrations.",
+    "Create an illustrative healthy lunches offer without selling.",
+    "Collect no-payment reservations for DeskFresh lunch boxes."
+  ],
+  "seven_day_plan": [
+    {
+      "day": 1,
+      "focus": "Define target customer",
+      "action": "Define the office workers in Abu Dhabi segment and its healthy lunches alternative.",
+      "output": "DeskFresh lunch boxes day 1 experiment record.",
+      "time_needed": "One to two hours, planning estimate",
+      "success_check": "Record actual DeskFresh lunch boxes responses and remaining gaps without assuming success."
+    },
+    {
+      "day": 2,
+      "focus": "Arrange customer interviews",
+      "action": "Interview five office workers in Abu Dhabi about the last time they chose healthy lunches.",
+      "output": "DeskFresh lunch boxes day 2 experiment record.",
+      "time_needed": "One to two hours, planning estimate",
+      "success_check": "Record actual DeskFresh lunch boxes responses and remaining gaps without assuming success."
+    },
+    {
+      "day": 3,
+      "focus": "Test the offer",
+      "action": "Test a DeskFresh lunch boxes offer message without selling.",
+      "output": "DeskFresh lunch boxes day 3 experiment record.",
+      "time_needed": "One to two hours, planning estimate",
+      "success_check": "Record actual DeskFresh lunch boxes responses and remaining gaps without assuming success."
+    },
+    {
+      "day": 4,
+      "focus": "Collect no-payment intent",
+      "action": "Invite office workers in Abu Dhabi to a no-payment waitlist for DeskFresh lunch boxes.",
+      "output": "DeskFresh lunch boxes day 4 experiment record.",
+      "time_needed": "One to two hours, planning estimate",
+      "success_check": "Record actual DeskFresh lunch boxes responses and remaining gaps without assuming success."
+    },
+    {
+      "day": 5,
+      "focus": "Review evidence",
+      "action": "Review recorded objections about healthy lunches and price.",
+      "output": "DeskFresh lunch boxes day 5 experiment record.",
+      "time_needed": "One to two hours, planning estimate",
+      "success_check": "Record actual DeskFresh lunch boxes responses and remaining gaps without assuming success."
+    },
+    {
+      "day": 6,
+      "focus": "Verify requirements",
+      "action": "Check what approvals apply to DeskFresh lunch boxes before selling.",
+      "output": "DeskFresh lunch boxes day 6 experiment record.",
+      "time_needed": "One to two hours, planning estimate",
+      "success_check": "Record actual DeskFresh lunch boxes responses and remaining gaps without assuming success."
+    },
+    {
+      "day": 7,
+      "focus": "Decide",
+      "action": "Decide whether to adjust DeskFresh lunch boxes based on recorded responses.",
+      "output": "DeskFresh lunch boxes day 7 experiment record.",
+      "time_needed": "One to two hours, planning estimate",
+      "success_check": "Record actual DeskFresh lunch boxes responses and remaining gaps without assuming success."
+    }
+  ],
+  "validation_before_spending": [
+    "Define one segment for DeskFresh lunch boxes.",
+    "Interview office workers in Abu Dhabi about current alternatives.",
+    "Draft a healthy lunches offer message without selling.",
+    "Collect no-payment waitlist intent for DeskFresh lunch boxes."
+  ],
+  "validation_questions": [
+    "What healthy lunches alternative did you use in situation 1, and why?",
+    "What healthy lunches alternative did you use in situation 2, and why?",
+    "What healthy lunches alternative did you use in situation 3, and why?",
+    "What healthy lunches alternative did you use in situation 4, and why?",
+    "What healthy lunches alternative did you use in situation 5, and why?"
+  ],
+  "whatsapp_message": "Hi, I am testing DeskFresh lunch boxes. What do you use for healthy lunches now, and would a no-payment waitlist interest you?",
+  "readiness_report": {
+    "idea": "Healthy pre-ordered lunch boxes for office workers in Abu Dhabi.",
+    "target_customer": "office workers in Abu Dhabi",
+    "best_first_action": "Ask five office workers in Abu Dhabi about their last healthy lunches choice and its current alternative.",
+    "estimated_first_test_cost_aed": 200,
+    "what_not_to_start_with": "Avoid a large healthy lunches inventory before learning.",
+    "main_risk": "The proposed healthy lunches schedule may not fit office workers in Abu Dhabi.",
+    "first_customer_channel": "Ask relevant office workers in Abu Dhabi coordinators for voluntary interview introductions.",
+    "next_step": "Interview five office workers in Abu Dhabi about the last time they chose healthy lunches."
+  },
+  "decision_engine": {
+    "decision": "Validate more",
+    "reason": "This looks promising if interviews confirm demand for DeskFresh lunch boxes.",
+    "next_test_action": "Ask five office workers in Abu Dhabi about their last healthy lunches choice and its current alternative.",
+    "risk_level": "Medium",
+    "recommended_test_budget_aed": 200
+  },
+  "customer_personas": [
+    {
+      "name": "Office workers in Abu Dhabi in proposed segment 1",
+      "cares_about": "Predictable timing and practical healthy lunches choices.",
+      "reach_through": "Voluntary interviews through relevant office workers in Abu Dhabi coordinators.",
+      "ask": "What healthy lunches alternative did you use in situation 1, and why?"
+    },
+    {
+      "name": "Office workers in Abu Dhabi in proposed segment 2",
+      "cares_about": "Predictable timing and practical healthy lunches choices.",
+      "reach_through": "Voluntary interviews through relevant office workers in Abu Dhabi coordinators.",
+      "ask": "What healthy lunches alternative did you use in situation 2, and why?"
+    },
+    {
+      "name": "Office workers in Abu Dhabi in proposed segment 3",
+      "cares_about": "Predictable timing and practical healthy lunches choices.",
+      "reach_through": "Voluntary interviews through relevant office workers in Abu Dhabi coordinators.",
+      "ask": "What healthy lunches alternative did you use in situation 3, and why?"
+    }
+  ],
+  "risk_radar": [
+    {
+      "name": "Customer Demand",
+      "level": "Medium",
+      "reason": "DeskFresh lunch boxes faces an unverified customer demand assumption about healthy lunches.",
+      "fix": "Check the customer demand assumption for DeskFresh lunch boxes before operating."
+    },
+    {
+      "name": "Cost / Financial",
+      "level": "Medium",
+      "reason": "DeskFresh lunch boxes faces an unverified cost / financial assumption about healthy lunches.",
+      "fix": "Check the cost / financial assumption for DeskFresh lunch boxes before operating."
+    },
+    {
+      "name": "Trust / Adoption",
+      "level": "Medium",
+      "reason": "DeskFresh lunch boxes faces an unverified trust / adoption assumption about healthy lunches.",
+      "fix": "Check the trust / adoption assumption for DeskFresh lunch boxes before operating."
+    },
+    {
+      "name": "Execution",
+      "level": "Medium",
+      "reason": "DeskFresh lunch boxes faces an unverified execution assumption about healthy lunches.",
+      "fix": "Check the execution assumption for DeskFresh lunch boxes before operating."
+    },
+    {
+      "name": "Regulation / Compliance",
+      "level": "Medium",
+      "reason": "DeskFresh lunch boxes faces an unverified regulation / compliance assumption about healthy lunches.",
+      "fix": "Check the regulation / compliance assumption for DeskFresh lunch boxes before operating."
+    }
+  ],
+  "pitches": {
+    "ten_sec": "DeskFresh lunch boxes explores flexible healthy lunches choices. We welcome honest feedback before selling.",
+    "thirty_sec": "Office workers in Abu Dhabi may find healthy lunches difficult to arrange. DeskFresh lunch boxes is testing a flexible offer through interviews and no-payment intent. We would value your honest view.",
+    "whatsapp": "Hi, I am testing DeskFresh lunch boxes. What do you use for healthy lunches now, and would a no-payment waitlist interest you?",
+    "instagram": "DeskFresh lunch boxes is exploring healthy lunches alternatives. What would make your current choice easier?"
+  },
+  "founder_passport": {
+    "status": "Ready for non-selling interviews",
+    "first_action": "Ask five office workers in Abu Dhabi about their last healthy lunches choice and its current alternative.",
+    "next_step": "Interview five office workers in Abu Dhabi about the last time they chose healthy lunches."
+  },
+  "steps": [
+    {
+      "step_number": 1,
+      "action": "Interview five office workers in Abu Dhabi about the last time they chose healthy lunches.",
+      "description": "Interview five office workers in Abu Dhabi about the last time they chose healthy lunches.",
+      "estimated_cost_aed": 0,
+      "timeline_days": 1,
+      "who_to_contact": "Voluntary participants from office workers in Abu Dhabi",
+      "location": "Abu Dhabi"
+    },
+    {
+      "step_number": 2,
+      "action": "Invite office workers in Abu Dhabi to a no-payment waitlist for DeskFresh lunch boxes.",
+      "description": "Invite office workers in Abu Dhabi to a no-payment waitlist for DeskFresh lunch boxes.",
+      "estimated_cost_aed": 0,
+      "timeline_days": 1,
+      "who_to_contact": "Voluntary participants from office workers in Abu Dhabi",
+      "location": "Abu Dhabi"
+    },
+    {
+      "step_number": 3,
+      "action": "Review recorded objections about healthy lunches and price.",
+      "description": "Review recorded objections about healthy lunches and price.",
+      "estimated_cost_aed": 0,
+      "timeline_days": 1,
+      "who_to_contact": "Voluntary participants from office workers in Abu Dhabi",
+      "location": "Abu Dhabi"
+    },
+    {
+      "step_number": 4,
+      "action": "Check what approvals apply to DeskFresh lunch boxes before selling.",
+      "description": "Check what approvals apply to DeskFresh lunch boxes before selling.",
+      "estimated_cost_aed": 0,
+      "timeline_days": 1,
+      "who_to_contact": "Voluntary participants from office workers in Abu Dhabi",
+      "location": "Abu Dhabi"
+    },
+    {
+      "step_number": 5,
+      "action": "Prepare a DeskFresh lunch boxes pilot plan only after official checks.",
+      "description": "Prepare a DeskFresh lunch boxes pilot plan only after official checks.",
+      "estimated_cost_aed": null,
+      "timeline_days": 1,
+      "who_to_contact": "Voluntary participants from office workers in Abu Dhabi",
+      "location": "Abu Dhabi"
+    },
+    {
+      "step_number": 6,
+      "action": "Run a DeskFresh lunch boxes pilot only after confirming required approvals are in place.",
+      "description": "Run a DeskFresh lunch boxes pilot only after confirming required approvals are in place.",
+      "estimated_cost_aed": null,
+      "timeline_days": 1,
+      "who_to_contact": "Voluntary participants from office workers in Abu Dhabi",
+      "location": "Abu Dhabi"
+    },
+    {
+      "step_number": 7,
+      "action": "Decide whether to adjust DeskFresh lunch boxes based on recorded responses.",
+      "description": "Decide whether to adjust DeskFresh lunch boxes based on recorded responses.",
+      "estimated_cost_aed": null,
+      "timeline_days": 1,
+      "who_to_contact": "Voluntary participants from office workers in Abu Dhabi",
+      "location": "Abu Dhabi"
+    }
+  ],
+  "total_estimated_cost_aed": null,
+  "total_timeline_days": 7,
+  "first_customer_tip": "Ask one relevant office workers in Abu Dhabi coordinator whether voluntary interview invitations are welcome.",
+  "bilingual_text": {
+    "en": {
+      "summary": "Healthy pre-ordered lunch boxes for office workers in Abu Dhabi.",
+      "problem": "Office workers in Abu Dhabi may find consistent healthy lunches difficult to arrange.",
+      "target_user": "office workers in Abu Dhabi",
+      "solution": "Customers pre-order lunch boxes weekly with flexible ingredients and collection times.",
+      "why_market": "The selected market contains the proposed segment; interview office workers in Abu Dhabi to test local fit.",
+      "first_customer_channel": "Ask relevant office workers in Abu Dhabi coordinators for voluntary interview introductions.",
+      "local_fit_reason": "DeskFresh lunch boxes needs a specific check of local fit with office workers in Abu Dhabi.",
+      "local_fit_improve": "Compare one healthy lunches assumption with the proposed office workers in Abu Dhabi.",
+      "clear_customer_reason": "DeskFresh lunch boxes needs a specific check of clear customer with office workers in Abu Dhabi.",
+      "clear_customer_improve": "Compare one healthy lunches assumption with the proposed office workers in Abu Dhabi.",
+      "low_starting_cost_reason": "DeskFresh lunch boxes needs a specific check of low starting cost with office workers in Abu Dhabi.",
+      "low_starting_cost_improve": "Compare one healthy lunches assumption with the proposed office workers in Abu Dhabi.",
+      "easy_first_step_reason": "DeskFresh lunch boxes needs a specific check of easy first step with office workers in Abu Dhabi.",
+      "easy_first_step_improve": "Compare one healthy lunches assumption with the proposed office workers in Abu Dhabi.",
+      "growth_potential_reason": "DeskFresh lunch boxes needs a specific check of growth potential with office workers in Abu Dhabi.",
+      "growth_potential_improve": "Compare one healthy lunches assumption with the proposed office workers in Abu Dhabi."
+    },
+    "ar": {
+      "summary": "نص ملخص يحتاج إلى اختبار مع الشريحة المختارة.",
+      "problem": "نص ملخص يحتاج إلى اختبار مع الشريحة المختارة.",
+      "target_user": "نص ملخص يحتاج إلى اختبار مع الشريحة المختارة.",
+      "solution": "نص ملخص يحتاج إلى اختبار مع الشريحة المختارة.",
+      "why_market": "نص ملخص يحتاج إلى اختبار مع الشريحة المختارة.",
+      "first_customer_channel": "نص ملخص يحتاج إلى اختبار مع الشريحة المختارة.",
+      "local_fit_reason": "نص ملخص يحتاج إلى اختبار مع الشريحة المختارة.",
+      "local_fit_improve": "نص ملخص يحتاج إلى اختبار مع الشريحة المختارة.",
+      "clear_customer_reason": "نص ملخص يحتاج إلى اختبار مع الشريحة المختارة.",
+      "clear_customer_improve": "نص ملخص يحتاج إلى اختبار مع الشريحة المختارة.",
+      "low_starting_cost_reason": "نص ملخص يحتاج إلى اختبار مع الشريحة المختارة.",
+      "low_starting_cost_improve": "نص ملخص يحتاج إلى اختبار مع الشريحة المختارة.",
+      "easy_first_step_reason": "نص ملخص يحتاج إلى اختبار مع الشريحة المختارة.",
+      "easy_first_step_improve": "نص ملخص يحتاج إلى اختبار مع الشريحة المختارة.",
+      "growth_potential_reason": "نص ملخص يحتاج إلى اختبار مع الشريحة المختارة.",
+      "growth_potential_improve": "نص ملخص يحتاج إلى اختبار مع الشريحة المختارة."
+    }
+  }
+}

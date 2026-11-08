@@ -80,7 +80,7 @@
       <p class="section-help" id="proof-help">Fill in feedback from up to 10 potential customers. The verdict updates live.</p>
       <div class="validation-progress"><div class="progress-label"><strong id="proof-progress-title"></strong><span id="proof-progress-count"></span></div><div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0"><span class="progress-initial" id="proof-progress"></span></div></div>
       <div class="proof-stats" id="proof-stats"></div>
-      <div class="evidence-ladder" id="evidence-ladder"></div><p class="evidence-philosophy" id="evidence-philosophy"></p><div class="evidence-strength" id="evidence-strength"></div>
+      <div class="evidence-ladder" id="evidence-ladder" tabindex="0" role="region" aria-label="Evidence strength"></div><p class="evidence-philosophy" id="evidence-philosophy"></p><div class="evidence-strength" id="evidence-strength"></div>
       <div class="proof-verdict" id="proof-verdict"></div>
       <div class="proof-actions">
         <button class="btn btn-light" id="proofCsvBtn" data-onclick="event-12">Download data (CSV)</button>
@@ -139,8 +139,8 @@
       </div>
     </div>
 
-    <div class="card">
-      <h2 class="sec" id="lbl-fuller">The fuller path (when you're ready)</h2>
+    <details class="card fuller-path" id="fuller-path" open>
+      <summary><h2 class="sec" id="lbl-fuller">The fuller path (when you're ready)</h2></summary>
       <div id="plan-meta" class="meta space-below"></div>
       <div id="steps-list"></div>
       <div class="charts space-above">
@@ -148,7 +148,7 @@
         <div class="chart-box"><h3 id="lbl-cost">Cost breakdown (AED)</h3><div><canvas id="cost-chart" role="img" aria-label="Cost breakdown"></canvas></div></div>
       </div>
       <div class="tip space-above" id="tip"></div>
-    </div>
+    </details>
 
     <div class="card">
       <h2 class="sec" id="lbl-personas">Potential customer segments</h2>

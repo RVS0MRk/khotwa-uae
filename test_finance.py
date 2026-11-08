@@ -1,22 +1,48 @@
 """Independent expected results for the Decimal financial contract."""
+
 import unittest
 from finance import calculate, analyze, FinanceInputError
 
-BASE = dict(equipment="1000", initial_software="200", initial_marketing="300", other_startup="500",
-            working_capital="1000", contingency="10", contingency_mode="percent", available_capital="3000",
-            price="50", units="100", variable_cost="20", fixed_cost="1200", cogs_per_unit="15",
-            cash_collections="4000", cash_operating_outflow="4600")
+BASE = dict(
+    equipment="1000",
+    initial_software="200",
+    initial_marketing="300",
+    other_startup="500",
+    working_capital="1000",
+    contingency="10",
+    contingency_mode="percent",
+    available_capital="3000",
+    price="50",
+    units="100",
+    variable_cost="20",
+    fixed_cost="1200",
+    cogs_per_unit="15",
+    cash_collections="4000",
+    cash_operating_outflow="4600",
+)
 
 
 class FinanceTests(unittest.TestCase):
     def test_expected_example(self):
         r = calculate(BASE)
-        for key, expected in dict(revenue="5000.00", variable_expenses="2000.00", operating_profit="1800.00",
-                                  contribution_per_unit="30.00", contribution_ratio="0.6000", gross_profit="3500.00",
-                                  gross_margin="0.7000", one_time_costs="2000.00", contingency_reserve="200.00",
-                                  startup_capital="3200.00", funding_gap="200.00", operating_cash="800.00",
-                                  monthly_cash_flow="-600.00", runway_months="1.33", break_even_units=40,
-                                  break_even_revenue="2000.00").items():
+        for key, expected in dict(
+            revenue="5000.00",
+            variable_expenses="2000.00",
+            operating_profit="1800.00",
+            contribution_per_unit="30.00",
+            contribution_ratio="0.6000",
+            gross_profit="3500.00",
+            gross_margin="0.7000",
+            one_time_costs="2000.00",
+            contingency_reserve="200.00",
+            startup_capital="3200.00",
+            funding_gap="200.00",
+            operating_cash="800.00",
+            monthly_cash_flow="-600.00",
+            runway_months="1.33",
+            break_even_units=40,
+            break_even_revenue="2000.00",
+        ).items():
             self.assertEqual(r[key], expected, key)
 
     def test_zero_sales(self):
@@ -81,7 +107,9 @@ class FinanceTests(unittest.TestCase):
 
     def test_whole_unit_ceiling(self):
         r = calculate(dict(BASE, fixed_cost="100", price="40", variable_cost="10"))
-        self.assertEqual((r["break_even_units"], r["break_even_revenue"], r["break_even_continuous_units"]), (4, "160.00", "3.3333"))
+        self.assertEqual(
+            (r["break_even_units"], r["break_even_revenue"], r["break_even_continuous_units"]), (4, "160.00", "3.3333")
+        )
 
     def test_scenarios_do_not_mutate_each_other(self):
         scenarios = {"conservative": dict(BASE, units="10"), "base": dict(BASE), "optimistic": dict(BASE, units="200")}

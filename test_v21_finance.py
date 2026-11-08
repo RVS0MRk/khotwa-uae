@@ -1,4 +1,5 @@
 """Independent Round 2 arithmetic examples, including 3,000 seeded cases."""
+
 import random
 import unittest
 from decimal import Decimal, ROUND_CEILING, ROUND_HALF_UP
@@ -18,7 +19,10 @@ class RoundTwoFinanceTests(unittest.TestCase):
                     baseline, comparison = Decimal(s["baseline"]), Decimal(s["comparison"])
                     self.assertNotEqual(baseline, comparison)
                     self.assertEqual(comparison, comparison.to_integral_value())
-                    self.assertEqual(Decimal(s["actual_percent"]), ((comparison-baseline)/baseline*100).quantize(Decimal('.01'), rounding=ROUND_HALF_UP))
+                    self.assertEqual(
+                        Decimal(s["actual_percent"]),
+                        ((comparison - baseline) / baseline * 100).quantize(Decimal(".01"), rounding=ROUND_HALF_UP),
+                    )
                 if units == 3:
                     self.assertEqual(sorted(int(s["comparison"]) for s in cases), [2, 4])
 
@@ -75,7 +79,9 @@ class RoundTwoFinanceTests(unittest.TestCase):
             self.assertEqual(r["payback_status"], "no_positive_benefit")
             self.assertIsNone(r["payback_months"])
         self.assertEqual(calculate(dict(BASE, cash_collections=""))["payback_status"], "unknown")
-        zero = dict(BASE, equipment="0", initial_software="0", initial_marketing="0", other_startup="0", cash_collections="5000")
+        zero = dict(
+            BASE, equipment="0", initial_software="0", initial_marketing="0", other_startup="0", cash_collections="5000"
+        )
         self.assertEqual(calculate(zero)["payback_months"], "0.00")
 
     def test_optional_licensing_once_and_old_records(self):
@@ -114,16 +120,102 @@ class RoundTwoFinanceTests(unittest.TestCase):
             units = rng.choice([0, 1, 2, 3, rng.randrange(4, 1000001)])
             setup, licence, reserve, funds = fils(), fils(), fils(), fils()
             receipts, payments = fils(), fils()
-            raw = {"equipment": str(setup), "initial_software": "0", "initial_marketing": "0", "other_startup": "0", "licensing": str(licence), "working_capital": "0", "contingency": str(reserve), "available_capital": str(funds), "price": str(price), "variable_cost": str(variable), "fixed_cost": str(fixed), "units": str(units), "cash_collections": str(receipts), "cash_operating_outflow": str(payments)}
+            raw = {
+                "equipment": str(setup),
+                "initial_software": "0",
+                "initial_marketing": "0",
+                "other_startup": "0",
+                "licensing": str(licence),
+                "working_capital": "0",
+                "contingency": str(reserve),
+                "available_capital": str(funds),
+                "price": str(price),
+                "variable_cost": str(variable),
+                "fixed_cost": str(fixed),
+                "units": str(units),
+                "cash_collections": str(receipts),
+                "cash_operating_outflow": str(payments),
+            }
             r = calculate(raw)
-            expected = {"revenue": units*price, "operating_profit": units*(price-variable)-fixed, "startup_capital": setup+licence+reserve, "monthly_cash_flow": receipts-payments}
+            expected = {
+                "revenue": units * price,
+                "operating_profit": units * (price - variable) - fixed,
+                "startup_capital": setup + licence + reserve,
+                "monthly_cash_flow": receipts - payments,
+            }
             for key, value in expected.items():
                 self.assertEqual(Decimal(r[key]), value, (case, key))
             if price > variable:
-                self.assertEqual(r["break_even_units"], int((fixed/(price-variable)).to_integral_value(rounding=ROUND_CEILING)), case)
+                self.assertEqual(
+                    r["break_even_units"],
+                    int((fixed / (price - variable)).to_integral_value(rounding=ROUND_CEILING)),
+                    case,
+                )
             if receipts > payments:
-                expected_payback = ((setup+licence)/(receipts-payments)).quantize(Decimal('.01'), rounding=ROUND_HALF_UP)
+                expected_payback = ((setup + licence) / (receipts - payments)).quantize(
+                    Decimal(".01"), rounding=ROUND_HALF_UP
+                )
                 self.assertEqual(Decimal(r["payback_months"]), expected_payback, case)
+
+    def test_display_consistency_20000_cases(self):
+        rng = random.Random(2208)
+        cent = Decimal(".01")
+        for case in range(20000):
+            raw = dict(
+                BASE,
+                equipment=str(Decimal(rng.randrange(10000000)) / 1000),
+                licensing=str(Decimal(rng.randrange(100000)) / 100),
+                contingency=str(Decimal(rng.randrange(10000)) / 100),
+                units=str(rng.randrange(1000001)),
+            )
+            r = calculate(raw)
+            d = lambda key: Decimal(r[key])
+            self.assertEqual(
+                d("startup_capital"), d("one_time_costs") + d("working_capital") + d("contingency_reserve"), case
+            )
+            self.assertEqual(d("funding_gap"), d("startup_capital") - d("available_capital"), case)
+            self.assertEqual(
+                d("operating_cash"), d("available_capital") - d("one_time_costs") - d("contingency_reserve"), case
+            )
+            reserve = (d("one_time_costs") * Decimal(raw["contingency"]) / 100).quantize(cent, rounding=ROUND_HALF_UP)
+            self.assertEqual(d("contingency_reserve"), reserve, case)
+            self.assertEqual(r["inputs"]["units"], str(int(raw["units"])), case)
+            self.assertEqual(d("revenue") - d("variable_expenses") - d("fixed_expenses"), d("operating_profit"))
+
+    def test_rounding_zero_contribution_and_partial_allocation(self):
+        zero = calculate(dict(BASE, price="20", variable_cost="20", fixed_cost="0", equipment="1.005"))
+        self.assertEqual((zero["break_even_status"], zero["break_even_units"]), ("at_break_even", 0))
+        self.assertEqual(zero["inputs"]["equipment"], "1.01")
+        self.assertIn("rounded_input:equipment", zero["warnings"])
+        allocation = analyze(
+            {"inputs": {"available_capital": "1000"}, "allocations": ["100", None, "50", None, None, None]}
+        )["allocation"]
+        self.assertEqual(
+            allocation,
+            {
+                "total": None,
+                "known_total": "150.00",
+                "remaining": "850.00",
+                "unallocated_stages": 4,
+                "over_budget": False,
+            },
+        )
+
+    def test_four_operating_inputs_do_not_invent_startup_spending(self):
+        r = calculate(
+            {
+                "price": "30",
+                "units": "100",
+                "variable_cost": "12",
+                "fixed_cost": "500",
+                "cash_mode": "simplified",
+                "available_capital": "3000",
+            }
+        )
+        self.assertEqual((r["revenue"], r["operating_profit"], r["break_even_units"]), ("3000.00", "1300.00", 28))
+        self.assertIsNone(r["runway_months"])
+        self.assertIsNone(r["payback_months"])
+        self.assertEqual((r["runway_status"], r["payback_status"]), ("unknown", "unknown"))
 
 
 if __name__ == "__main__":
