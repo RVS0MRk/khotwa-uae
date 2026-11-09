@@ -31,10 +31,7 @@ function setupInvestmentWorkspace() {
   });
   panels[0].append(results);
   const intro = uiNode("div", "finance-actions");
-  [
-    [1, "Enter startup costs", "أدخل تكاليف التأسيس"],
-    [2, "Enter sales & expenses", "أدخل المبيعات والمصروفات"],
-  ].forEach(([i, en, ar]) => {
+  [[1, "Add startup costs", "أضف تكاليف التأسيس"]].forEach(([i, en, ar]) => {
     const b = uiNode("button", "btn btn-light");
     b.dataset.en = en;
     b.dataset.ar = ar;

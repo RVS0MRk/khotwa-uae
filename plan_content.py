@@ -3,7 +3,7 @@
 from copy import deepcopy
 import re
 import math
-from content_safety import safe_text, MISSING, language_matches, offending
+from content_safety import safe_text, MISSING, language_matches, offending, filter_tree
 from scoring import normalize_scores, DIMENSIONS
 
 PITCH_LIMITS = {"ten_sec": 25, "thirty_sec": 75, "whatsapp": 45, "instagram": 40}
@@ -72,6 +72,8 @@ def compose_pitches(plan, lang):
 def normalize_plan(raw, inputs, lang, template_factory, sync_costs):
     if not isinstance(raw, dict):
         raise ValueError("Invalid plan")
+    unfiltered = deepcopy(raw)
+    raw = filter_tree(raw)
     original = deepcopy(raw)
     plan = template_factory(deepcopy(raw), inputs, lang)
     idea = str(inputs.get("idea") or "").strip()
@@ -165,9 +167,11 @@ def normalize_plan(raw, inputs, lang, template_factory, sync_costs):
             if not re.search(themes[i], str(source.get("action", "")) + " " + str(source.get("focus", "")), re.I):
                 item["action"] = defaults[i]["action"]
             if list_name == "steps":
+                supplied = unfiltered.get(list_name) or []
+                supplied = supplied[i] if i < len(supplied) and isinstance(supplied[i], dict) else {}
                 item["estimated_cost_aed"] = (
                     source.get("estimated_cost_aed")
-                    if not offending(str(source.get("action", "")) + " " + str(source.get("description", "")))
+                    if not offending(str(supplied.get("action", "")) + " " + str(supplied.get("description", "")))
                     and isinstance(source.get("estimated_cost_aed"), (int, float))
                     and not isinstance(source.get("estimated_cost_aed"), bool)
                     and source.get("estimated_cost_aed") >= 0

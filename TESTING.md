@@ -1,4 +1,4 @@
-# Testing Khotwa V2.2
+# Testing Khotwa V2.2.1
 
 Use Python 3.12 and Node.js 20 or newer. Run commands from the repository root. The application has no frontend build step.
 
@@ -55,6 +55,49 @@ node test_v2.cjs
 node test_v21.cjs
 node test_v22.cjs
 ```
+
+V2.2.1 adds `test_v221_safety.py` and the table in
+`tests/fixtures/v221_safety.json`. These check English/Arabic assertions,
+negations, conditions, goals, every raw model string field, Advisor/discovery,
+and both PDF boundaries. The original personalization and financial assertions
+remain. Run the safety checks independently with:
+
+```sh
+python -m unittest test_v221_safety -v
+```
+
+`test_v22.cjs` also runs `tests/v221_browser.cjs`: Arabic category suggestions,
+manual selection, missing versus zero price, all six layout corrections and
+full-motion frame sampling during theme changes. The axe helper activates the
+audited page, emulates reduced motion, verifies transitions are disabled, and
+waits for fonts, the theme-switch marker and finite animations to settle using
+a bounded rendering-state check. Theme frames are tested separately with
+reduced motion explicitly off. No arbitrary accessibility sleep is used.
+
+For the three consecutive release runs, set `KHOTWA_REVIEW_DIR` to a separate
+ignored directory each time (otherwise captures are overwritten):
+
+```powershell
+$env:PYTHON_EXE = (Resolve-Path .\.venv\Scripts\python.exe).Path
+Remove-Item Env:GROQ_API_KEY -ErrorAction SilentlyContinue
+1..3 | ForEach-Object {
+    $env:KHOTWA_REVIEW_DIR = "outputs/v221-review/windows-$_"
+    node test_v22.cjs
+    if ($LASTEXITCODE -ne 0) { throw "Browser run $_ failed" }
+}
+```
+
+```sh
+export PYTHON_EXE="$PWD/.venv/bin/python"
+unset GROQ_API_KEY
+for run in 1 2 3; do
+  KHOTWA_REVIEW_DIR="outputs/v221-review/linux-$run" node test_v22.cjs || exit 1
+done
+```
+
+The review records actual OS/browser versions and per-run results. A portable
+test implementation does not establish a Linux result: Linux/Chromium 153
+must be run on an available Linux host or CI before claiming that verification.
 
 V2/V2.1 artifacts are ignored under `outputs/`. The older browser suites print their temporary screenshot directories. No customer data is used. The one intentional HTTP 500 in `test_browser.cjs` is its malformed-provider fixture, not a suite failure. Diagnostic ERROR logs in Python similarly exercise failures intentionally.
 

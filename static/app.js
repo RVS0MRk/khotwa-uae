@@ -102,11 +102,7 @@ function restoreSession() {
   restoringSession = true;
   try {
     lang = saved.lang === "ar" ? "ar" : "en";
-    if (saved.theme === "dark")
-      document.documentElement.setAttribute("data-theme", "dark");
-    else document.documentElement.removeAttribute("data-theme");
-    document.getElementById("themeBtn").textContent =
-      saved.theme === "dark" ? "\u2600" : "\u263e";
+    setTheme(saved.theme === "dark");
     applyLang();
     const form = saved.form;
     if (form.idea && !saved.plan) setEntry("existing");
@@ -2630,7 +2626,11 @@ function calcProof() {
   for (const [value, label] of [
     [nYes, t.stInterested + " /10"],
     [nMaybe, t.stMaybe + " /10"],
-    [prices.length ? money(avg) : uiText("Not provided", "لم يقدم"), t.stAvg],
+    [
+      prices.length ? money(avg) : "—",
+      t.stAvg +
+        (prices.length ? "" : " · " + uiText("Not provided", "لم يُقدّم")),
+    ],
     [nPre, t.stPre + " /10"],
   ]) {
     const card = uiNode("div", "stat-card"),
@@ -3121,16 +3121,27 @@ function resetApp() {
   window.scrollTo({ top: 0, behavior: motionBehavior() });
 }
 
+let themeSwitchGeneration = 0;
+function setTheme(dark) {
+  const root = document.documentElement;
+  const generation = ++themeSwitchGeneration;
+  root.classList.add("theme-switching");
+  // Commit the transition override before changing any theme tokens. This
+  // also cancels an in-flight background hover transition on a focused button.
+  void root.offsetWidth;
+  if (dark) root.setAttribute("data-theme", "dark");
+  else root.removeAttribute("data-theme");
+  document.getElementById("themeBtn").textContent = dark ? "\u2600" : "\u263e";
+  void root.offsetWidth;
+  requestAnimationFrame(() =>
+    requestAnimationFrame(() => {
+      if (generation === themeSwitchGeneration)
+        root.classList.remove("theme-switching");
+    }),
+  );
+}
 function toggleTheme() {
-  var r = document.documentElement;
-  var dark = r.getAttribute("data-theme") === "dark";
-  if (dark) {
-    r.removeAttribute("data-theme");
-    document.getElementById("themeBtn").textContent = "\u263e";
-  } else {
-    r.setAttribute("data-theme", "dark");
-    document.getElementById("themeBtn").textContent = "\u2600";
-  }
+  setTheme(document.documentElement.getAttribute("data-theme") !== "dark");
   styleCharts();
   saveSession();
 }

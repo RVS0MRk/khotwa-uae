@@ -234,6 +234,12 @@ body.rtl header h1 {
   transform: translateY(-1px);
   box-shadow: var(--shadow);
 }
+/* Theme token changes must be atomic; ordinary hover motion resumes afterward. */
+html.theme-switching *,
+html.theme-switching *::before,
+html.theme-switching *::after {
+  transition: none !important;
+}
 .btn-primary {
   background: #17634e;
   color: white;
@@ -626,7 +632,7 @@ input[type="range"] {
 .journey {
   display: flex;
   gap: 12px;
-  margin: 20px 0 8px;
+  margin: 4px 0 8px;
 }
 .jstep {
   display: flex;
@@ -2200,12 +2206,14 @@ footer a {
   font-weight: 400 !important;
 }
 .score-measure,
-.score-why {
+.score-why,
+.score-financial-context {
   font-size: 12px;
   color: var(--muted);
 }
 .decision-card,
-.donot-grid {
+.donot-grid,
+.caution-card {
   grid-column: 1/-1;
 }
 .day-card summary {

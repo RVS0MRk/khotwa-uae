@@ -6,6 +6,7 @@ from copy import deepcopy
 from scoring import normalize_scores
 from plan_utils import _int, _money, _sync_path_costs
 from plan_normalize import _normalize_plan, _apply_plan_language, _segment_names
+from content_safety import export_plan
 
 logger = logging.getLogger(__name__)
 
@@ -339,7 +340,7 @@ def build_pdf(p, lang="en"):
     )
     from reportlab.lib.enums import TA_LEFT, TA_RIGHT
 
-    p = _localize_pdf_plan(p, lang)
+    p = export_plan(_localize_pdf_plan(p, lang))
     p["opportunity_score"] = normalize_scores(p.get("opportunity_score"), (p.get("state") or {}).get("idea", ""), lang)
     ar = lang == "ar"
     font_ok = ensure_arabic_font() if ar else False

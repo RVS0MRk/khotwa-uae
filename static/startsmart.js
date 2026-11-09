@@ -12,6 +12,18 @@ function uiNode(tag, className, text) {
   if (text != null) node.textContent = text;
   return node;
 }
+function businessMarketParts(state) {
+  const unknown =
+    /^(?:not sure|unknown|undefined|null|غير متأكد|لست متأكداً|غير معلوم)$/i;
+  const region =
+    state.region === "UAE-wide"
+      ? uiText("UAE-wide", "الإمارات")
+      : T[lang].regions[state.region] || state.region || "";
+  const context = T[lang].contexts[state.context] || state.context || "";
+  return [region, context]
+    .map((s) => s.trim())
+    .filter((s, i, all) => s && !unknown.test(s) && all.indexOf(s) === i);
+}
 function polishLanguage() {
   document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
   setTxt(
@@ -217,15 +229,8 @@ function renderDashboardSummary() {
     ),
   );
   const market = uiNode("div", "summary-market");
-  market.append(
-    uiNode(
-      "b",
-      "",
-      s.region === "UAE-wide"
-        ? uiText("UAE-wide", "الإمارات")
-        : T[lang].regions[s.region] || s.region || "",
-    ),
-    uiNode("span", "", T[lang].contexts[s.context] || s.context || ""),
+  businessMarketParts(s).forEach((part, i) =>
+    market.append(uiNode(i === 0 ? "b" : "span", "", part)),
   );
   const subtitle = uiNode(
     "p",
@@ -234,9 +239,6 @@ function renderDashboardSummary() {
       (currentPlan.business_name_suggestion || ""),
   );
   title.append(subtitle);
-  for (const child of [...market.children])
-    if (/^(?:Not sure|غير متأكد|لست متأكداً)$/.test(child.textContent.trim()))
-      child.remove();
   const actions = document.querySelector(".action-row");
   const menu = uiNode("details", "dashboard-actions"),
     summary = uiNode("summary", "btn btn-light", uiText("Actions", "إجراءات"));

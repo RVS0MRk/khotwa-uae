@@ -4,7 +4,11 @@ const assert = require("node:assert/strict"),
   path = require("node:path");
 const { spawn } = require("node:child_process");
 const { chromium } = require("playwright");
-const root = path.resolve("outputs/v22-review"),
+const { settledVisuals } = require("./tests/browser_stability.cjs");
+const { verifyV221 } = require("./tests/v221_browser.cjs");
+const root = path.resolve(
+    process.env.KHOTWA_REVIEW_DIR || "outputs/v22-review",
+  ),
   shots = path.join(root, "v22");
 const base = "http://127.0.0.1:5007";
 const tabs = [
@@ -65,6 +69,14 @@ async function actions(page) {
     await page.locator(".dashboard-actions summary").click();
 }
 async function audit(page, view, width, locale, theme) {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await settledVisuals(page);
+  assert.equal(
+    await page
+      .locator("#need-idea")
+      .evaluate((e) => getComputedStyle(e).transitionDuration),
+    "0s",
+  );
   const violations = await page.evaluate(async () => {
     const r = await axe.run(document, {
       runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21aa"] },
@@ -470,6 +482,7 @@ async function journey(browser, locale) {
     (await page.locator("#privacy-dialog").innerText()).includes("Groq"),
   );
   await page.addScriptTag({ url: base + "/__test/axe.js" });
+  await settledVisuals(page);
   const privacyViolations = await page.evaluate(async () => {
     const result = await axe.run(document);
     return result.violations
@@ -504,6 +517,7 @@ async function main() {
       await pause(100);
     }
     browser = await chromium.launch({ headless: true });
+    checks += await verifyV221(browser, base, root);
     await journey(browser, "en");
     await journey(browser, "ar");
     // Each matrix context begins cold with no service worker or browser cache.

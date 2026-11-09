@@ -13,6 +13,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle, Spacer, PageBreak
 from finance import analyze, calculate
+from content_safety import export_plan
 from decimal import Decimal, ROUND_HALF_UP
 
 LABELS = {
@@ -187,7 +188,7 @@ def finance_flowables(inputs, lang="en"):
 
 def build_investment_report(payload, lang="en"):
     result = analyze(payload.get("finance", {}))
-    p = payload.get("plan", {})
+    p = export_plan(payload.get("plan", {}))
     notes = payload.get("notes", {})
     style, tx = text_style(lang)
     ar = lang == "ar"

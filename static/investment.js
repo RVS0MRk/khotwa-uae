@@ -549,12 +549,9 @@ function initInvestment() {
   renderFunding();
   setTxt(
     "finance-business-context",
-    (currentPlan.state.idea || "") +
-      " · " +
-      (T[lang].regions[currentPlan.state.region] || currentPlan.state.region) +
-      " · " +
-      (T[lang].contexts[currentPlan.state.context] ||
-        currentPlan.state.context),
+    [currentPlan.state.idea, ...businessMarketParts(currentPlan.state)]
+      .filter(Boolean)
+      .join(" · "),
   );
   showInvestmentSection(investment.section || 0, false, false);
   if (financeResult) renderFinance();

@@ -1,42 +1,66 @@
 // Focused entry flow; no model request is made merely by opening a form.
 const CATEGORY_WORDS = [
+  ["Food & Catering", /food|lunch|meal|cater|restaurant|bakery|coffee/i],
+  ["Agriculture & Farming", /farm|agricultur|crop|hydroponic/i],
+  ["Education & Tutoring", /tutor|course|coding|class|teach|education/i],
+  ["Technology & Digital", /\bapp\b|website|\bAI\b|software|digital|no.code/i],
+  ["Health & Wellness", /health|wellness|fitness|yoga/i],
+  ["Handicrafts & Arts", /craft|art\b|paint|jewel|handmade/i],
+  ["Tourism & Hospitality", /tour|travel|hotel|hospitality/i],
+  ["Retail & Trading", /retail|shop|store|trading/i],
+  ["Services & Maintenance", /wash|clean|repair|maintenance|delivery/i],
+];
+function arabicCategoryPattern(words) {
+  // Unicode boundaries avoid matching فن inside فندق or صحة inside an unrelated
+  // word. Common article/conjunction prefixes still match natural Arabic.
+  return new RegExp(
+    `(?:^|[^\\p{L}\\p{N}])(?:وال|ال|و)?(?:${words})(?=$|[^\\p{L}\\p{N}])`,
+    "u",
+  );
+}
+const ARABIC_CATEGORY_WORDS = [
   [
     "Food & Catering",
-    /food|lunch|meal|cater|restaurant|bakery|coffee|طعام|مطعم|وجبة|وجبات|مخبز|قهوة/i,
+    "طعام|مطعم|مطاعم|وجبة|وجبات|مخبز|مخابز|قهوة|غداء|عشاء|فطور|افطار|اكل|حلويات|كيك|مطبخ|مطابخ",
   ],
-  [
-    "Agriculture & Farming",
-    /farm|agricultur|crop|hydroponic|زراع|مزرع|محاصيل/i,
-  ],
+  ["Agriculture & Farming", "زراعة|زراعي|زراعية|مزرعة|مزارع|محاصيل"],
   [
     "Education & Tutoring",
-    /tutor|course|coding|class|teach|education|تعليم|دروس|تدريس|دورة|برمجة للطلاب/i,
+    "تعليم|تعليمي|تعليمية|دروس|تدريس|دورة|دورات|ورش تعليمية|ورش عمل|ورشة عمل|ورش للاطفال|ورشة للاطفال|برمجة للطلاب",
   ],
   [
     "Technology & Digital",
-    /\bapp\b|website|\bAI\b|software|digital|no.code|تطبيق|موقع|برمجيات|ذكاء اصطناعي|رقمي/i,
+    "تطبيق|تطبيقات|موقع|مواقع|برمجيات|ذكاء اصطناعي|رقمي|رقمية",
   ],
-  ["Health & Wellness", /health|wellness|fitness|yoga|صحة|لياقة|رياضة|يوغا/i],
-  [
-    "Handicrafts & Arts",
-    /craft|art\b|paint|jewel|handmade|حرف|(?:^|\s)فن(?:\s|$)|رسم|مجوهر|يدوي/i,
-  ],
-  [
-    "Tourism & Hospitality",
-    /tour|travel|hotel|hospitality|سياحة|سفر|فندق|ضيافة/i,
-  ],
-  ["Retail & Trading", /retail|shop|store|trading|بيع|تجارة|متجر/i],
-  [
-    "Services & Maintenance",
-    /wash|clean|repair|maintenance|delivery|غسيل|تنظيف|صيانة|إصلاح|توصيل/i,
-  ],
-];
+  ["Health & Wellness", "صحة|صحي|صحية|تغذية|لياقة|رياضة|رياضي|رياضية|يوغا"],
+  ["Handicrafts & Arts", "حرف|حرفية|فن|فنون|رسم|مجوهرات|يدوي|يدوية"],
+  ["Tourism & Hospitality", "سياحة|سياحي|سفر|فندق|فنادق|ضيافة"],
+  ["Retail & Trading", "بيع|تجارة|متجر|متاجر|ملابس"],
+  ["Services & Maintenance", "غسيل|غسل|تنظيف|صيانة|اصلاح|توصيل"],
+].map(([category, words]) => [category, arabicCategoryPattern(words)]);
+function detectBusinessCategory(idea) {
+  const normalized = String(idea)
+    .normalize("NFKC")
+    .replace(/[\u0610-\u061a\u064b-\u065f\u0670\u0640]/g, "")
+    .replace(/[أإآٱ]/g, "ا")
+    .replace(/ى/g, "ي");
+  // Use the same ordered category precedence in either language. Food context
+  // wins over a healthy adjective; children alone never implies Education.
+  return (
+    CATEGORY_WORDS.find(
+      ([category, english]) =>
+        english.test(idea) ||
+        ARABIC_CATEGORY_WORDS.find(([key]) => key === category)[1].test(
+          normalized,
+        ),
+    )?.[0] || "Other"
+  );
+}
 function suggestCategory() {
   const c = document.getElementById("category");
   if (c.dataset.touched === "true") return;
   const idea = document.getElementById("idea").value;
-  const key =
-    CATEGORY_WORDS.find(([, pattern]) => pattern.test(idea))?.[0] || "Other";
+  const key = detectBusinessCategory(idea);
   c.selectedIndex = T.en.categories.indexOf(key) + 1;
   setTxt(
     "category-hint",
