@@ -1,0 +1,50 @@
+{
+  "unsafe_en": [
+    "Our tutoring service reached 75 subscribers during its first week.",
+    "A local investor invested AED 90,000 in our repair business.",
+    "The booking platform secured contracts with five hotels.",
+    "Monthly revenue grew steadily throughout the spring.",
+    "The pilot demonstrated that families want our learning kits.",
+    "Our subscription is already profitable in Sharjah.",
+    "More than 80 members recommend our fitness classes.",
+    "Several schools signed annual agreements for the software.",
+    "We raised seed funding for the delivery platform.",
+    "Office teams ordered all of our available meal batches.",
+    "Three hundred users subscribed to our scheduling tool.",
+    "The survey found that parents prefer our weekend workshops.",
+    "Customers booked every available cleaning slot yesterday.",
+    "Our craft store attracted regular buyers from across Dubai.",
+    "Local market demand is firmly established."
+  ],
+  "unsafe_ar": [
+    "استثمر مستثمر محلي 80,000 درهم في منصة التعليم.",
+    "نمت إيرادات متجرنا خلال الأسابيع الماضية.",
+    "اشترك 70 مستخدمًا في خدمة المواعيد.",
+    "وقعت خمس مدارس عقود اشتراك سنوية معنا.",
+    "أثبتت التجربة أن العائلات تفضل عرضنا.",
+    "ارتفعت مبيعات الوجبات بنسبة 30%.",
+    "خدمتنا مربحة منذ الشهر الأول.",
+    "حجز العملاء كل المواعيد المتاحة لهذا الأسبوع.",
+    "التزم المستثمرون بتمويل مشروع التوصيل.",
+    "أكثر من 200 عميل يوصون بمتجرنا."
+  ],
+  "safe_en": [
+    "If two schools sign contracts, compare the actual support costs.",
+    "Our tutoring service has not reached its subscriber target yet.",
+    "Could a local investor fund an early prototype?",
+    "Plan a survey to measure whether parents prefer weekend workshops.",
+    "We expect revenue to grow only if repeat orders materialise.",
+    "No investor has committed funding to this idea.",
+    "Ask customers how often they booked a cleaner last year.",
+    "The goal is 50 subscriptions; this is a target, not achieved traction."
+  ],
+  "safe_ar": [
+    "إذا وقعت مدرستان عقودًا فراجع تكلفة الدعم الفعلية.",
+    "لم يصل متجرنا إلى هدف المبيعات بعد.",
+    "هل يمكن أن يمول مستثمر نموذجًا أوليًا؟",
+    "نخطط لدراسة لمعرفة ما إذا كانت العائلات تفضل ورش نهاية الأسبوع.",
+    "لا يوجد تمويل ملتزم به لهذا المشروع.",
+    "اسأل العملاء عن آخر مرة حجزوا فيها خدمة تنظيف.",
+    "هدفنا 50 اشتراكًا وهو هدف افتراضي وليس نتيجة محققة."
+  ]
+}

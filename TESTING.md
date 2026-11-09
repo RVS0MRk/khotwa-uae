@@ -1,4 +1,4 @@
-# Testing Khotwa V2.2.1
+# Testing Khotwa V2.2.2
 
 Use Python 3.12 and Node.js 20 or newer. Run commands from the repository root. The application has no frontend build step.
 
@@ -102,6 +102,26 @@ must be run on an available Linux host or CI before claiming that verification.
 V2/V2.1 artifacts are ignored under `outputs/`. The older browser suites print their temporary screenshot directories. No customer data is used. The one intentional HTTP 500 in `test_browser.cjs` is its malformed-provider fixture, not a suite failure. Diagnostic ERROR logs in Python similarly exercise failures intentionally.
 
 ## Live integration and deployment
+
+V2.2.2 adds `test_v222_safety.py`, the unchanged V2.2.1 test file with its expanded
+fixture, and the separate pre-authored `tests/fixtures/v222_heldout.json`.
+The held-out acceptance test requires at least 90% removal of fabricated
+outcomes and 100% survival of safe sentences. It does not assert that every
+held-out unsafe case passes. See `docs/V22_2_REVIEW.md` for the actual miss.
+The fixture's SHA-256 is checked with LF-normalized text so fresh LF/CRLF
+checkouts use the same immutable-content comparison.
+
+```sh
+python -m unittest test_v221_safety test_v222_safety test_v222_heldout -v
+python scripts/evaluate_v222_safety.py
+python scripts/evaluate_v222_safety.py --fixture tests/fixtures/v221_safety.json
+```
+
+The evaluator imports only the local filter: it reads no key, imports no Flask
+configuration and calls no provider. Its JSON includes each result and source
+hashes. `test_v22.cjs` now retains all prior checks and adds footer geometry,
+eight footer captures and Arabic tourism/education precedence checks. Use the
+three-run commands above with separate `KHOTWA_REVIEW_DIR` directories.
 
 `test_api.py` is an explicit live Groq connection check, not a unittest test case. Run `python test_api.py` only with an intentionally configured environment key. It consumes a real request. Mock suite success does not establish model fluency, real response latency, Render resource usage or real phone behavior. Do not use `secret.txt` to run automated checks.
 

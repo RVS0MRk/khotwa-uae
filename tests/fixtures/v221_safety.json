@@ -19,7 +19,19 @@
     "We already have 40 pre‑orders.",
     "No advertising needed demand is proven.",
     "Not only demand is proven, the idea is viable.",
-    "Demand is not only proven but growing."
+    "Demand is not only proven but growing.",
+    "Our waitlist already has 230 sign-ups.",
+    "Over 300 office workers have already joined the waitlist.",
+    "Customers are already paying AED 35 per box.",
+    "The product has achieved product-market fit.",
+    "Sales grew 25% last month.",
+    "Three corporate clients have signed contracts with us.",
+    "Investors have committed AED 200,000.",
+    "Interviews confirmed that 9 out of 10 workers would buy.",
+    "This business is a proven money-maker.",
+    "Demand here is clearly established.",
+    "We've sold out every batch so far.",
+    "Hundreds of customers trust DeskFresh."
   ],
   "safe_en": [
     "Customers pre-order lunch boxes weekly.",
@@ -40,7 +52,14 @@
     "An unverified assumption of strong demand needs customer interviews.",
     "If the idea is validated, compare the recorded evidence.",
     "Do not start operating before official requirements are confirmed.",
-    "The business is not guaranteed to succeed."
+    "The business is not guaranteed to succeed.",
+    "If 10 of 20 interviewees join the waitlist, demand may be worth testing further.",
+    "Until customers pay, the idea remains unproven.",
+    "A target of 30 sign-ups would suggest early interest.",
+    "Ask whether office workers have already tried meal subscriptions.",
+    "Unless interviews confirm demand, do not buy equipment.",
+    "Check whether demand is proven before you spend.",
+    "Track how many people join the waitlist this week."
   ],
   "unsafe_ar": [
     "الفكرة مؤكدة وناجحة.",
@@ -57,7 +76,13 @@
     "لا نحتاج إلى إعلان، الطلب مؤكد.",
     "إذا أعجبتك الخطة، لدينا 40 طلبًا مسبقًا.",
     "لا نحتاج إعلانات الطلب مؤكد.",
-    "موظفو المكاتب لديهم 40 طلبًا مسبقًا."
+    "موظفو المكاتب لديهم 40 طلبًا مسبقًا.",
+    "انضم أكثر من 300 موظف إلى قائمة الانتظار بالفعل.",
+    "العملاء يدفعون بالفعل 35 درهمًا لكل صندوق.",
+    "حققنا مبيعات بقيمة 10,000 درهم الشهر الماضي.",
+    "وقّع ثلاثة عملاء من الشركات عقودًا معنا.",
+    "الإقبال على الخدمة كبير ومؤكد.",
+    "بعنا كل الكميات حتى الآن."
   ],
   "safe_ar": [
     "يطلب العملاء صناديق الغداء مسبقًا كل أسبوع.",
@@ -71,6 +96,11 @@
     "نخطط لأن يكون لدينا 40 مشتركًا كهدف افتراضي.",
     "نقترح اشتراكًا أسبوعيًا لصناديق الغداء مع مواعيد استلام مرنة.",
     "قد تساعد وجبات الغداء الصحية موظفي المكاتب.",
-    "لا يوجد دليل على أن الطلب مؤكد."
+    "لا يوجد دليل على أن الطلب مؤكد.",
+    "إذا انضم 10 أشخاص إلى قائمة الانتظار فقد يستحق الطلب اختبارًا إضافيًا.",
+    "حتى يدفع العملاء، تبقى الفكرة غير مثبتة.",
+    "اسأل الموظفين هل جربوا اشتراكات الوجبات من قبل.",
+    "تحقق مما إذا كان الطلب مثبتًا قبل أن تنفق.",
+    "هدفنا الوصول إلى 30 تسجيلًا كمؤشر أولي."
   ]
 }

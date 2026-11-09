@@ -1998,6 +1998,14 @@ footer a {
 /* Static layout helpers replace inline template styles. */
 .footer-links {
   margin-top: 0.4rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 20px;
+}
+.footer-links a {
+  margin: 0;
 }
 .advisor-suggestions {
   padding: 0.75rem 0.9rem 0;

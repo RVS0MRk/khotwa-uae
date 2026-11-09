@@ -45,6 +45,124 @@ _TRACTION_UNIT = (
     r"(?:pre[ -]?orders?|orders?|customers?|clients?|users?|sign[ -]?ups?|reservations?|subscribers?|members?)"
 )
 _COUNT = r"\d[\d,]*(?:\s*\+)?"
+# Categories, not a list of complete claims: a realised state/action plus its
+# business context. Present-tense model descriptions ('customers pre-order')
+# are deliberately distinct from reported outcomes ('customers have ordered').
+_BUSINESS_OBJECT = re.compile(
+    r"\b(?:customers?|clients?|users?|people|workers?|members?|subscribers?|sign[ -]?ups?|waitlist|"
+    r"orders?|pre[ -]?orders?|subscriptions?|bookings?|purchases?|payments?|buyers?|batches|batch|sales|revenue|profits?|contracts?|agreements?|investors?|"
+    r"funding|aed|demand|market|product[ -]market fit|money[ -]maker|interviews?|surveys?|pilot|"
+    r"research|data|tests?|business|product|service)\b|"
+    r"(?<!\w)(?:وال|ال|و|بال|ل)?(?:عملاء|عميل|مشتركين|مشتركون|مشترك|موظف|موظفين|موظفون|"
+    r"مستخدم|مستخدمين|اشخاص|قائمة الانتظار|طلبات|طلب|كميات|دفعات|مبيعات|ايرادات|ارباح|عقود|اتفاقيات|"
+    r"مستثمر|مستثمرين|مستثمرون|تمويل|درهم|الاقبال|اقبال|سوق|مقابلات|تجربة|دراسة|بيانات|خدمة|"
+    r"مشروع|اشتراكات|حجوزات|مشترين)(?:نا|هم|ه|ا|ات)?(?!\w)",
+    re.I,
+)
+_ACHIEVED = re.compile(
+    r"\b(?:sold(?: out)?|signed|joined|paid|paying|committed|invested|raised|grew|achieved|attracted|"
+    r"secured|reached|booked|ordered|subscribed|trust(?:s|ed)?|confirmed|showed|established|profitable|"
+    r"product[ -]market fit|money[ -]maker|already)\b|"
+    r"(?<!\w)(?:و)?(?:حقق(?:نا|ت|وا)?|بعنا|باع(?:وا|ت)?|وقع(?:نا|ت|وا)?|انضم(?:وا|ت)?|"
+    r"يدفعون|دفع(?:وا|نا|ت)?|استثمر(?:نا|وا|ت)?|التزم(?:وا|نا|ت)?|نمت|ارتفعت|"
+    r"اشترك(?:وا|ت|نا)?|حجز(?:وا|ت|نا)?|مؤكد(?:ة|ون)?|ثابت(?:ة)?|بالفعل|ارباح|مربح(?:ة)?)(?!\w)",
+    re.I,
+)
+_EVIDENCE_SOURCE = re.compile(
+    r"\b(?:interviews?|surveys?|(?:our|the) pilot|research|data|tests?)\s+"
+    r"(?:confirmed|showed|found|proved|demonstrated)\b|"
+    r"(?<!\w)(?:اثبتت|اظهرت|اكدت)\s+(?:المقابلات|التجربة|الدراسة|البيانات)(?!\w)",
+    re.I,
+)
+_DEMAND_CERTAINTY = re.compile(
+    r"(?:\b(?:demand|market)\b|(?<!\w)(?:الطلب|الاقبال|السوق)(?!\w)).{0,25}?"
+    r"(?:(?:clearly|already|firmly)\s*)?(?P<certainty>established|confirmed|certain|مؤكد|ثابت)",
+    re.I,
+)
+_QUANTIFIED_PEOPLE = re.compile(
+    r"\b(?:over\s+|more than\s+|hundreds of\s+|thousands of\s+|\d[\d,]*\s+|"
+    r"(?:one|two|three|four|five|six|seven|eight|nine|ten|several)\s+)"
+    r"(?:(?:active|corporate|office|paying|regular)\s+){0,2}"
+    r"(?:customers?|clients?|users?|people|workers?|members?|subscribers?)\s+"
+    r"(?:(?:already|actively|regularly|now)\s+)?"
+    r"(?:have|has|are|were|use|choose|recommend|endorse|buy|like|prefer|rely|trust|[a-z]+(?:ed|ing|s))\b|"
+    r"(?<!\w)(?:اكثر من\s+)?\d[\d,]*\s+(?:عميل|عميلا|عملاء|مستخدم|مشترك|موظف|اشخاص)"
+    r"\s+(?:ي|ت)[\u0621-\u064a]{2,}(?!\w)",
+    re.I,
+)
+_CLAUSE_BOUNDARY = re.compile(r"(?<=[.!?؟])\s+|[;؛:،]|,(?!\d)|\b(?:but|however|because|although|and|ولكن|لكن)\b")
+_DIRECTIVE = re.compile(
+    r"^\s*[\"'“‘(]*(?:(?:please|first|then)\s+)?"
+    r"(?:ask|check|track|test|measure|verify|review|record|compare|find out|investigate|"
+    r"aim|target|plan|assume|expect|imagine|suppose|consider)\b|"
+    r"^\s*(?:اسال|تحقق|راجع|اختبر|قس|قارن|تتبع|سجل|نهدف|هدفنا|نخطط|نفترض|نتوقع)(?!\w)",
+    re.I,
+)
+_ASSERTIVE_SUBJECT = re.compile(
+    r"\b(?:this|our|your|the)\s+(?:idea|business|product|market|demand|concept)\s+"
+    r"(?:is|are|has|have|was|were)\b|(?<!\w)(?:الفكرة|المشروع|الطلب|السوق)\s+"
+    r"(?:مؤكد|مثبت|ناجح|مضمون|مربح)",
+    re.I,
+)
+
+
+def _directive_guarded(clause):
+    if not _DIRECTIVE.search(clause):
+        return False
+    # A heading followed by a new factual clause is not a request to check it:
+    # 'Test the offer This idea is validated'. Keep genuine interrogative
+    # complements, including 'Check whether this idea is validated'.
+    for assertion in _ASSERTIVE_SUBJECT.finditer(clause):
+        if not re.search(r"\b(?:whether|if|how|when)\b|(?<!\w)(?:هل|اذا)(?!\w)", clause[: assertion.start()]):
+            return False
+    return True
+
+
+def _outcome_guarded(clause, start=0):
+    """Only this assertion's clause may supply a question, goal or negation."""
+    if clause.rstrip().endswith(("?", "؟")) or _directive_guarded(clause):
+        return True
+    prefix = clause[:start]
+    if re.search(
+        r"\b(?:if|unless|until|whether|would|could|may|might|will|shall|hypothetical\w*|"
+        r"hypothesis|hypotheses|expect(?:s|ed)?|assum(?:e|es|ed|ption)|"
+        r"(?:aim|target|goal)s?\s+(?:is|of|to|for)|plans?\s+to|planned\s+to)\b|"
+        r"(?<!\w)(?:اذا|لو|حتي|هل|افتراض\w*|قد|ربما|سوف|نهدف|نخطط|نتوقع|هدفنا)(?!\w)",
+        prefix,
+    ):
+        return True
+    if re.search(
+        r"\b(?:not|never)\s+(?!only\b)(?:yet\s+|already\s+|been\s+|being\s+)*$|"
+        r"\bno\s+(?:\w+\s+){0,2}(?:customer|client|investor|funding|revenue|profit)s?\s+(?:has\s+|have\s+)?$|"
+        r"\b(?:unverified|unproven)\s+(?:\w+\s+){0,2}$|"
+        r"(?<!\w)لا\s+(?:يوجد|يتوفر)\s+(?:اي\s+)?دليل\s+(?:علي\s+)?(?:ان\s+)?(?:\w+\s+){0,3}$|"
+        r"(?<!\w)(?:لم|لا|ليس|ليست|غير)\s+(?:يتم\s+|تم\s+)?$|"
+        r"(?<!\w)(?:بلا|دون)\s+(?:بيع\s+او\s+)?$",
+        prefix,
+    ):
+        return True
+    return False
+
+
+def _unsupported_outcome(sentence):
+    text = _claim_text(sentence)
+    for clause in _CLAUSE_BOUNDARY.split(text):
+        # A question mark belongs to this sentence only, never a previous one.
+        if clause.rstrip().endswith(("?", "؟")) or _directive_guarded(clause):
+            continue
+        if not _BUSINESS_OBJECT.search(clause):
+            continue
+        matches = list(_ACHIEVED.finditer(clause)) + list(_EVIDENCE_SOURCE.finditer(clause))
+        matches += list(_QUANTIFIED_PEOPLE.finditer(clause))
+        for match in matches:
+            if not _outcome_guarded(clause, match.start()) and not _qualified_claim(clause, match):
+                return True
+        for match in _DEMAND_CERTAINTY.finditer(clause):
+            if not _outcome_guarded(clause, match.start("certainty")) and not _qualified_claim(clause, match):
+                return True
+    return False
+
+
 _EVIDENCE = re.compile(
     r"\b(?:research|surveys?|interviews?)\s+(?:shows?|suggests?|found|confirms?|prove[sd]?)\b|"
     r"\bcustomers?\s+(?:already\s+)?(?:said|reported|told us|love|prefer|are interested)\b|"
@@ -93,6 +211,11 @@ def _qualified_claim(text, match):
         text[: match.start()],
     )[-1]
     suffix = text[match.end() :]
+    # Existing precise patterns use the same guards, scoped to this clause.
+    # A condition or question in a neighbouring clause cannot exempt a fact.
+    local = prefix + _CLAUSE_BOUNDARY.split(text[match.start() :])[0]
+    if _outcome_guarded(local, len(prefix)):
+        return True
     if re.search(
         r"(?:\b(?:not|never)\s+(?:yet\s+)?|"
         r"\b(?:do not|don't|cannot|can't|never)\s+(?:assume|claim|say)\s+(?:\w+\s+){0,3}|"
@@ -142,7 +265,7 @@ def offending(sentence):
         re.I,
     ):
         return True
-    if _unsupported_evidence(sentence):
+    if _unsupported_evidence(sentence) or _unsupported_outcome(sentence):
         return True
     if re.fullmatch(r"(?:mobile )?(?:water.use|waste.disposal|mobile.service) permits?", sentence.strip(" ."), re.I):
         return True

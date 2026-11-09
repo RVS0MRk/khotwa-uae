@@ -6,6 +6,7 @@ const { spawn } = require("node:child_process");
 const { chromium } = require("playwright");
 const { settledVisuals } = require("./tests/browser_stability.cjs");
 const { verifyV221 } = require("./tests/v221_browser.cjs");
+const { verifyV222 } = require("./tests/v222_browser.cjs");
 const root = path.resolve(
     process.env.KHOTWA_REVIEW_DIR || "outputs/v22-review",
   ),
@@ -518,6 +519,7 @@ async function main() {
     }
     browser = await chromium.launch({ headless: true });
     checks += await verifyV221(browser, base, root);
+    checks += await verifyV222(browser, base, root);
     await journey(browser, "en");
     await journey(browser, "ar");
     // Each matrix context begins cold with no service worker or browser cache.

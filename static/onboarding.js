@@ -34,7 +34,10 @@ const ARABIC_CATEGORY_WORDS = [
   ],
   ["Health & Wellness", "صحة|صحي|صحية|تغذية|لياقة|رياضة|رياضي|رياضية|يوغا"],
   ["Handicrafts & Arts", "حرف|حرفية|فن|فنون|رسم|مجوهرات|يدوي|يدوية"],
-  ["Tourism & Hospitality", "سياحة|سياحي|سفر|فندق|فنادق|ضيافة"],
+  [
+    "Tourism & Hospitality",
+    "سياحة|سياحي|سياح|سائح|رحلات|سفاري|جولات|سفر|فندق|فنادق|ضيافة",
+  ],
   ["Retail & Trading", "بيع|تجارة|متجر|متاجر|ملابس"],
   ["Services & Maintenance", "غسيل|غسل|تنظيف|صيانة|اصلاح|توصيل"],
 ].map(([category, words]) => [category, arabicCategoryPattern(words)]);
