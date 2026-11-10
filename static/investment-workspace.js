@@ -126,6 +126,7 @@ function setupInvestmentWorkspace() {
   panels[4].append(sections[3]);
   panels[5].append(sections[5]);
   panels[6].append(sections[4], sections[6]);
+  panels[6].prepend(sections[6].querySelector(".ai-disclosure"));
   layout.remove();
   INVESTMENT_SECTIONS.forEach((pair, i) => {
     const button = uiNode("button");

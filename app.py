@@ -55,12 +55,14 @@ from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 import math
 import ipaddress
 from content_safety import safe_text, MISSING
+from disclosures import AI_DISCLOSURE, PROOF_DISCLOSURE
 from scoring import normalize_scores
 from finance import analyze as analyze_finance, FinanceInputError
 from config import GROQ_URL, MODEL, GROQ_API_KEY, GROQ_COMPLETION_TOKENS
 from groq_client import request_completion, log_failure
 
 app = Flask(__name__)
+app.jinja_env.globals.update(ai_disclosure=AI_DISCLOSURE, proof_disclosure=PROOF_DISCLOSURE)
 app.config["MAX_CONTENT_LENGTH"] = 256 * 1024
 app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 31536000
 

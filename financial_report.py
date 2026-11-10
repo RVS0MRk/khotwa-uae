@@ -14,6 +14,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle, Spacer, PageBreak
 from finance import analyze, calculate
 from content_safety import export_plan
+from disclosures import AI_DISCLOSURE, PROOF_DISCLOSURE
 from decimal import Decimal, ROUND_HALF_UP
 
 LABELS = {
@@ -196,6 +197,29 @@ def build_investment_report(payload, lang="en"):
         "investment-heading", parent=style, fontSize=24, leading=32, spaceAfter=20, keepWithNext=True
     )
     output = [Paragraph(tx("خطوة | ملخص الاستثمار" if ar else "Khotwa | Investment brief"), heading)]
+    note = ParagraphStyle(
+        "evidence-note", parent=style, fontSize=9, leading=13, textColor=colors.HexColor("#556760"), spaceAfter=6
+    )
+    for message in (AI_DISCLOSURE["ar" if ar else "en"], PROOF_DISCLOSURE["ar" if ar else "en"]):
+        if not ar:
+            output.append(Paragraph(tx(message), note))
+            continue
+        # Wrap the fixed Arabic notice in logical order before bidi shaping.
+        # Shaping an entire multi-line paragraph first reverses line order.
+        line = []
+        line_style = ParagraphStyle("evidence-note-line", parent=note, spaceAfter=0)
+        for word in message.split():
+            candidate = " ".join(line + [word])
+            shaped = get_display(arabic_reshaper.reshape(candidate))
+            # The document has 50pt margins plus 6pt frame padding per side;
+            # allow a small rounding margin so Paragraph never rewraps a line.
+            if line and pdfmetrics.stringWidth(shaped, note.fontName, note.fontSize) > A4[0] - 116:
+                output.append(Paragraph(tx(" ".join(line)), line_style))
+                line = []
+            line.append(word)
+        if line:
+            output.append(Paragraph(tx(" ".join(line)), line_style))
+        output.append(Spacer(1, 6))
     state = p.get("state") or {}
     overview = p.get("idea_overview") or {}
     fields = [

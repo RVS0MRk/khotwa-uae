@@ -1,0 +1,5 @@
+<div class="ai-disclosure" role="note"{% if scroll_notice %} tabindex="0"{% endif %}>
+  {% if scroll_notice %}<p data-en="{{ proof_disclosure.en }}" data-ar="{{ proof_disclosure.ar }}">{{ proof_disclosure.en }}</p>{% endif %}
+  <p data-en="{{ ai_disclosure.en }}" data-ar="{{ ai_disclosure.ar }}">{{ ai_disclosure.en }}</p>
+  {% if not scroll_notice %}<p data-en="{{ proof_disclosure.en }}" data-ar="{{ proof_disclosure.ar }}">{{ proof_disclosure.en }}</p>{% endif %}
+</div>

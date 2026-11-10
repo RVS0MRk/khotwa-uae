@@ -1,4 +1,4 @@
-# Testing Khotwa V2.2.2
+# Testing Khotwa V2.2.3
 
 Use Python 3.12 and Node.js 20 or newer. Run commands from the repository root. The application has no frontend build step.
 
@@ -102,6 +102,25 @@ must be run on an available Linux host or CI before claiming that verification.
 V2/V2.1 artifacts are ignored under `outputs/`. The older browser suites print their temporary screenshot directories. No customer data is used. The one intentional HTTP 500 in `test_browser.cjs` is its malformed-provider fixture, not a suite failure. Diagnostic ERROR logs in Python similarly exercise failures intentionally.
 
 ## Live integration and deployment
+
+V2.2.3 adds `test_v223.py` and `tests/v223_browser.cjs`. The new checks retain all
+existing tests and verify fixed AI/provenance notes on browser outputs and page 1
+of both PDFs in both languages, executive-summary assumption labels, the two
+precision cases in all five plan fields and Advisor/PDF output, and possessive
+Arabic normalization. `tests/fixtures/v223_pattern_lock.json` locks all nine
+existing compiled detector patterns to the V2.2.2 baseline: vocabulary was not
+expanded. The V2.2.2 held-out fixture and its lock remain unchanged.
+
+```sh
+python -m unittest test_v223 -v
+python scripts/evaluate_v222_safety.py
+```
+
+The notices are application-owned, not filtered model fields. They explicitly
+say Proof Mode observations are self-reported and not independently verified;
+recording an entry does not automatically confirm a business outcome. The
+Advisor note is keyboard-scrollable to preserve room for the conversation.
+The V2.2 browser suite automatically includes 24 additional disclosure states.
 
 V2.2.2 adds `test_v222_safety.py`, the unchanged V2.2.1 test file with its expanded
 fixture, and the separate pre-authored `tests/fixtures/v222_heldout.json`.

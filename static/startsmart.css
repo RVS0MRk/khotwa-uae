@@ -2070,6 +2070,22 @@ footer a {
   margin: 10px 0;
   max-width: 75ch;
 }
+.ai-disclosure {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+  margin: 8px 0 16px;
+}
+.ai-disclosure p + p {
+  margin-top: 6px;
+}
+.chat-panel .ai-disclosure {
+  margin: 0;
+  padding: 4px 16px;
+  max-height: 120px;
+  overflow: auto;
+  flex-shrink: 0;
+}
 .chat-panel .privacy-notice {
   padding: 0 16px;
   font-size: 12px;

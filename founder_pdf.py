@@ -7,6 +7,7 @@ from scoring import normalize_scores
 from plan_utils import _int, _money, _sync_path_costs
 from plan_normalize import _normalize_plan, _apply_plan_language, _segment_names
 from content_safety import export_plan
+from disclosures import AI_DISCLOSURE, PROOF_DISCLOSURE
 
 logger = logging.getLogger(__name__)
 
@@ -637,6 +638,9 @@ def build_pdf(p, lang="en"):
 
     E = []
     # ---- PAGE 1 ----
+    E.append(Paragraph(tx(AI_DISCLOSURE["ar" if ar else "en"]), small))
+    E.append(Paragraph(tx(PROOF_DISCLOSURE["ar" if ar else "en"]), small))
+    E.append(Spacer(1, 8))
     E.append(
         Paragraph(tx("اسم تجاري مقترح · افتراض ذكاء اصطناعي" if ar else "Suggested brand name · AI ASSUMPTION"), small)
     )
@@ -673,6 +677,7 @@ def build_pdf(p, lang="en"):
     )
     E.append(Spacer(1, 8))
     E.append(Paragraph(tx(L["exec"]), h2))
+    overview = p.get("idea_overview") or {}
     idea_source = (
         "AI SUGGESTION SELECTED BY USER" if state.get("idea_source") == "ai_suggestion_selected" else "USER INPUT"
     )
@@ -680,6 +685,13 @@ def build_pdf(p, lang="en"):
         kv(
             [
                 (L["idea"] + " (" + idea_source + ")", state.get("idea") or r.get("idea") or p.get("summary", "")),
+                ("الملخص (AI ASSUMPTION)" if ar else "Summary (AI ASSUMPTION)", p.get("summary", "")),
+                ("المشكلة (AI ASSUMPTION)" if ar else "Problem (AI ASSUMPTION)", overview.get("problem", "")),
+                ("الحل (AI ASSUMPTION)" if ar else "Solution (AI ASSUMPTION)", overview.get("solution", "")),
+                (
+                    "سبب اختيار السوق (AI ASSUMPTION)" if ar else "Why this market (AI ASSUMPTION)",
+                    overview.get("why_market", ""),
+                ),
                 ("الفئة" if ar else "Category", state.get("category") or p.get("_category", "")),
                 ("السوق" if ar else "Market", state.get("region") or p.get("_region", "")),
                 ("نوع المشروع" if ar else "Business context", state.get("context") or p.get("_context", "")),

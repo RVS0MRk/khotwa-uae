@@ -38,7 +38,8 @@ def _claim_text(text):
     text = unicodedata.normalize("NFKC", text).lower().replace("’", "'")
     text = re.sub(r"[\u0610-\u061a\u064b-\u065f\u0670\u0640]", "", text)
     text = re.sub(r"[\u2010-\u2015\u2212]", "-", text)
-    return text.translate(str.maketrans("أإآٱى", "ااااي"))
+    text = text.translate(str.maketrans("أإآٱى", "ااااي"))
+    return _arabic_matching_copy(text)
 
 
 _TRACTION_UNIT = (
@@ -106,6 +107,73 @@ _ASSERTIVE_SUBJECT = re.compile(
 )
 
 
+def _possessive_stem(word):
+    for suffix in ("نا", "ها", "هم", "ك"):
+        if word.endswith(suffix) and len(word) - len(suffix) >= 3:
+            stem = word[: -len(suffix)]
+            return stem[:-1] + "ة" if stem.endswith("ت") else stem
+    return word
+
+
+def _arabic_matching_copy(text):
+    """Inflections only; derive noun membership from the unchanged patterns."""
+
+    def normalize(match):
+        word = match.group()
+        stem = _possessive_stem(word)
+        if stem != word and _BUSINESS_OBJECT.fullmatch(stem):
+            return stem
+        # Accusative tanween leaves an alef after diacritic removal.
+        if word.endswith("ا") and _ACHIEVED.fullmatch(word[:-1]):
+            return word[:-1]
+        return word
+
+    return re.sub(r"[\u0621-\u064a]+", normalize, text)
+
+
+def _possessive_outcome_subject(clause):
+    # A possessive noun directly before an existing outcome state is a subject,
+    # including business names outside the lists. No new noun/verb vocabulary.
+    for outcome in _ACHIEVED.finditer(clause):
+        before = re.search(r"([\u0621-\u064a]+)\s+$", clause[: outcome.start()])
+        if before and _possessive_stem(before[1]) != before[1]:
+            return True
+    return False
+
+
+def _participial_description(clause, outcome):
+    """An attributive participle without a finite completed-result assertion."""
+    if outcome.group() not in {"ordered", "booked", "delivered", "sold", "shipped", "subscribed"}:
+        return False
+    if re.search(r"\b(?:has|have|had|is|are|was|were|did|does|do|already)\b|\d|\b(?:yesterday|last|so far)\b", clause):
+        return False
+    prefix = clause[: outcome.start()].strip()
+    premodifier = prefix.endswith("pre-")
+    if premodifier:
+        prefix = prefix[:-4].strip()
+    if prefix and (_BUSINESS_OBJECT.search(prefix) or re.search(r"\b(?:i|we|you|they|he|she|it)\b", prefix)):
+        return False
+    if not re.match(r"\s+(?!out\b)[a-z]+\b", clause[outcome.end() :]):
+        return False
+    # Post-nominal modifiers introduce how/by whom/for whom the product is
+    # ordered. A following direct object instead makes this a finite result
+    # ('Office teams ordered all ...'), not a noun modifier.
+    if (
+        prefix
+        and not premodifier
+        and not re.match(
+            r"\s+(?:online|by|for|to|from|at|in|through|via|with|on|weekly|monthly|daily)\b",
+            clause[outcome.end() :],
+        )
+    ):
+        return False
+    # Other finite achieved outcomes still invalidate the sentence.
+    return all(
+        m.group() in {"ordered", "booked", "delivered", "sold", "shipped", "subscribed"}
+        for m in _ACHIEVED.finditer(clause)
+    )
+
+
 def _directive_guarded(clause):
     if not _DIRECTIVE.search(clause):
         return False
@@ -132,6 +200,9 @@ def _outcome_guarded(clause, start=0):
     ):
         return True
     if re.search(
+        r"\b(?:none of|not one of)\s+(?:\w+\s+){0,16}(?:(?:has|have|had|is|was)\s+)?(?:ever\s+|yet\s+)?$|"
+        r"\b(?:no one|nobody)\s+(?:(?:has|have|had|is|was)\s+)?(?:ever\s+|yet\s+)?$|"
+        r"\b(?:has|have)\s+not\s+(?:\w+\s+){0,3}$|"
         r"\b(?:not|never)\s+(?!only\b)(?:yet\s+|already\s+|been\s+|being\s+)*$|"
         r"\bno\s+(?:\w+\s+){0,2}(?:customer|client|investor|funding|revenue|profit)s?\s+(?:has\s+|have\s+)?$|"
         r"\b(?:unverified|unproven)\s+(?:\w+\s+){0,2}$|"
@@ -150,11 +221,13 @@ def _unsupported_outcome(sentence):
         # A question mark belongs to this sentence only, never a previous one.
         if clause.rstrip().endswith(("?", "؟")) or _directive_guarded(clause):
             continue
-        if not _BUSINESS_OBJECT.search(clause):
+        if not _BUSINESS_OBJECT.search(clause) and not _possessive_outcome_subject(clause):
             continue
         matches = list(_ACHIEVED.finditer(clause)) + list(_EVIDENCE_SOURCE.finditer(clause))
         matches += list(_QUANTIFIED_PEOPLE.finditer(clause))
         for match in matches:
+            if _participial_description(clause, match):
+                continue
             if not _outcome_guarded(clause, match.start()) and not _qualified_claim(clause, match):
                 return True
         for match in _DEMAND_CERTAINTY.finditer(clause):
