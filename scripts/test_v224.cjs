@@ -1,0 +1,4 @@
+/* Standalone runner for the added V2.2.4 cases; provider is always mocked. */
+const {spawn}=require('node:child_process'),path=require('node:path'),fs=require('node:fs');
+const {chromium}=require('playwright');const {verifyV224}=require('../tests/v224_browser.cjs');
+(async()=>{const root=path.resolve(process.env.KHOTWA_REVIEW_DIR||'outputs/v224-review/focused');fs.mkdirSync(root,{recursive:true});const base='http://127.0.0.1:5017';const server=spawn(process.env.PYTHON_EXE||'python',['test_browser_server.py'],{env:{...process.env,TEST_PORT:'5017',V22_RICH:'1',GROQ_API_KEY:'test-only-placeholder'},windowsHide:true,stdio:'ignore'});let b;try{for(let i=0;i<80;i++){try{if((await fetch(base+'/health')).ok)break}catch{}await new Promise(r=>setTimeout(r,100))}b=await chromium.launch();await verifyV224(b,base,root)}finally{await b?.close();server.kill()}})().catch(e=>{console.error(e);process.exitCode=1});

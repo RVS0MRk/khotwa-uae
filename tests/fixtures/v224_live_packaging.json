@@ -1,0 +1,320 @@
+{
+  "business_name_suggestion": "EcoPack Abu Dhabi",
+  "customer_personas": [
+    {
+      "ask": "How much do you spend monthly on disposable packaging?",
+      "cares_about": "Eco‑branding, cost of waste disposal, quick service",
+      "current_alternative": "Home cooking or takeaway",
+      "name": "Independent cafe owner",
+      "potential_need": "Convenient meals at a predictable time",
+      "reach_through": "WhatsApp, local cafe association meetings",
+      "source": "ai_assumption",
+      "why_benefit": "May replace Home cooking or takeaway if convenient meals at a predictable time matters to this segment; test this assumption."
+    },
+    {
+      "ask": "Would a subscription that handles collection and washing fit your workflow?",
+      "cares_about": "Operational simplicity, compliance with Abu Dhabi sustainability guidelines",
+      "current_alternative": "Individual orders or office canteens",
+      "name": "Mid‑size family restaurant manager",
+      "potential_need": "Reliable group lunch ordering",
+      "reach_through": "Phone calls, industry networking events",
+      "source": "ai_assumption",
+      "why_benefit": "May replace Individual orders or office canteens if reliable group lunch ordering matters to this segment; test this assumption."
+    },
+    {
+      "ask": "Do your customers ask for greener packaging options?",
+      "cares_about": "Food safety, customer perception of green practices",
+      "current_alternative": "Self-catering or an existing caterer",
+      "name": "Health‑focused fast‑casual eatery founder",
+      "potential_need": "Flexible portions and timing for a small event",
+      "reach_through": "Instagram DMs, email newsletters",
+      "source": "ai_assumption",
+      "why_benefit": "May replace Self-catering or an existing caterer if flexible portions and timing for a small event matters to this segment; test this assumption."
+    }
+  ],
+  "decision_engine": {
+    "decision": "Validate more",
+    "next_test_action": "Run the 7‑day interview and waitlist plan",
+    "reason": "Key assumptions about demand and regulatory fit are still untested",
+    "recommended_test_budget_aed": "",
+    "risk_level": "Medium"
+  },
+  "do_not_start_with": [
+    "major equipment purchase",
+    "large stock purchase",
+    "expensive marketing",
+    "full website",
+    "large production batch"
+  ],
+  "estimate_note": "Planning estimate — verify costs and requirements before spending.",
+  "estimated_budget_gap_aed": 0,
+  "first_customer_tip": "Leverage personal introductions or local cafe association meetings to get warm introductions to owners.",
+  "first_step_today": "Approach 5‑7 nearby restaurant owners/managers, ask what packaging they currently use, their biggest pain point, and if they'd join a free‑no‑payment waitlist for reusable containers.",
+  "founder_passport": {
+    "first_action": "Interview 5‑7 restaurant owners today",
+    "next_step": "Collect no‑payment reservations via WhatsApp",
+    "status": "Ready to validate, not operate"
+  },
+  "idea_overview": {
+    "evidence": "No customer evidence collected yet. This is a hypothesis to test.",
+    "impact": "Cuts waste fees by up to 30%, improves brand image, and meets UAE sustainability goals.",
+    "problem": "Restaurants in Abu Dhabi face rising waste disposal fees and consumer pressure for greener packaging.",
+    "solution": "Provide a subscription of reusable, biodegradable containers that can be collected, washed, and reused for take‑away orders.",
+    "target_user": "Owners or kitchen managers of small to medium independent restaurants in Abu Dhabi (10‑50 seats).",
+    "why_market": "Abu Dhabi’s Vision 2030 emphasizes sustainability; local restaurants are early adopters of green initiatives."
+  },
+  "instead_do": [
+    "interview 10 people",
+    "create a WhatsApp interest form",
+    "collect no-payment reservations",
+    "verify approvals before commercial operation"
+  ],
+  "opportunity_score": {
+    "assessed_count": 5,
+    "assessed_sum": 19,
+    "clear_customer": {
+      "improve": "Ask interviewees about their current spend on packaging and openness to subscription model.",
+      "reason": "Problem is clear, alternatives exist, but willingness to switch is untested.",
+      "score": 3,
+      "source": "ai_assumption",
+      "status": "provisional"
+    },
+    "easy_first_step": {
+      "improve": "Prepare a concise interview script.",
+      "reason": "The first step is a 15‑minute interview, doable today without any purchase.",
+      "score": 5,
+      "source": "ai_assumption",
+      "status": "provisional"
+    },
+    "growth_potential": {
+      "improve": "Map a simple logistics flow and estimate wash capacity needs.",
+      "reason": "Reusable model can scale, but logistics (collection, washing) may become capacity constraints.",
+      "score": 3,
+      "source": "ai_assumption",
+      "status": "provisional"
+    },
+    "local_fit": {
+      "improve": "Identify and reach out to at least 3 specific restaurant owners today.",
+      "reason": "Founder targets Abu Dhabi restaurants, aligns with local sustainability push, but lacks proven contacts.",
+      "score": 4,
+      "source": "ai_assumption",
+      "status": "provisional"
+    },
+    "low_starting_cost": {
+      "improve": "Outline a minimal‑cost prototype (e.g., sample container) for later testing.",
+      "reason": "Initial test only needs interview time and a simple WhatsApp form, well within AED 10,000 budget.",
+      "score": 4,
+      "source": "ai_assumption",
+      "status": "provisional"
+    },
+    "maximum": 25,
+    "source": "ai_assumption",
+    "status": "provisional",
+    "total": 19
+  },
+  "pitches": {
+    "instagram": "🌱 Reduce waste, boost your brand! Abu Dhabi restaurants can now switch to reusable take‑away containers with zero upfront cost. Join the waitlist today. SustainableDining EcoPackAE",
+    "ten_sec": "EcoPack offers Abu Dhabi restaurants a subscription of reusable containers, cutting waste fees and boosting green branding.",
+    "thirty_sec": "We provide a hassle‑free subscription of biodegradable, reusable take‑away containers for Abu Dhabi restaurants. They collect, we wash, and they reuse—saving up to 30% on waste disposal costs while meeting the emirate’s sustainability goals. Join our no‑payment waitlist to be first when we launch.",
+    "whatsapp": "Hi, I’m testing EcoPack – a reusable packaging subscription for Abu Dhabi restaurants. Can I ask what you currently use and if you’d join a free waitlist?"
+  },
+  "readiness_report": {
+    "best_first_action": "Interview 5‑7 restaurant owners about current packaging pain points",
+    "estimated_budget_gap_aed": 0,
+    "estimated_first_test_cost_aed": 200,
+    "estimated_setup_cost_aed": 0,
+    "first_customer_channel": "In‑person or WhatsApp outreach to restaurant owners",
+    "idea": "Sustainable packaging for local restaurants.",
+    "main_risk": "Regulatory uncertainty around reusable food‑grade containers",
+    "next_step": "Collect no‑payment reservations after interviews",
+    "target_customer": "Owners/managers of small‑medium independent restaurants",
+    "what_not_to_start_with": "Do not purchase containers or set up a wash facility before licences are verified"
+  },
+  "risk_radar": [
+    {
+      "fix": "Gather clear intent via waitlist before any spend",
+      "level": "Medium",
+      "name": "Customer Demand",
+      "reason": "No evidence yet that restaurants will switch from cheap disposables",
+      "source": "ai_assumption"
+    },
+    {
+      "fix": "Stick to interview and WhatsApp tools",
+      "level": "Low",
+      "name": "Cost / Financial",
+      "reason": "Initial validation costs are small relative to AED 10,000 budget",
+      "source": "ai_assumption"
+    },
+    {
+      "fix": "Explain cleaning protocol and provide sample visuals",
+      "level": "Medium",
+      "name": "Trust / Adoption",
+      "reason": "Restaurants may doubt durability and hygiene of reusable containers",
+      "source": "ai_assumption"
+    },
+    {
+      "fix": "Map a simple pilot flow and test with one partner later",
+      "level": "Medium",
+      "name": "Execution",
+      "reason": "Logistics of collection and washing could be complex",
+      "source": "ai_assumption"
+    },
+    {
+      "fix": "Check with Abu Dhabi municipality and Food Control Authority before any containers are used",
+      "level": "High",
+      "name": "Regulation / Compliance",
+      "reason": "Unclear if Abu Dhabi authorities require specific food‑grade reusable container approvals",
+      "source": "ai_assumption"
+    }
+  ],
+  "seven_day_plan": [
+    {
+      "action": "Write a concise profile of Abu Dhabi restaurant owners (size, cuisine, pain points)",
+      "day": 1,
+      "focus": "Define target customer",
+      "output": "One‑page target customer sheet",
+      "success_check": "Profile completed and shared",
+      "time_needed": "1–2h · estimate"
+    },
+    {
+      "action": "Meet 5‑7 owners/managers for 15‑minute interviews",
+      "day": 2,
+      "focus": "Arrange customer interviews",
+      "output": "Interview notes with pain points and interest level",
+      "success_check": "Notes captured for each interview",
+      "time_needed": "2–4h · estimate"
+    },
+    {
+      "action": "Send a simple WhatsApp message describing the reusable packaging subscription and link to interest form",
+      "day": 3,
+      "focus": "Test the offer",
+      "output": "Message template and link ready",
+      "success_check": "Message sent to at least 5 contacts",
+      "time_needed": "1–3h · estimate"
+    },
+    {
+      "action": "Track who fills the interest form and records their intent to join waitlist",
+      "day": 4,
+      "focus": "Collect no-payment intent",
+      "output": "List of 5‑10 no‑payment reservations",
+      "success_check": "At least 5 names collected",
+      "time_needed": "Time varies"
+    },
+    {
+      "action": "Analyse interview notes and reservation list for common objections",
+      "day": 5,
+      "focus": "Review evidence",
+      "output": "Evidence summary with top 3 objections",
+      "success_check": "Summary document created",
+      "time_needed": "1–2h · estimate"
+    },
+    {
+      "action": "Research Abu Dhabi municipality and Abu Dhabi Food Control Authority requirements for reusable food containers",
+      "day": 6,
+      "focus": "Verify requirements",
+      "output": "Checklist of required licences/approvals",
+      "success_check": "Checklist completed",
+      "time_needed": "Time varies"
+    },
+    {
+      "action": "Compare demand signals vs regulatory feasibility; decide to continue, pivot, or stop",
+      "day": 7,
+      "focus": "Decide",
+      "output": "Decision memo with next steps",
+      "success_check": "Clear decision recorded",
+      "time_needed": "1h · estimate"
+    }
+  ],
+  "small_test_plan": {
+    "intro": "Validate demand and willingness to join a no‑payment waitlist.",
+    "points": [
+      "Create a one‑page WhatsApp interest form.",
+      "Interview 10 restaurant owners about packaging pain points.",
+      "Present the subscription concept and capture stated intent.",
+      "Collect names for a waitlist of early adopters.",
+      "Review the results before spending"
+    ]
+  },
+  "steps": [
+    {
+      "action": "Conduct targeted interviews",
+      "description": "Create a concise profile of Abu Dhabi restaurant owners",
+      "estimated_cost_aed": 0,
+      "location": "Abu Dhabi",
+      "step_number": 1,
+      "timeline_days": 2,
+      "who_to_contact": "Potential customers"
+    },
+    {
+      "action": "Create interest or waitlist test",
+      "description": "Conduct 5‑7 in‑person or phone interviews",
+      "estimated_cost_aed": 0,
+      "location": "Abu Dhabi",
+      "step_number": 2,
+      "timeline_days": 3,
+      "who_to_contact": "Restaurant owners/managers"
+    },
+    {
+      "action": "Review evidence",
+      "description": "Set up a simple form to capture no‑payment reservations",
+      "estimated_cost_aed": 0,
+      "location": "Abu Dhabi",
+      "step_number": 3,
+      "timeline_days": 1,
+      "who_to_contact": "Potential customers"
+    },
+    {
+      "action": "Verify official requirements",
+      "description": "Gather names and contact info of interested restaurants",
+      "estimated_cost_aed": 0,
+      "location": "Abu Dhabi",
+      "step_number": 4,
+      "timeline_days": 2,
+      "who_to_contact": "Interviewed owners"
+    },
+    {
+      "action": "Prepare smallest lawful pilot",
+      "description": "Summarize pain points, interest level, and objections",
+      "estimated_cost_aed": 0,
+      "location": "Abu Dhabi",
+      "step_number": 5,
+      "timeline_days": 1,
+      "who_to_contact": "Potential partners"
+    },
+    {
+      "action": "Run pilot if permitted",
+      "description": "Check Abu Dhabi municipality & Food Control Authority for reusable container approvals",
+      "estimated_cost_aed": 0,
+      "location": "Online/Abu Dhabi",
+      "step_number": 6,
+      "timeline_days": 3,
+      "who_to_contact": "Relevant government departments"
+    },
+    {
+      "action": "Decide next move",
+      "description": "Based on demand signals and regulatory clearance, choose to continue, pivot or stop",
+      "estimated_cost_aed": 0,
+      "location": "Abu Dhabi",
+      "step_number": 7,
+      "timeline_days": 1,
+      "who_to_contact": "Founder team"
+    }
+  ],
+  "suggested_test_price_aed": 30,
+  "summary": "Eco-friendly, reusable packaging for Abu Dhabi restaurants to reduce waste and cost.",
+  "total_estimated_cost_aed": 0,
+  "total_timeline_days": 12,
+  "validation_before_spending": [
+    "Confirm real pain point with owners",
+    "Capture stated intent without payment",
+    "Verify regulatory requirements before any purchase"
+  ],
+  "validation_questions": [
+    "What packaging do you currently use for take‑away orders?",
+    "What is your biggest cost or hassle related to that packaging?",
+    "If a reusable container subscription could reduce waste fees, would you consider it?",
+    "What price per meal would make the subscription attractive?",
+    "Would you join a no‑payment waitlist to try the service once approved?"
+  ],
+  "whatsapp_message": "Hi, I am testing reusable restaurant packaging in Abu Dhabi. Could I ask about your current alternative and whether you would join a no-payment waitlist?"
+}

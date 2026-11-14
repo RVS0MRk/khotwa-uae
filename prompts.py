@@ -118,6 +118,13 @@ def build_prompt(lang, user_type, region="UAE-wide", context="Not sure"):
         "\n"
         "\n"
         "Rules:\n"
+        "- Prose is prospective planning, research questions or explicit hypotheses, never a record of achieved business outcomes. "
+        "User inputs are unverified assumptions; Proof Mode observations are self-reported; financial outputs are projections. "
+        "Never infer actual revenue, profit, customers, subscriptions, contracts, investments, loans, approvals or verified demand. "
+        "Do not invent numerical savings/performance, free offers, discounts, refunds or delivery commitments. "
+        "Use proposed benefits as questions to test. Keep unrelated useful personalized advice. "
+        "Internal schema/control identifiers must never appear in display strings.\n"
+        "- Preserve user-proposed commitments only verbatim as explicitly attributed, unverified user statements. Never strengthen or add commercial terms.\n"
         "- first_step_today: MUST be specific and customer-facing (interviews about problems, price "
         'or trust), doable today in under 2 hours, and non-operational. NOT vague like "research the '
         'market".\n'

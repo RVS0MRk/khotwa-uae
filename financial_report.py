@@ -14,7 +14,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle, Spacer, PageBreak
 from finance import analyze, calculate
 from content_safety import export_plan
-from disclosures import AI_DISCLOSURE, PROOF_DISCLOSURE
+from disclosures import AI_DISCLOSURE, PROOF_DISCLOSURE, TRANSLATION_NOTICE
 from decimal import Decimal, ROUND_HALF_UP
 
 LABELS = {
@@ -200,7 +200,10 @@ def build_investment_report(payload, lang="en"):
     note = ParagraphStyle(
         "evidence-note", parent=style, fontSize=9, leading=13, textColor=colors.HexColor("#556760"), spaceAfter=6
     )
-    for message in (AI_DISCLOSURE["ar" if ar else "en"], PROOF_DISCLOSURE["ar" if ar else "en"]):
+    messages = [AI_DISCLOSURE["ar" if ar else "en"], PROOF_DISCLOSURE["ar" if ar else "en"]]
+    if p.get("_source_lang") and p["_source_lang"] != lang and p.get("_localization_status") == "fallback":
+        messages.append(TRANSLATION_NOTICE[lang])
+    for message in messages:
         if not ar:
             output.append(Paragraph(tx(message), note))
             continue

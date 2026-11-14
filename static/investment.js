@@ -459,13 +459,30 @@ function financeField(key, value, onchange, prefix) {
   input.value = value ?? "";
   label.htmlFor = input.id;
   input.addEventListener("input", () => {
-    input.removeAttribute("aria-invalid");
+    const peers = !prefix || prefix === "quick" || prefix === "fin"
+      ? [document.getElementById("quick-" + key), document.getElementById("fin-" + key)]
+      : [input];
+    for (const peer of peers) {
+      if (!peer) continue;
+      if (peer !== input) peer.value = input.value;
+      peer.removeAttribute("aria-invalid");
+      peer.removeAttribute("aria-errormessage");
+      const message = document.getElementById(peer.id + "-error");
+      if (message) { message.textContent = ""; message.hidden = true; }
+    }
     if (key === "price" && (!prefix || prefix === "fin" || prefix === "quick"))
       investment.aiPricePrefill = false;
     onchange(input.value);
     scheduleFinance();
   });
-  label.append(input, uiNode("small", "", spec[lang === "ar" ? 3 : 2]));
+  const hint = uiNode("small", "", spec[lang === "ar" ? 3 : 2]);
+  hint.id = input.id + "-hint";
+  input.setAttribute("aria-describedby", hint.id);
+  const error = uiNode("small", "error");
+  error.id = input.id + "-error";
+  error.hidden = true;
+  error.setAttribute("aria-live", "polite");
+  label.append(input, hint, error);
   return label;
 }
 function initInvestment() {
@@ -599,8 +616,7 @@ async function calculateFinance(captureOriginal = false) {
       result = await response.json();
     if (epoch !== financeEpoch) return;
     if (!response.ok) {
-      const input = document.getElementById("fin-" + result.field);
-      input?.setAttribute("aria-invalid", "true");
+      showFinanceFieldError(result.field, captureOriginal === true);
       throw Error(result.field || "input");
     }
     financeResult = result;
@@ -632,6 +648,22 @@ async function calculateFinance(captureOriginal = false) {
   } finally {
     clearTimeout(timer);
   }
+}
+function showFinanceFieldError(key, focus) {
+  const controls = ["quick-", "fin-"].map(p => document.getElementById(p + key)).filter(Boolean);
+  let first;
+  for (const input of controls) {
+    const visible = !!input.getClientRects().length && !input.closest("[hidden]");
+    input.removeAttribute("aria-invalid");
+    input.removeAttribute("aria-errormessage");
+    const message = document.getElementById(input.id + "-error");
+    if (message) { message.hidden = !visible; message.textContent = visible ? uiText("Enter a non-negative number; monthly units must be whole.", "أدخل رقماً غير سالب؛ يجب أن تكون وحدات الشهر صحيحة.") : ""; }
+    if (!visible) continue;
+    input.setAttribute("aria-invalid", "true");
+    input.setAttribute("aria-errormessage", input.id + "-error");
+    first ||= input;
+  }
+  if (focus && first) first.focus({ preventScroll: true });
 }
 function table(target, headers, rows) {
   const wrap = document.getElementById(target);

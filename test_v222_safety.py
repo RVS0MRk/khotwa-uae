@@ -158,6 +158,11 @@ class V222SafetyTests(unittest.TestCase):
                     all_sentences.append(tagged(text, mark))
                     markers[mark] = kind
             body = good + " " + " ".join(all_sentences)
+            from provenance import seal, sources
+            # Only explicitly safe fixture sentences are certified. LEAK
+            # assertions must not inherit a previously published receipt.
+            plan["summary"] = good + " " + " ".join(s for s in all_sentences if "LEAK" not in s)
+            seal(plan, sources({"idea": raw["summary"]}))
             # Both PDF types actually render these fields; bypass /generate to
             # exercise the export boundary independently, including old plans.
             plan["summary"] = body

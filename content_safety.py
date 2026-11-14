@@ -422,7 +422,9 @@ def export_plan(plan):
             return [visit(child, path + (str(i),)) for i, child in enumerate(value)]
         return filter_sentences(value) if isinstance(value, str) else value
 
-    return visit(plan)
+    from material_claims import protect_export
+
+    return protect_export(visit(plan))
 
 
 def clean_tree(value, lang):

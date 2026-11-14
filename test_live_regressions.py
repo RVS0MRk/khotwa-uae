@@ -73,7 +73,13 @@ class LiveRegressions(unittest.TestCase):
         self.assertIn("Office lunch buyers", startsmart._segment_names("Lunch catering", "", "", "en"))
 
     def test_english_pdf_portable_punctuation(self):
-        pdf = startsmart.build_pdf(example_plan(), "en")
+        from provenance import seal, sources
+
+        # Authenticate this known, offline fixture before the export boundary.
+        # Unsigned narrative from older/client-edited plans is intentionally omitted.
+        plan = example_plan()
+        seal(plan, sources(plan=plan))
+        pdf = startsmart.build_pdf(plan, "en")
         reader = PdfReader(pdf)
         text = "\n".join(page.extract_text() for page in reader.pages)
         self.assertEqual(reader.metadata.title, "Khotwa - Founder First-Step Report")

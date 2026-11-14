@@ -15,6 +15,14 @@ def configure_mock_environment():
     import config
 
     config.GROQ_API_KEY = TEST_KEY
+    # Mock only the new external semantic-classification boundary. Production
+    # has no environment switch bypassing it. Publication/source rules still run.
+    import material_claims
+
+    def fixture_classifier(items, _api_key):
+        return {item["id"]: "noun_phrase" for item in items}
+
+    material_claims.classify = fixture_classifier
     if "app" in sys.modules:
         sys.modules["app"].API_KEY = TEST_KEY
 

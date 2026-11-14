@@ -1,0 +1,320 @@
+{
+  "business_name_suggestion": "Abu Dhabi Healthy LunchBox",
+  "customer_personas": [
+    {
+      "ask": "What would make you switch from your current lunch provider?",
+      "cares_about": "Convenient, premium‑quality meals that boost productivity",
+      "current_alternative": "Home cooking or takeaway",
+      "name": "Corporate Executive",
+      "potential_need": "Convenient meals at a predictable time",
+      "reach_through": "LinkedIn and internal corporate newsletters",
+      "source": "ai_assumption",
+      "why_benefit": "May replace Home cooking or takeaway if convenient meals at a predictable time matters to this segment; test this assumption."
+    },
+    {
+      "ask": "How much would you be willing to pay daily for a balanced lunch?",
+      "cares_about": "Affordable healthy options that fit a busy schedule",
+      "current_alternative": "Individual orders or office canteens",
+      "name": "Mid‑level Professional",
+      "potential_need": "Reliable group lunch ordering",
+      "reach_through": "WhatsApp groups and office break‑room flyers",
+      "source": "ai_assumption",
+      "why_benefit": "May replace Individual orders or office canteens if reliable group lunch ordering matters to this segment; test this assumption."
+    },
+    {
+      "ask": "Which menu items are most important for you in a daily lunch box?",
+      "cares_about": "Variety, dietary preferences and easy ordering",
+      "current_alternative": "Self-catering or an existing caterer",
+      "name": "Expat Junior Analyst",
+      "potential_need": "Flexible portions and timing for a small event",
+      "reach_through": "Expat community forums and Instagram",
+      "source": "ai_assumption",
+      "why_benefit": "May replace Self-catering or an existing caterer if flexible portions and timing for a small event matters to this segment; test this assumption."
+    }
+  ],
+  "decision_engine": {
+    "decision": "Validate more",
+    "next_test_action": "Conduct 5‑10 in‑person interviews and capture waitlist sign‑ups via a Google Form.",
+    "reason": "Assumptions about demand and regulatory needs are untested; early interviews are needed.",
+    "recommended_test_budget_aed": 500,
+    "risk_level": "Medium"
+  },
+  "do_not_start_with": [
+    "major equipment purchase",
+    "large stock purchase",
+    "expensive marketing",
+    "full website",
+    "large production batch"
+  ],
+  "estimate_note": "Planning estimate — verify costs and requirements before spending.",
+  "estimated_budget_gap_aed": null,
+  "first_customer_tip": "Leverage existing office networks and ask for referrals – personal introductions increase trust for a new food service.",
+  "first_step_today": "Approach 5–10 office workers in your building, ask what they currently eat for lunch, how much they spend, and whether they'd join a no‑payment waitlist for a healthy lunch‑box subscription.",
+  "founder_passport": {
+    "first_action": "Interview 5‑10 office workers and capture waitlist sign‑ups",
+    "next_step": "Validate demand, then check food‑service licence requirements",
+    "status": "Ready to validate, not operate"
+  },
+  "idea_overview": {
+    "evidence": "No customer evidence collected yet. This is a hypothesis to test.",
+    "impact": "Improves employee wellbeing, reduces lunchtime stress and can lower long‑term health costs for companies.",
+    "problem": "Office workers rely on fast food or expensive take‑away meals, leading to unhealthy eating habits and low productivity.",
+    "solution": "A subscription service delivering a daily, nutritionally‑balanced lunch‑box (protein, veg, whole‑grain) to the office for a fixed monthly fee.",
+    "target_user": "Professionals working in office towers in Abu Dhabi city centre and Al Maryah Island, aged 25‑45, who value convenience and health.",
+    "why_market": "Abu Dhabi’s growing corporate hub, high expatriate population and increasing health awareness create demand for convenient, nutritious meals."
+  },
+  "instead_do": [
+    "interview 10 people",
+    "create a WhatsApp interest form",
+    "collect no-payment reservations",
+    "verify approvals before commercial operation"
+  ],
+  "opportunity_score": {
+    "assessed_count": 5,
+    "assessed_sum": 19,
+    "clear_customer": {
+      "improve": "Interview at least 10 potential users about current lunch spend and pain points.",
+      "reason": "Problem is plausible but alternatives and willingness to pay are untested.",
+      "score": 3,
+      "source": "ai_assumption",
+      "status": "provisional"
+    },
+    "easy_first_step": {
+      "improve": "Prepare a short script and a Google Form for the waitlist.",
+      "reason": "The suggested interview/waitlist action is under 2 hours and requires no equipment.",
+      "score": 5,
+      "source": "ai_assumption",
+      "status": "provisional"
+    },
+    "growth_potential": {
+      "improve": "Check availability of shared kitchen spaces or cloud‑kitchen partners in Abu Dhabi.",
+      "reason": "Subscription model can scale, but kitchen capacity and logistics may become constraints.",
+      "score": 3,
+      "source": "ai_assumption",
+      "status": "provisional"
+    },
+    "local_fit": {
+      "improve": "Validate exact office locations and daily footfall.",
+      "reason": "Founder targets a clear office‑worker segment in Abu Dhabi with a health‑focused offering.",
+      "score": 4,
+      "source": "ai_assumption",
+      "status": "provisional"
+    },
+    "low_starting_cost": {
+      "improve": "Map out exact cost of first test (e.g., printing flyers, small incentives).",
+      "reason": "Initial validation can be done with interview tools and a simple WhatsApp waitlist, well under the 10,000 AED budget.",
+      "score": 4,
+      "source": "ai_assumption",
+      "status": "provisional"
+    },
+    "maximum": 25,
+    "source": "ai_assumption",
+    "status": "provisional",
+    "total": 19
+  },
+  "pitches": {
+    "instagram": "🍱 Office life in Abu Dhabi just got healthier! Fresh, balanced lunch‑boxes delivered to your desk for 30 AED/day. Click the link to join the waitlist and be the first to try. HealthyWorklife AbuDhabiEats",
+    "ten_sec": "Healthy lunch‑boxes delivered daily to Abu Dhabi offices – convenient, balanced meals for just 30 AED a day.",
+    "thirty_sec": "We deliver fresh, nutritionally‑balanced lunch‑boxes to office desks in Abu Dhabi. For 30 AED per day you get a protein, veg and whole‑grain combo, saving you time, money and unhealthy fast‑food cravings. Join our waitlist and be the first to enjoy hassle‑free healthy lunches.",
+    "whatsapp": "Hi! We're launching a healthy lunch‑box subscription for Abu Dhabi office workers. Would you be interested in a daily balanced meal for 30 AED? Can I ask what you currently eat for lunch?"
+  },
+  "readiness_report": {
+    "best_first_action": "Interview 5‑10 office workers and collect no‑payment reservations",
+    "estimated_budget_gap_aed": null,
+    "estimated_first_test_cost_aed": 200,
+    "estimated_setup_cost_aed": null,
+    "first_customer_channel": "WhatsApp groups and LinkedIn posts targeting office staff.",
+    "idea": "Healthy lunch-box subscriptions for office workers in Abu Dhabi.",
+    "main_risk": "Regulatory approval for food handling and uncertain demand",
+    "next_step": "Run the 7‑day validation plan and document required permits",
+    "target_customer": "Office professionals in Abu Dhabi city centre",
+    "what_not_to_start_with": "Do not rent a kitchen or buy bulk food before confirming demand and licences"
+  },
+  "risk_radar": [
+    {
+      "fix": "Gather waitlist numbers and price feedback before scaling",
+      "level": "Medium",
+      "name": "Customer Demand",
+      "reason": "No evidence yet that office workers will pay 30 AED daily",
+      "source": "ai_assumption"
+    },
+    {
+      "fix": "Plan a lean cloud‑kitchen partnership to keep overhead low",
+      "level": "Low",
+      "name": "Cost / Financial",
+      "reason": "Initial validation costs are minimal; main expense is kitchen later",
+      "source": "ai_assumption"
+    },
+    {
+      "fix": "Highlight hygiene certifications and ingredient sourcing in messaging",
+      "level": "Medium",
+      "name": "Trust / Adoption",
+      "reason": "Food safety perception can be a barrier for new providers",
+      "source": "ai_assumption"
+    },
+    {
+      "fix": "Map delivery routes and test a single‑building pilot after approvals",
+      "level": "Medium",
+      "name": "Execution",
+      "reason": "Coordinating daily delivery to multiple office buildings adds logistics complexity",
+      "source": "ai_assumption"
+    },
+    {
+      "fix": "Contact Abu Dhabi Food Control Department to confirm licence requirements before any cooking",
+      "level": "High",
+      "name": "Regulation / Compliance",
+      "reason": "Food‑service activities in Abu Dhabi require municipal approvals that are not yet verified",
+      "source": "ai_assumption"
+    }
+  ],
+  "seven_day_plan": [
+    {
+      "action": "Write a concise persona for Abu Dhabi office workers (age, role, lunch habits)",
+      "day": 1,
+      "focus": "Define target customer",
+      "output": "One‑page persona sheet",
+      "success_check": "Persona includes location, budget range and pain point",
+      "time_needed": "1–2h · estimate"
+    },
+    {
+      "action": "Approach 5–10 colleagues or nearby office staff and ask the interview script",
+      "day": 2,
+      "focus": "Arrange customer interviews",
+      "output": "Interview notes with quotes",
+      "success_check": "At least 5 distinct pain points recorded",
+      "time_needed": "2–4h · estimate"
+    },
+    {
+      "action": "Design a simple image of a weekly menu and price (30 AED per day) and share via WhatsApp/LinkedIn",
+      "day": 3,
+      "focus": "Test the offer",
+      "output": "Message sent to 20 potential users",
+      "success_check": "Message delivered and opened",
+      "time_needed": "1–3h · estimate"
+    },
+    {
+      "action": "Open a Google Form for a no‑payment waitlist and ask for preferred days",
+      "day": 4,
+      "focus": "Collect no-payment intent",
+      "output": "List of at least 5 sign‑ups",
+      "success_check": "Form receives 5+ entries",
+      "time_needed": "Time varies"
+    },
+    {
+      "action": "Summarize interview insights, price reactions and reservation numbers",
+      "day": 5,
+      "focus": "Review evidence",
+      "output": "One‑page evidence summary",
+      "success_check": "Clear yes/no signal on interest",
+      "time_needed": "1–2h · estimate"
+    },
+    {
+      "action": "Research Abu Dhabi municipality and food‑service authority for any licence needed for a cloud‑kitchen or home‑based catering",
+      "day": 6,
+      "focus": "Verify requirements",
+      "output": "List of required permits (if any) and next steps",
+      "success_check": "Documented list of approvals",
+      "time_needed": "Time varies"
+    },
+    {
+      "action": "Compare demand evidence vs. regulatory cost and decide to continue, pivot or stop",
+      "day": 7,
+      "focus": "Decide",
+      "output": "Decision memo (continue, adjust, stop)",
+      "success_check": "Clear next action recorded",
+      "time_needed": "1h · estimate"
+    }
+  ],
+  "small_test_plan": {
+    "intro": "Validate demand and price sensitivity before any kitchen setup.",
+    "points": [
+      "Create a one‑page landing image with menu examples and price.",
+      "Share it in office WhatsApp groups and LinkedIn.",
+      "Collect no‑payment reservations via a Google Form.",
+      "Ask each respondent their current lunch spend and preferred delivery time.",
+      "Review the results before spending"
+    ]
+  },
+  "steps": [
+    {
+      "action": "Define personas and interview script",
+      "description": "Create clear target‑customer profiles and a short interview guide",
+      "estimated_cost_aed": 0,
+      "location": "Abu Dhabi",
+      "step_number": 1,
+      "timeline_days": 2,
+      "who_to_contact": "Potential customers"
+    },
+    {
+      "action": "Create interest or waitlist test",
+      "description": "Ask validation questions and record responses",
+      "estimated_cost_aed": 0,
+      "location": "Abu Dhabi office towers",
+      "step_number": 2,
+      "timeline_days": 3,
+      "who_to_contact": "Office workers"
+    },
+    {
+      "action": "Review evidence",
+      "description": "Google Form or WhatsApp list to capture interest",
+      "estimated_cost_aed": 50,
+      "location": "Abu Dhabi",
+      "step_number": 3,
+      "timeline_days": 2,
+      "who_to_contact": "Interviewees"
+    },
+    {
+      "action": "Verify official requirements",
+      "description": "Create a one‑page summary of demand signals",
+      "estimated_cost_aed": 0,
+      "location": "Abu Dhabi",
+      "step_number": 4,
+      "timeline_days": 1,
+      "who_to_contact": "Relevant official authority"
+    },
+    {
+      "action": "Prepare smallest lawful pilot",
+      "description": "Contact Abu Dhabi municipality food‑control for licence info",
+      "estimated_cost_aed": 0,
+      "location": "Online/phone",
+      "step_number": 5,
+      "timeline_days": 5,
+      "who_to_contact": "Municipality food‑control dept."
+    },
+    {
+      "action": "Run pilot if permitted",
+      "description": "Reach out to cloud‑kitchen providers for cost‑effective space",
+      "estimated_cost_aed": 200,
+      "location": "Abu Dhabi",
+      "step_number": 6,
+      "timeline_days": 7,
+      "who_to_contact": "Cloud‑kitchen operators"
+    },
+    {
+      "action": "Review and decide",
+      "description": "Review actual pilot evidence before the next phase.",
+      "estimated_cost_aed": null,
+      "location": "Abu Dhabi",
+      "step_number": 7,
+      "timeline_days": 7,
+      "who_to_contact": "Regulatory consultant (optional)"
+    }
+  ],
+  "suggested_test_price_aed": 30,
+  "summary": "Fresh, balanced lunch‑box subscriptions delivered daily to office workers in Abu Dhabi.",
+  "total_estimated_cost_aed": null,
+  "total_timeline_days": 12,
+  "validation_before_spending": [
+    "Interview target users before any kitchen rent.",
+    "Collect stated intent (no‑payment reservations) before ordering ingredients.",
+    "Confirm required food‑service licences before any commercial activity."
+  ],
+  "validation_questions": [
+    "What do you currently eat for lunch and how much does it cost?",
+    "What are the biggest frustrations with your current lunch option?",
+    "Would you consider a healthy, ready‑made lunch‑box delivered to your desk for 30 AED per day?",
+    "What menu items would make you sign up for a subscription?",
+    "How likely are you to join a waitlist for a service that starts in the next month?"
+  ],
+  "whatsapp_message": "Hi, I am testing a healthy lunch‑box subscription in Abu Dhabi. Could I ask about your current alternative and whether you would join a no‑payment waitlist?"
+}

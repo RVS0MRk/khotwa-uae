@@ -56,7 +56,7 @@ class V223Tests(unittest.TestCase):
                 "caution": "",
             }
             with patch.object(app, "call_groq", return_value=json.dumps(answer)):
-                r = app.app.test_client().post("/ask", json={"question": "What should I test?", "lang": "en"})
+                r = app.app.test_client().post("/ask", json={"question": "What should I test?", "lang": "en", "plan_context": {"idea": "Pre-ordered healthy lunch boxes delivered to office workers in Abu Dhabi."}})
             self.assertEqual(r.status_code, 200)
             for value in [
                 r.json["answer"]["summary"],
@@ -127,6 +127,8 @@ class V223Tests(unittest.TestCase):
                 plan["first_step_today"] = PRECISION[1]
                 plan["idea_overview"]["problem"] = PRECISION[0]
             # Model/client text cannot override the application-owned notice.
+            from provenance import seal, sources
+            seal(plan, sources({"idea": (plan.get("state") or {}).get("idea", "")}))
             plan["ai_disclosure"] = "This business is independently verified."
             for endpoint, payload in [
                 ("/pdf", dict(plan, _lang=lang)),

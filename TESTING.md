@@ -184,3 +184,47 @@ Get-ChildItem static -Filter *.js | ForEach-Object { node --check $_.FullName }
 Without both the flag and an environment key, this exits before making a request. With them it makes exactly two requests, one EN and one AR, with the existing JSON schema and 5,000-token generation budget; it never reads secret.txt. Output contains only language, latency, final-content token diagnostics and the ratio of cleaned model strings retained by normalization. That ratio includes unsafe/model-structural strings in its denominator, so a low live ratio requires investigation rather than weakening safety. Provider errors are reported by type/diagnostics, never raw model text, reasoning or keys. The unittest exercises this script with mock responses; **the real opt-in command was not run for V2.2**.
 
 Four rich PDFs and all rendered page PNGs are in the review package. Rendering used Poppler and visual inspection; Python also verifies founder score/timeline/cost images exist. No real customer data or academic report is included in test artifacts.
+
+## V2.2.4 verification
+
+```powershell
+Remove-Item Env:GROQ_API_KEY -ErrorAction SilentlyContinue
+$env:PYTHON_EXE = (Resolve-Path .venv/Scripts/python.exe).Path
+$env:PYTHONUTF8 = '1'
+& $env:PYTHON_EXE -m unittest discover -v
+node test_browser.cjs
+node test_redesign.cjs
+node test_v2.cjs
+node test_v21.cjs
+$env:KHOTWA_REVIEW_DIR = 'outputs/v224-run-1'; node test_v22.cjs
+$env:KHOTWA_REVIEW_DIR = 'outputs/v224-run-2'; node test_v22.cjs
+$env:KHOTWA_REVIEW_DIR = 'outputs/v224-run-3'; node test_v22.cjs
+# Faster targeted browser checks, in addition to the required full sequence:
+node scripts/test_v224.cjs
+```
+
+On Windows, ensure the previous fixture's child `test_browser_server.py` has
+exited before rerunning a suite on its port. Verify process identity before
+stopping it; do not stop the user's local application. The packaged PowerShell
+runner performs this check and records each exit code with timestamps. Never
+run the full and targeted V2.2 suites concurrently on the same port.
+
+Discovery retains all 134 baseline methods and adds 16 V2.2.4 methods. The new
+external semantic-classification boundary is mocked, alongside existing mocked
+Groq generation; production policy/source binding and export receipts still run.
+The added fixtures cover actual prior live failures and new EN/AR claims,
+offers, hypotheses, negations and source-attributed user statements. Semantic
+model accuracy itself is not established by these tests. All five browser
+suites remain; V2.2 includes eight additional groups for the seven-ticket fixes.
+
+The review archive contains a reproducible mock-only PDF evidence script,
+actual PDFs, Poppler renders, numerical/coordinate checks and contact sheets.
+The helper's Poppler executable path is machine-specific and must be adjusted
+on another host. Its coordinate checks supplement visual review.
+
+`scripts/live_v224.py --confirm-live` is owner opt-in, **not CI**: ten fictional
+ideas plus ten Advisor questions, no more than 40 actual provider attempts,
+65-second pacing and stop-on-failure. It uses the application's normal local
+key configuration without printing it. Do not run it just to satisfy mock tests.
+See `docs/V22_4_REVIEW.md` for the manual content-review procedure and explicit
+NOT VERIFIED live/deployment limitations.

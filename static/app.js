@@ -68,10 +68,16 @@ function saveSession() {
       proof,
       investment: investmentRecovery(),
     });
+    // Cryptographic receipts/identities are opaque app metadata. Their random
+    // hex digits can resemble a phone number; still inspect every user/content
+    // field, including the source ledger, for contact details and credentials.
+    const privacyText = JSON.stringify(JSON.parse(snapshot), (key, value) =>
+      ["_content_receipt", "_canonical_id"].includes(key) ? undefined : value,
+    );
     // If an idea or generated plan contains contact details or a credential, keep it in memory only.
     if (
       /(?:gsk_|sk-)[A-Za-z0-9_-]{16,}|[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}|(?:\+?971|0)5[0-9\s().-]{8,}/i.test(
-        snapshot,
+        privacyText,
       )
     ) {
       sessionStorage.removeItem(SESSION_KEY);
@@ -252,7 +258,7 @@ async function discoverIdeas() {
   box.replaceChildren();
   startLoader(true);
   const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 45000);
+  const timer = setTimeout(() => ctrl.abort(), 65000);
   try {
     const resp = await fetch("/discover", {
       method: "POST",
@@ -893,11 +899,34 @@ function toggleLang() {
     planVariants[target] &&
     planVariants[target].state?.idea === currentPlan.state?.idea
   )
+  {
+    const previous = currentPlan;
     currentPlan = JSON.parse(JSON.stringify(planVariants[target]));
+    // These are canonical business data, never language-version state.
+    for (const key of ["state", "opportunity_score", "proof_summary", "_financial_inputs", "_preEvidenceDecision"])
+      if (previous[key] !== undefined) currentPlan[key] = structuredClone(previous[key]);
+  }
   lang = target;
   applyLang();
   localizeV2();
+  translationNotice();
   saveSession();
+}
+function translationNotice() {
+  let note = document.getElementById("translation-notice");
+  if (!note) {
+    note = uiNode("p", "finance-notice");
+    note.id = "translation-notice";
+    note.setAttribute("role", "status");
+    document.getElementById("result-nav").after(note);
+  }
+  const incomplete = currentPlan && (currentPlan._source_lang || currentPlan._content_lang) && (currentPlan._source_lang || currentPlan._content_lang) !== lang && currentPlan._localization_status === "fallback";
+  note.hidden = !incomplete;
+  note.textContent = incomplete ? uiText("Some translation is unavailable. Original business content and the same assessment are retained.", "بعض الترجمة غير متاحة. احتُفظ بمحتوى المشروع الأصلي والتقييم نفسه.") : "";
+  if (currentPlan?._verification?.status === "fallback") {
+    note.hidden = false;
+    note.textContent += " " + uiText("AI content verification was unavailable. Planning templates fill the unverified fields.", "تعذر التحقق من محتوى الذكاء الاصطناعي. استُخدمت قوالب تخطيط للحقول غير المتحقق منها.");
+  }
 }
 function updateBudget(v) {
   const l = lang === "ar" ? "الميزانية — " : "Budget — ";
@@ -932,7 +961,7 @@ async function generate() {
     var ctrl = new AbortController();
     var to = setTimeout(function () {
       ctrl.abort();
-    }, 45000);
+    }, 65000);
     var resp = await fetch("/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -979,6 +1008,7 @@ async function generate() {
     document.getElementById("chat-messages").replaceChildren();
     currentPlan = plan;
     showPlan(plan);
+    translationNotice();
     selectPanel(0);
     buildProof();
     if (plan._local) localizedStatus("error", T.en.chatFail, T.ar.chatFail);
@@ -1896,6 +1926,7 @@ function showPlan(rawPlan) {
   syncPathCosts(rawPlan);
   setupDashboard();
   updateDashboardLabels();
+  translationNotice();
   const p = escapePlan(rawPlan);
   const t = T[lang];
   const state = rawPlan.state || {};
@@ -2997,8 +3028,9 @@ async function askQuestion() {
     if (sendBtn) sendBtn.disabled = false;
   }
   try {
-    var ctx = currentPlan
-      ? JSON.stringify(currentPlan)
+    const advisorPlan = currentPlan ? Object.fromEntries(Object.entries(currentPlan).filter(([key]) => !["_content_receipt", "_provenance", "_alternate_plan", "_verification"].includes(key))) : null;
+    var ctx = advisorPlan
+      ? JSON.stringify(advisorPlan)
       : JSON.stringify({
           idea: currentIdea(),
           category: (document.getElementById("category") || {}).value,
@@ -3010,7 +3042,7 @@ async function askQuestion() {
     var ctrl = new AbortController();
     var to = setTimeout(function () {
       ctrl.abort();
-    }, 45000);
+    }, 65000);
     var resp = await fetch("/ask", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

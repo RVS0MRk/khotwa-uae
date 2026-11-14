@@ -1,0 +1,62 @@
+{
+  "unsupported_en": [
+    "Khalifa Fund approved our loan application.",
+    "We closed a pre-seed round of AED 150,000.",
+    "We generated AED 18000 in revenue last month.",
+    "Our first hotel partner signed a supply agreement yesterday.",
+    "The venture received seed backing from two investors.",
+    "A bank has sanctioned the startup's credit facility.",
+    "Recurring receipts now cover all the studio's expenses.",
+    "The subscription roster passed the hundred-member mark.",
+    "A foundation awarded capital to the packaging venture.",
+    "Corporate purchasing teams have executed supply agreements."
+  ],
+  "unsupported_ar": [
+    "وصلت الإيرادات إلى 18,000 درهم في أكتوبر.",
+    "وافقت جهة التمويل على قرض مشروعنا.",
+    "أودع المستثمرون رأس المال المتفق عليه.",
+    "أبرمت شركتنا اتفاقية توريد مع فندق.",
+    "تجاوز عدد المشتركين المئة هذا الشهر.",
+    "بات دخل الاستوديو يغطي مصروفاته بالكامل.",
+    "مُنح المشروع دعماً مالياً من مؤسسة.",
+    "تأكد استعداد أصحاب المطاعم للدفع من المقابلات.",
+    "أصبح لدينا عملاء يدفعون مقابل الخدمة.",
+    "اعتمد المصرف التسهيلات الائتمانية للشركة."
+  ],
+  "promises_en": [
+    "Our packaging reduces costs by up to 30%.",
+    "We provide containers saving up to 30% on waste disposal costs.",
+    "Restaurants can switch with zero upfront cost.",
+    "Get your first robotics class free.",
+    "We deliver every clothing order within 24 hours.",
+    "Every buyer receives a full refund guarantee."
+  ],
+  "promises_ar": [
+    "تخفض عبواتنا التكاليف بنسبة 30٪.",
+    "نقدم نظام جمع مجاني للمطاعم.",
+    "نضمن توصيل الطلب خلال 24 ساعة.",
+    "احصل على أول ورشة روبوتات مجاناً.",
+    "نوفر ضمان استرجاع كامل لجميع الطلبات.",
+    "يمكن للمطاعم الانضمام دون تكلفة أولية."
+  ],
+  "safe_en": [
+    "If restaurant owners report a packaging problem, compare their current alternatives.",
+    "We have not closed a funding round.",
+    "No free delivery is promised.",
+    "Test whether office workers would pay AED 35.",
+    "Ask which container sizes the restaurant currently purchases.",
+    "None of the 10 people you interviewed has paid yet.",
+    "A target of 30 sign-ups would suggest early interest.",
+    "Compare robotics workshop times with parents before renting a venue."
+  ],
+  "safe_ar": [
+    "إذا أبلغ أصحاب المطاعم عن مشكلة في التغليف فقارن البدائل الحالية.",
+    "لم نحصل على تمويل حتى الآن.",
+    "لا نعد بتوصيل مجاني.",
+    "اختبر ما إذا كان موظفو المكاتب سيدفعون 35 درهماً.",
+    "اسأل أصحاب المطاعم عن أحجام العبوات التي يشترونها حالياً.",
+    "لم يدفع أي من الأشخاص العشرة الذين قابلتهم حتى الآن.",
+    "هدفنا الوصول إلى 30 تسجيلًا كمؤشر أولي.",
+    "قارن مواعيد ورش الروبوتات مع أولياء الأمور قبل استئجار مكان."
+  ]
+}

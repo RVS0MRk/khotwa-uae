@@ -1126,13 +1126,19 @@ def _apply_plan_language(plan, bilingual, lang):
             continue
         if isinstance(original, str) and _language_matches(original, lang, idea):
             continue
-        _set_plan_path(plan, path, _plan_language_fallback(key, plan, lang))
+        # Missing translations cannot replace the canonical assessment/content.
         fallback_used = True
     if (plan.get("state") or {}).get("target_customer_source") == "ai_assumption":
         plan["state"]["target_customer"] = plan["readiness_report"].get("target_customer", "")
-    _compose_pitches(plan, lang)
     plan["_localization_status"] = "fallback" if fallback_used else "complete"
+    plan["_presentation_lang"] = lang
+    plan.setdefault("_source_lang", plan.get("_content_lang", lang))
     plan["_content_lang"] = lang
+    if plan["_source_lang"] != lang:
+        from material_claims import prose_items
+        if any(not _language_matches(text, lang, idea) for path, text in prose_items(plan)
+               if not path.endswith(("business_name_suggestion", ".name", ".location"))):
+            plan["_localization_status"] = "fallback"
 
 
 def _safeguard_plan(plan, lang):

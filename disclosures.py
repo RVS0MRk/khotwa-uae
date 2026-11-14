@@ -8,3 +8,8 @@ PROOF_DISCLOSURE = {
     "en": "Proof Mode entries are self-reported observations, not independently verified evidence. Recording them does not automatically confirm customers, payments or other business outcomes.",
     "ar": "إدخالات وضع الإثبات ملاحظات تُبلّغ عنها بنفسك، وليست أدلة متحققًا منها بشكل مستقل. تسجيلها لا يؤكد تلقائيًا وجود عملاء أو مدفوعات أو نتائج أعمال أخرى.",
 }
+
+TRANSLATION_NOTICE = {
+    "en": "Some translation is unavailable. Original business content and the same assessment are retained.",
+    "ar": "بعض الترجمة غير متاحة. احتُفظ بمحتوى المشروع الأصلي والتقييم نفسه.",
+}

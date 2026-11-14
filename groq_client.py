@@ -34,7 +34,7 @@ def safe_api_message(message, api_key):
     return " ".join(message.split())[:500]
 
 
-def request_completion(api_key, messages, *, max_completion_tokens, json_mode=True, temperature=0.7):
+def request_completion(api_key, messages, *, max_completion_tokens, json_mode=True, temperature=0.7, timeout=40):
     diagnostics = {
         "http_status": None,
         "finish_reason": None,
@@ -43,6 +43,11 @@ def request_completion(api_key, messages, *, max_completion_tokens, json_mode=Tr
     }
     if not api_key:
         raise GroqGenerationError("No Groq API key configured", diagnostics)
+    from provider_budget import reserve
+    retry = reserve()
+    if retry:
+        diagnostics.update(local_rate_limited=True, retry_after=retry)
+        raise GroqGenerationError("Local provider-call budget exhausted", diagnostics)
     body = {
         "model": MODEL,
         "messages": messages,
@@ -58,7 +63,7 @@ def request_completion(api_key, messages, *, max_completion_tokens, json_mode=Tr
             GROQ_URL,
             headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
             json=body,
-            timeout=40,
+            timeout=timeout,
         )
     except requests.RequestException as exc:
         # Network exception strings may include request details. Never log them.
@@ -69,6 +74,11 @@ def request_completion(api_key, messages, *, max_completion_tokens, json_mode=Tr
     except ValueError:
         raise GroqGenerationError("Groq returned a non-JSON HTTP response", diagnostics, "JSONDecodeError") from None
     if response.status_code != 200:
+        if response.status_code == 429:
+            try:
+                diagnostics["retry_after"] = min(600, max(1, int(response.headers.get("Retry-After", "60"))))
+            except (ValueError, TypeError):
+                diagnostics["retry_after"] = 60
         error = payload.get("error", {}) if isinstance(payload, dict) else {}
         message = error.get("message") if isinstance(error, dict) else None
         raise GroqGenerationError(safe_api_message(message, api_key), diagnostics, "HTTPError")

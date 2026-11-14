@@ -62,7 +62,11 @@ class QualityUpgradeTests(unittest.TestCase):
                 )
                 for path in khotwa._BILINGUAL_PATHS.values():
                     value = khotwa._plan_path(alternate, path)
-                    self.assertTrue(khotwa._language_matches(value, "ar", idea), (path, value))
+                    # V2.2.4 keeps original personalized copy when translation
+                    # is unavailable; it may not synthesize a different plan.
+                    if not khotwa._language_matches(value, "ar", idea):
+                        self.assertEqual(value, khotwa._plan_path(plan, path))
+                        self.assertEqual(alternate["_localization_status"], "fallback")
                 needs.append(plan["customer_personas"][0]["potential_need"])
         self.assertEqual(len(set(needs)), 3)
 

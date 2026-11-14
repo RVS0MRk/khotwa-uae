@@ -43,32 +43,32 @@ def _short_context(plan_context):
     decision = p.get("decision_engine", {}) or {}
     state = p.get("state", {}) or {}
     bits = {
-        "idea": state.get("idea") or r.get("idea") or p.get("idea") or p.get("summary", ""),
-        "category": state.get("category") or p.get("_category") or p.get("category", ""),
-        "target_customer": state.get("target_customer") or r.get("target_customer", ""),
-        "customer_type": p.get("_user_type") or p.get("user_type", ""),
-        "user_budget_aed_USER_INPUT": state.get("user_budget_aed", p.get("_budget", p.get("budget", ""))),
-        "opportunity_score_out_of_25": score.get("total", ""),
-        "first_step_today": p.get("first_step_today", ""),
-        "main_risk": r.get("main_risk", ""),
-        "identified_risks": "; ".join(
+        "Business idea as entered": state.get("idea") or r.get("idea") or p.get("idea") or p.get("summary", ""),
+        "Chosen category": state.get("category") or p.get("_category") or p.get("category", ""),
+        "Hypothetical customer segment": state.get("target_customer") or r.get("target_customer", ""),
+        "Chosen customer type": p.get("_user_type") or p.get("user_type", ""),
+        "Budget entered by founder (not an AI estimate)": state.get("user_budget_aed", p.get("_budget", p.get("budget", ""))),
+        "Provisional opportunity score (out of 25)": score.get("total", ""),
+        "Proposed first action": p.get("first_step_today", ""),
+        "Risk hypothesis": r.get("main_risk", ""),
+        "Planning risks (not confirmed)": "; ".join(
             f"{x.get('name', '')}: {x.get('reason', '')}" for x in risks[:5] if isinstance(x, dict)
         ),
-        "proof_mode_recorded_evidence_only": proof if proof else {"total_responses": 0},
-        "recommended_next_step": decision.get("next_test_action") or r.get("next_step", ""),
-        "first_customer_channel": r.get("first_customer_channel", ""),
-        "region": state.get("region") or p.get("_region", ""),
-        "business_context": state.get("context") or p.get("_context", ""),
+        "Self-reported Proof Mode observations (not independently verified)": proof if proof else {"total_responses": 0},
+        "Suggested next check": decision.get("next_test_action") or r.get("next_step", ""),
+        "Suggested interview channel": r.get("first_customer_channel", ""),
+        "Selected UAE market": state.get("region") or p.get("_region", ""),
+        "Chosen business context": state.get("context") or p.get("_context", ""),
     }
     if isinstance(p.get("_financial_inputs"), dict):
         try:
             calculated = analyze_finance({"inputs": p["_financial_inputs"]})["base"]
-            bits["financial_calculations_USER_ASSUMPTIONS"] = {
+            bits["Calculated projections from user assumptions, not actual results"] = {
                 k: calculated[k]
                 for k in ("revenue", "operating_profit", "break_even_units", "funding_gap", "runway_months")
             }
         except FinanceInputError:
-            bits["financial_calculations"] = "Inputs invalid; do not invent figures"
+            bits["Financial projection status"] = "Inputs invalid; do not invent figures"
     return "; ".join(f"{k}: {str(v)[:400]}" for k, v in bits.items() if v)[:4300]
 
 
@@ -139,7 +139,8 @@ def _context_recall_answer(question, data, lang):
         "market": bool(re.search(r"\bmarket\b|\bregion\b|\bemirate\b|سوق|إمارة|منطقة", q)),
         "evidence": bool(re.search(r"\bevidence\b|\bproof\b|\bvalidation\b|دليل|أدلة|إثبات|تحقق", q)),
     }
-    if sum(requested.values()) < 3:
+    exact_budget_recall = bool(re.fullmatch(r"\s*(?:what is my budget\??|ما (?:هي )?ميزانيتي[؟?]?)\s*", q))
+    if sum(requested.values()) < 3 and not exact_budget_recall:
         return None
     context = data.get("plan_context") or {}
     try:
@@ -185,7 +186,7 @@ def _context_recall_answer(question, data, lang):
         status = (
             f"{count} إدخالات مسجّلة في وضع الإثبات؛ لا نعرف ما حدث خارج التطبيق."
             if ar
-            else f"{count} entries recorded in Proof Mode; activity outside this app is unknown."
+            else f"{count} entries recorded in Proof Mode; activity outside this app is unknown. Entries are self-reported, not independently verified."
         )
         points.append({"title": "الأدلة" if ar else "Evidence", "text": status})
     previous = bool(re.search(r"\bprevious\b|\bearlier\b|\blast suggestion\b|السابق|السابقة|آخر اقتراح", q))
@@ -254,7 +255,7 @@ def _advisor_budget_provenance(answer, plan_context, lang):
     return fix(answer)
 
 
-def handle_ask(call_groq, logger):
+def handle_ask(call_groq, logger, api_key=""):
     data = dict(request.json or {})
     data["history"] = safe_history(data.get("history", []))
     lang = data.get("lang", "en")
@@ -343,11 +344,34 @@ def handle_ask(call_groq, logger):
                 history.append({"role": item["role"], "content": item["content"][:1200]})
         answer = call_groq(system, question, json_mode=True, history=history, endpoint="/ask")
         parsed = _parse_advisor(answer, lang)
+        from material_claims import verify_model
+        try:
+            supplied_plan = data.get("plan_context", {})
+            supplied_plan = json.loads(supplied_plan) if isinstance(supplied_plan, str) else supplied_plan
+            idea = (supplied_plan.get("state") or {}).get("idea") or supplied_plan.get("idea", "") if isinstance(supplied_plan, dict) else ""
+        except (ValueError, TypeError):
+            idea = ""
+        parsed, verification = verify_model(parsed, {"question": question, "idea": idea}, lang, api_key, logger)
+        parsed["points"] = [p for p in parsed.get("points", []) if p.get("title") and p.get("text")]
+        fallback = _advisor_fallback(lang, question)
+        if parsed["points"] and (not parsed.get("summary") or parsed["summary"] == _advisor_fallback(lang)["summary"]):
+            parsed["summary"] = (
+                "خطوات مقترحة للاختبار؛ لا تؤكد نتائج أعمال." if lang == "ar"
+                else "Suggested checks to try; these do not establish business outcomes."
+            )
+        for key in ("title", "summary", "next_action", "caution"):
+            if not parsed.get(key):
+                parsed[key] = fallback[key]
         if parsed == _advisor_fallback(lang):
             parsed = _advisor_fallback(lang, question)
-        return _advisor_response(_advisor_budget_provenance(parsed, data.get("plan_context"), lang), lang)
+        return _advisor_response(_advisor_budget_provenance(parsed, data.get("plan_context"), lang), lang, verification["status"])
     except Exception as exc:
         log_failure(logger, "/ask", exc, getattr(g, "groq_diagnostics", None))
+        diagnostics = getattr(exc, "diagnostics", {})
+        if diagnostics.get("http_status") == 429 or diagnostics.get("local_rate_limited"):
+            response = jsonify(error="rate_limited" if diagnostics.get("local_rate_limited") else "provider_rate_limited")
+            response.headers["Retry-After"] = str(exc.diagnostics.get("retry_after", 60))
+            return response, 429
         return jsonify({"error": "advisor_unavailable"}), 503
 
 
@@ -432,6 +456,8 @@ def _clean_advisor_strings(value):
         return [_clean_advisor_strings(item) for item in value]
     if not isinstance(value, str):
         return value
+    from material_claims import public_terms
+    value = public_terms(value, "ar" if re.search(r"[\u0600-\u06ff]", value) else "en")
     for _ in range(10):
         decoded = unescape(value)
         if decoded == value:
@@ -447,7 +473,7 @@ def _clean_advisor_strings(value):
     return " ".join(value.split())
 
 
-def _advisor_response(answer, lang):
+def _advisor_response(answer, lang, verification_status="source_composed"):
     answer = _clean_advisor_strings(answer)
     for key, label in (("next_action", r"Next action|الخطوة التالية"), ("caution", r"Caution|تنبيه")):
         answer[key] = re.sub(rf"^(?:{label})\s*:\s*", "", answer.get(key, ""), flags=re.I)
@@ -458,6 +484,7 @@ def _advisor_response(answer, lang):
     )
     response.headers["Cache-Control"] = "no-store"
     response.headers["X-StartSmart-Advisor"] = "structured-v2"
+    response.headers["X-Khotwa-Content-Verification"] = verification_status
     return response
 
 
@@ -542,6 +569,11 @@ def _parse_advisor(raw, lang):
         "next_action": plain(obj["next_action"], 350),
         "caution": plain(obj.get("caution", ""), 350),
     }
+    # Display labels are application formatting, not part of a sentence's
+    # speech act; remove them before the independent publication checks.
+    for key, label in (("next_action", r"Next action|الخطوة التالية"), ("caution", r"Caution|تنبيه")):
+        if isinstance(result.get(key), str):
+            result[key] = re.sub(rf"^(?:{label})\s*:\s*", "", result[key], flags=re.I)
     if (
         not all(result.get(key) for key in ("title", "summary", "next_action"))
         or any(not point["title"] or not point["text"] for point in result["points"])
@@ -568,7 +600,10 @@ def _parse_advisor(raw, lang):
         return fallback
     result.update(
         title=safe_text(result["title"], lang, fallback["title"], minimum=1),
-        summary=summary or fallback["summary"],
+        summary=summary or (
+            ("خطوات مقترحة للاختبار؛ لا تؤكد نتائج أعمال." if lang == "ar" else "Suggested checks to try; these do not establish business outcomes.")
+            if points else fallback["summary"]
+        ),
         next_action=action or fallback["next_action"],
         points=points,
         caution=safe_text(result["caution"], lang, minimum=1),

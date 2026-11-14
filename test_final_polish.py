@@ -20,7 +20,7 @@ def model_plan(costs=(0, 0, 0, 0, 100, 300, 0)):
         "business_name_suggestion": "Content service",
         "summary": "A planning assumption.",
         "steps": [
-            {"step_number": i + 1, "action": "Validation", "estimated_cost_aed": cost} for i, cost in enumerate(costs)
+            {"step_number": i + 1, "action": "Validation step", "estimated_cost_aed": cost} for i, cost in enumerate(costs)
         ],
         "total_estimated_cost_aed": 5000,
         "readiness_report": {"target_customer": "Restaurant owners/marketing managers with 1-20 seats"},
@@ -61,7 +61,7 @@ class FinalPolishTests(unittest.TestCase):
                 "Social-media content service",
                 [4, 3, 5, 4, 3],
                 [
-                    "Founder has restaurant content experience",
+                    "Founder restaurant content experience is an assumption to check",
                     "Restaurants' willingness to change suppliers is unknown",
                     "Content interviews need few tools",
                     "A sample content calendar can be shown this week",
@@ -72,10 +72,10 @@ class FinalPolishTests(unittest.TestCase):
                 "Cold-chain delivery fleet",
                 [2, 4, 1, 2, 4],
                 [
-                    "Founder lacks refrigerated fleet experience",
-                    "Perishable-goods buyers have a defined delivery problem",
-                    "Refrigerated vehicles exceed the entered budget",
-                    "Cold-chain logistics need careful preparation",
+                    "Founder refrigerated fleet experience is unknown and needs testing",
+                    "Perishable-goods buyers may have a defined delivery problem",
+                    "Refrigerated vehicles may exceed the entered budget",
+                    "Cold-chain logistics may need careful preparation",
                     "Repeat delivery routes may support expansion",
                 ],
             ),

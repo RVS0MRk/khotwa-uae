@@ -18,6 +18,18 @@ DIRTY_ADVISOR = {
 
 
 def fake_groq(system, user, **kwargs):
+    from flask import request, has_request_context
+    from pathlib import Path
+    fixture = request.headers.get("X-Khotwa-Test-Fixture", "") if has_request_context() else ""
+    if fixture == "ar-advisor" and "Founder Advisor" in system:
+        return json.dumps({"title":"تحديث دليل الأدلة","summary":"لم أتمكن من إعداد إجابة موثوقة الآن.","points":[{"title":"سجّل الردود","text":"أدخل القيم في proof_mode_recorded_evidence_only لتتبع إجمالي الردود."}],"next_action":"اسأل عشرة مالكي سيارات في دبي.","caution":""},ensure_ascii=False)
+    if fixture in ("live-lunch", "live-lunch-ar", "live-packaging", "adverse-lunch") and "Founder Advisor" not in system and "Suggest exactly three" not in system:
+        name = "v224_live_lunch_ar" if fixture == "live-lunch-ar" else "v224_live_packaging" if fixture == "live-packaging" else "v224_live_lunch"
+        raw = json.loads((Path(__file__).parent / "tests/fixtures" / (name + ".json")).read_text(encoding="utf-8"))
+        if fixture == "adverse-lunch":
+            raw["summary"] = "We closed a pre-seed round of AED 150,000."
+            raw["pitches"] = {k: raw["summary"] for k in raw["pitches"]}
+        return json.dumps(raw,ensure_ascii=False)
     if os.environ.get("V22_RICH") == "1" and "Suggest exactly three" not in system and "Founder Advisor" not in system:
         from pathlib import Path
 

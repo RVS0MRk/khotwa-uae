@@ -195,6 +195,9 @@ class V221SafetyTests(unittest.TestCase):
 
         raw = fixture("rich_plan_ar")
         plan = app._normalize_plan(raw, {"idea": raw["summary"], "budget": 5000}, "ar")
+        from provenance import seal, sources
+        # Certify the clean fixture before injecting unsigned adverse text.
+        seal(plan, sources({"idea": raw["summary"]}))
         claims = " ".join(CASES["unsafe_ar"][:3])
         for path in (
             ("summary",),

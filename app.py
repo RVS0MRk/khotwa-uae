@@ -60,6 +60,8 @@ from scoring import normalize_scores
 from finance import analyze as analyze_finance, FinanceInputError
 from config import GROQ_URL, MODEL, GROQ_API_KEY, GROQ_COMPLETION_TOKENS
 from groq_client import request_completion, log_failure
+from material_claims import verify_model
+from provenance import sources, seal, digest
 
 app = Flask(__name__)
 app.jinja_env.globals.update(ai_disclosure=AI_DISCLOSURE, proof_disclosure=PROOF_DISCLOSURE)
@@ -371,16 +373,27 @@ def generate():
         raw = json.loads(text)
         if not isinstance(raw, dict):
             raise ValueError("Invalid plan")
+        raw, verification = verify_model(raw, data, lang, API_KEY, app.logger)
         bilingual = raw.pop("bilingual_text", {})
         primary = _normalize_plan(_safeguard_plan(deepcopy(raw), lang), data, lang)
         alternate_lang = "ar" if lang != "ar" else "en"
-        alternate = _normalize_plan(_safeguard_plan(deepcopy(raw), alternate_lang), data, alternate_lang)
         _apply_plan_language(primary, bilingual, lang)
+        primary["_canonical_id"] = digest({"inputs": data, "plan": primary})[:24]
+        primary["_verification"] = verification
+        alternate = deepcopy(primary)
         _apply_plan_language(alternate, bilingual, alternate_lang)
+        ledger = sources(data)
+        seal(primary, ledger)
+        seal(alternate, ledger)
         primary["_alternate_plan"] = alternate
         return jsonify(primary)
     except Exception as exc:
         log_failure(app.logger, "/generate", exc, getattr(g, "groq_diagnostics", None))
+        diagnostics = getattr(exc, "diagnostics", {})
+        if diagnostics.get("http_status") == 429 or diagnostics.get("local_rate_limited"):
+            response = jsonify(error="rate_limited" if diagnostics.get("local_rate_limited") else "provider_rate_limited")
+            response.headers["Retry-After"] = str(exc.diagnostics.get("retry_after", 60))
+            return response, 429
         return jsonify({"error": "generation_failed"}), 500
 
 
@@ -415,6 +428,23 @@ def discover():
         ideas = parsed.get("ideas") if isinstance(parsed, dict) else None
         if not isinstance(ideas, list) or len(ideas) != 3:
             raise ValueError("Invalid ideas")
+        # Validate source shape/language before the verification fallback so a
+        # malformed or wrong-language provider response is still an error.
+        if any(not isinstance(card, dict) or any(not isinstance(card.get(k), str) or not _language_matches(card[k], lang)
+               for k in ("name", "fit", "customer", "first_test", "assumption")) for card in ideas):
+            raise ValueError("Invalid discovery language or shape")
+        verified, verification = verify_model(parsed, profile, lang, API_KEY, app.logger)
+        for i, card in enumerate(verified["ideas"]):
+            defaults = {
+                "name": f"فكرة مقابلات {i+1}" if lang == "ar" else f"Interview-led concept {i+1}",
+                "fit": "اختبر مدى ملاءمة مهاراتك لهذا المفهوم قبل الالتزام." if lang == "ar" else "Test how your stated skills fit this concept before committing.",
+                "customer": "شريحة محتملة تحتاج إلى تحديد" if lang == "ar" else "A potential segment to define",
+                "first_test": "قابل خمسة عملاء محتملين ثم اختبر قائمة انتظار بلا دفع." if lang == "ar" else "Interview five potential customers, then test a no-payment waitlist.",
+                "assumption": "فرضية تحتاج إلى مقابلات فعلية قبل الإنفاق." if lang == "ar" else "A hypothesis to check in real interviews before spending.",
+            }
+            for key, value in defaults.items():
+                card[key] = card.get(key) or value
+        ideas = verified["ideas"]
         cleaned = []
         for idea in ideas:
             if not isinstance(idea, dict) or not all(
@@ -471,6 +501,11 @@ def discover():
         return jsonify({"ideas": cleaned, "evidence_status": "not_validated"})
     except Exception as exc:
         log_failure(app.logger, "/discover", exc, getattr(g, "groq_diagnostics", None))
+        diagnostics = getattr(exc, "diagnostics", {})
+        if diagnostics.get("http_status") == 429 or diagnostics.get("local_rate_limited"):
+            response = jsonify(error="rate_limited" if diagnostics.get("local_rate_limited") else "provider_rate_limited")
+            response.headers["Retry-After"] = str(diagnostics.get("retry_after", 60))
+            return response, 429
         return jsonify({"error": "discovery_unavailable"}), 503
 
 
@@ -499,7 +534,7 @@ def pdf():
 
 @app.post("/ask")
 def ask():
-    return _advisor_impl.handle_ask(call_groq, app.logger)
+    return _advisor_impl.handle_ask(call_groq, app.logger, API_KEY)
 
 
 if __name__ == "__main__":

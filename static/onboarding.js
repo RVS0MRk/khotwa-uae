@@ -7,7 +7,7 @@ const CATEGORY_WORDS = [
   ["Health & Wellness", /health|wellness|fitness|yoga/i],
   ["Handicrafts & Arts", /craft|art\b|paint|jewel|handmade/i],
   ["Tourism & Hospitality", /tour|travel|hotel|hospitality/i],
-  ["Retail & Trading", /retail|shop|store|trading/i],
+  ["Retail & Trading", /\b(?:retail|shop|store|trading)\b/i],
   ["Services & Maintenance", /wash|clean|repair|maintenance|delivery/i],
 ];
 function arabicCategoryPattern(words) {
@@ -47,6 +47,14 @@ function detectBusinessCategory(idea) {
     .replace(/[\u0610-\u061a\u064b-\u065f\u0670\u0640]/g, "")
     .replace(/[أإآٱ]/g, "ا")
     .replace(/ى/g, "ي");
+  // Prefer the earliest explicit primary activity over a product/topic word.
+  // A workshop is education only in a learning context, not a repair shop.
+  const intents = [
+    ["Education & Tutoring", /\b(?:teach\w*|tutor\w*|classes?|courses?|training)\b|\bworkshops?\b(?=.{0,65}\b(?:children|kids|students|robotics|coding|learning)\b)|(?:تعليم|تدريس|دروس|دورات)|(?:ورش|ورشة)(?=.{0,65}(?:روبوت|اطفال|طلاب|تعليم))/iu],
+    ["Retail & Trading", /\b(?:sell\w*|retail|trading|shops?|stores?)\b|(?:بيع|متجر|متاجر|تجارة)/iu],
+    ["Technology & Digital", /\b(?:develop\w*|build\w*)\b(?=.{0,50}\b(?:software|apps?|platform)\b)|\bsoftware\b|(?:تطوير|برمجة)(?=.{0,50}(?:برمجيات|تطبيق|نظام|روبوت))/iu],
+  ].map(([category, pattern]) => ({ category, index: normalized.search(pattern) })).filter(x => x.index >= 0).sort((a,b) => a.index-b.index);
+  if (intents.length) return intents[0].category;
   // Use the same ordered category precedence in either language. Food context
   // wins over a healthy adjective; children alone never implies Education.
   return (

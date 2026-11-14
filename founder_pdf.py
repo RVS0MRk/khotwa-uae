@@ -7,7 +7,7 @@ from scoring import normalize_scores
 from plan_utils import _int, _money, _sync_path_costs
 from plan_normalize import _normalize_plan, _apply_plan_language, _segment_names
 from content_safety import export_plan
-from disclosures import AI_DISCLOSURE, PROOF_DISCLOSURE
+from disclosures import AI_DISCLOSURE, PROOF_DISCLOSURE, TRANSLATION_NOTICE
 
 logger = logging.getLogger(__name__)
 
@@ -89,6 +89,14 @@ def _localize_pdf_plan(original, lang):
     Proof entries, prices, scores, user inputs and custom model text stay intact.
     The same bilingual defaults used by /generate also own the PDF defaults.
     """
+    if original.get("_canonical_id"):
+        alternate = original.get("_alternate_plan")
+        p = deepcopy(alternate if isinstance(alternate, dict) and alternate.get("_presentation_lang") == lang else original)
+        for key in ("opportunity_score", "state", "proof_summary", "_financial_inputs"):
+            if key in original:
+                p[key] = deepcopy(original[key])
+        p.pop("_alternate_plan", None)
+        return _sync_path_costs(p)
     alternate = original.get("_alternate_plan") if isinstance(original, dict) else None
     use_alternate = isinstance(alternate, dict) and alternate.get("_content_lang") == lang
     source = alternate if use_alternate else original
@@ -480,7 +488,7 @@ def build_pdf(p, lang="en"):
         "h1", fontName=BOLD, textColor=NAVY, fontSize=20, leading=26, spaceAfter=8, alignment=align, splitLongWords=1
     )
     sub = ParagraphStyle("sub", fontName=BASE, textColor=GREY, fontSize=11, leading=15, spaceAfter=14, alignment=align)
-    h2 = ParagraphStyle("h2", fontName=BOLD, textColor=NAVY, fontSize=13, spaceBefore=10, spaceAfter=6, alignment=align)
+    h2 = ParagraphStyle("h2", fontName=BOLD, textColor=NAVY, fontSize=13, spaceBefore=10, spaceAfter=6, alignment=align, keepWithNext=True)
     body = ParagraphStyle(
         "body", fontName=BASE, fontSize=10, leading=15, spaceAfter=3, alignment=align, splitLongWords=1
     )
@@ -640,6 +648,8 @@ def build_pdf(p, lang="en"):
     # ---- PAGE 1 ----
     E.append(Paragraph(tx(AI_DISCLOSURE["ar" if ar else "en"]), small))
     E.append(Paragraph(tx(PROOF_DISCLOSURE["ar" if ar else "en"]), small))
+    if p.get("_source_lang") and p["_source_lang"] != lang and p.get("_localization_status") == "fallback":
+        E.append(Paragraph(tx(TRANSLATION_NOTICE[lang]), small))
     E.append(Spacer(1, 8))
     E.append(
         Paragraph(tx("اسم تجاري مقترح · افتراض ذكاء اصطناعي" if ar else "Suggested brand name · AI ASSUMPTION"), small)
