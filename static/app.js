@@ -2757,14 +2757,9 @@ function syncEvidencePresentation(total, purchases, verdict) {
   if (!currentPlan) return;
   const ar = lang === "ar",
     p = currentPlan;
-  const evidence = total
-    ? ar
-      ? "أدلة أدخلها المستخدم: " + total + " إجابات. " + verdict
-      : "User-entered customer evidence: " + total + " responses. " + verdict
-    : ar
-      ? "لم تُجمع أدلة من العملاء بعد."
-      : "No customer evidence collected yet.";
+  const evidence = proofEvidenceText(total);
   if (p.idea_overview) p.idea_overview.evidence = evidence;
+  if (p.readiness_report) p.readiness_report.customer_evidence = evidence;
   setTxt("overview-evidence", evidence);
   setTxt("readiness-evidence-text", evidence);
   if (!p._preEvidenceRisk && p.risk_radar?.[0])

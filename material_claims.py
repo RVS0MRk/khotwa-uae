@@ -9,7 +9,7 @@ from copy import deepcopy
 import json
 import re
 from content_safety import markup, offending
-from provenance import sources, digest, receipt_strings
+from provenance import sources, digest, receipt_strings, verified_receipt
 
 MAX_ITEMS = 160
 MAX_CHARS = 26000
@@ -212,7 +212,7 @@ def protect_export(plan):
     """Recheck receipts per field; user records never become external proof."""
     clean = deepcopy(plan)
     allowed = receipt_strings(plan)
-    lang = plan.get("_content_lang", plan.get("_lang", "en"))
+    lang = plan.get("_export_lang", plan.get("_content_lang", plan.get("_lang", "en")))
     lengths = sorted({int(token.split(":",1)[0]) for token in allowed}, reverse=True)
     def authenticated(value):
         return f"{len(value)}:{digest(value)[:32]}" in allowed
@@ -229,6 +229,39 @@ def protect_export(plan):
     for path, value in prose_items(clean):
         if not authenticated(value):
             _set(clean, path, " ".join(recover(fragment) for fragment in re.split(r"(?<=[.!?؟])\s+", value)).strip())
+    # Browser Proof edits are not model prose and cannot re-sign a receipt.
+    # Authenticate the original assessment, then deterministically derive its
+    # one mutable dimension and evidence text from bounded SELF-REPORTS.
+    from scoring import proof_counts, proof_evidence_text, assessment_from_proof
+    receipt = verified_receipt(plan)
+    baseline = receipt.get("assessment") if receipt and receipt["version"] == 3 else None
+    counts = proof_counts(plan.get("proof_summary"))
+    if isinstance(plan.get("opportunity_score"), dict):
+        clean["opportunity_score"] = assessment_from_proof(baseline, counts, lang)
+    evidence = proof_evidence_text(counts, lang)
+    clean["_proof_presentation"] = {"text": evidence, "valid_counts": counts is not None}
+    if isinstance(clean.get("idea_overview"), dict):
+        clean["idea_overview"]["evidence"] = evidence
+    if isinstance(clean.get("readiness_report"), dict):
+        clean["readiness_report"]["customer_evidence"] = evidence
+    if counts and counts["total_responses"]:
+        if clean.get("risk_radar") and isinstance(clean["risk_radar"][0], dict):
+            clean["risk_radar"][0]["reason"] = evidence
+        decision = clean.get("decision_engine")
+        if not isinstance(decision, dict):
+            decision = clean["decision_engine"] = {}
+        purchases = counts["actual_payments"] + counts["repeat_customers"]
+        decision.update(
+            decision=("راجع أدلة التجربة" if purchases else "تحقق أكثر") if lang == "ar" else
+                     ("Review pilot evidence" if purchases else "Validate more"),
+            reason=evidence,
+            next_test_action="راجع الأدلة وتحقق من المتطلبات الرسمية قبل أي تجربة تشغيلية." if lang == "ar" else
+                             "Review the evidence and verify official requirements before any operational test.",
+        )
+    elif receipt and receipt["version"] == 3 and isinstance(receipt.get("decision"), dict):
+        clean["decision_engine"] = deepcopy(receipt["decision"])
+    if counts is None:
+        clean["proof_summary"] = {}
     # State's display aliases must not bypass the narrative gate.
     state = clean.get("state")
     if isinstance(state, dict):

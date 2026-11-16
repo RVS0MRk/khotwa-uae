@@ -72,6 +72,11 @@ function updateEvidenceScore(total, yes, intent, reservations, paid, repeat) {
   }
   aggregateScores(sc);
 }
+function proofEvidenceText(total) {
+  return total
+    ? uiText(`${total} self-reported Proof Mode responses. Not independently verified.`, `${total} إجابات بإقرار المستخدم في وضع الإثبات؛ لم تُتحقق بشكل مستقل.`)
+    : uiText("No Proof Mode observations recorded yet.", "لم تُسجّل ملاحظات في وضع الإثبات بعد.");
+}
 function renderScores(sc) {
   aggregateScores(sc);
   const ar = lang === "ar",
@@ -191,6 +196,7 @@ function refreshScoreDisplay() {
   if (!currentPlan) return;
   const sc = currentPlan.opportunity_score;
   renderScores(sc);
+  currentPlan.state.opportunity_score = structuredClone(sc);
   renderFinanceIntegration();
   const cell = document.querySelectorAll("#passport-table .pv2")[3];
   if (cell) cell.textContent = scoreLabel(sc);

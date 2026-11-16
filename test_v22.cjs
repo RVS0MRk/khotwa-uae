@@ -9,6 +9,7 @@ const { verifyV221 } = require("./tests/v221_browser.cjs");
 const { verifyV222 } = require("./tests/v222_browser.cjs");
 const { verifyV223 } = require("./tests/v223_browser.cjs");
 const { verifyV224 } = require("./tests/v224_browser.cjs");
+const { verifyConsistency } = require("./tests/consistency_browser.cjs");
 const root = path.resolve(
     process.env.KHOTWA_REVIEW_DIR || "outputs/v22-review",
   ),
@@ -520,6 +521,7 @@ async function main() {
       await pause(100);
     }
     browser = await chromium.launch({ headless: true });
+    checks += await verifyConsistency(browser, base, root);
     checks += await verifyV221(browser, base, root);
     checks += await verifyV222(browser, base, root);
     checks += await verifyV223(browser, base, root);

@@ -58,7 +58,7 @@ function polishLanguage() {
   [
     ["No login required", "بلا تسجيل دخول"],
     ["Validate before spending", "تحقق قبل الإنفاق"],
-    ["Real customer evidence", "أدلة من عملاء حقيقيين"],
+    ["Record customer feedback", "سجّل ملاحظات العملاء"],
     ["Founder report", "تقرير المؤسس"],
   ].forEach(([en, ar]) =>
     trust.appendChild(uiNode("span", "", uiText(en, ar))),

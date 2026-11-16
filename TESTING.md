@@ -1,4 +1,4 @@
-# Testing Khotwa V2.2.3
+# Testing Khotwa V2.2.4
 
 Use Python 3.12 and Node.js 20 or newer. Run commands from the repository root. The application has no frontend build step.
 
@@ -42,6 +42,8 @@ The consolidated runner uses its own Python interpreter for each fixture server 
 - `test_redesign.cjs`: keyboard, evidence ladder, loading, motion and a 9-width x 2-language x 2-theme screenshot matrix, including eight dashboard tabs.
 - `test_v2.cjs`: financial workflows, scenario edits/reset, staged allocations, readiness, recovery, funding filters, CSV/PDF failure and vendor fallback.
 - `test_v21.cjs`: seven financial subpanels, discrete cases, simplified mode, individual scenario reset, semantic status localization, recovered subpanel, five widths in both languages, minimum fonts, token contrast, clipping, focus, labels and chart tables.
+- `test_consistency.py`: signed baseline/identity integrity, forged and legacy receipts, invalid Proof counts, incomplete assessments, Clear restoration, 42 Python–JavaScript Proof-rule comparisons, and actual bilingual Founder PDF content.
+- `test_v22.cjs` includes `tests/consistency_browser.cjs`: actual UI generation and 16 Founder PDF downloads across native English/Arabic businesses, no observations, five responses, changed evidence and Clear. It checks score/status/narrative, state aliases, Clear/reload, finance EN→AR→EN and initial Arabic session recovery, 390px layout and serious/critical axe violations. `tests/check_pdf_consistency.py` independently inspects the downloaded artifacts. All provider access is mocked; `/pdf` is real.
 
 `GROQ_API_KEY` may be absent for every mock suite. Browser fixture servers set their synthetic value through `test_support`; `TEST_PORT` selects their isolated local port. `PYTHON_EXE` is optional for direct browser commands and points at the project's interpreter when `python` on PATH is different. The runner sets it automatically. `NODE_PATH` is unnecessary after normal `npm ci`. In V2.2 this workstation ran a real clean `npm ci` with the locked Playwright/axe packages, using an integrity-verified npm CLI with its bundled Node 24.22.1. Production has no npm/build requirement.
 

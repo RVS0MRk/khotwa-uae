@@ -3,7 +3,6 @@
 import os, io, re, urllib.request, logging
 from html import escape
 from copy import deepcopy
-from scoring import normalize_scores
 from plan_utils import _int, _money, _sync_path_costs
 from plan_normalize import _normalize_plan, _apply_plan_language, _segment_names
 from content_safety import export_plan
@@ -91,7 +90,9 @@ def _localize_pdf_plan(original, lang):
     """
     if original.get("_canonical_id"):
         alternate = original.get("_alternate_plan")
-        p = deepcopy(alternate if isinstance(alternate, dict) and alternate.get("_presentation_lang") == lang else original)
+        use_alternate = (isinstance(alternate, dict) and alternate.get("_presentation_lang") == lang
+                         and alternate.get("_canonical_id") == original["_canonical_id"])
+        p = deepcopy(alternate if use_alternate else original)
         for key in ("opportunity_score", "state", "proof_summary", "_financial_inputs"):
             if key in original:
                 p[key] = deepcopy(original[key])
@@ -349,8 +350,9 @@ def build_pdf(p, lang="en"):
     )
     from reportlab.lib.enums import TA_LEFT, TA_RIGHT
 
-    p = export_plan(_localize_pdf_plan(p, lang))
-    p["opportunity_score"] = normalize_scores(p.get("opportunity_score"), (p.get("state") or {}).get("idea", ""), lang)
+    localized = _localize_pdf_plan(p, lang)
+    localized["_export_lang"] = lang
+    p = export_plan(localized)
     ar = lang == "ar"
     font_ok = ensure_arabic_font() if ar else False
     if ar and not font_ok:
@@ -615,7 +617,7 @@ def build_pdf(p, lang="en"):
     sc = p.get("opportunity_score", {}) or {}
     total = sc.get("total")
     score_label = f"{total} / 25" if type(total) is int else ("غير مكتمل" if ar else "Incomplete")
-    decision = L["medium"]
+    decision = (p.get("decision_engine") or {}).get("decision") or L["medium"]
     r = p.get("readiness_report", {}) or {}
     state = p.get("state", {}) or {}
 
@@ -678,13 +680,19 @@ def build_pdf(p, lang="en"):
     E.append(
         Paragraph(
             tx(
-                "مبنية أساساً على افتراضات؛ أدلة العملاء لازمة."
-                if ar
-                else "Based mainly on assumptions — customer evidence is still required."
+                (p.get("_proof_presentation") or {}).get("text", "")
             ),
             small,
         )
     )
+    E.append(Paragraph(tx(
+        (f"تغطية التقييم: {sc.get('assessed_count', 0)} من 5. " if ar else
+         f"Assessment coverage: {sc.get('assessed_count', 0)} of 5. ") +
+        (("النتيجة غير مكتملة؛ لا نقاط للمعلومات المفقودة." if ar else
+          "Incomplete assessment; missing information earns no points.") if total is None else
+         ("درجة مبدئية وليست احتمال نجاح تجاري." if ar else
+          "Provisional assessment, not a probability of business success."))
+    ), small))
     E.append(Spacer(1, 8))
     E.append(Paragraph(tx(L["exec"]), h2))
     overview = p.get("idea_overview") or {}
@@ -882,7 +890,7 @@ def build_pdf(p, lang="en"):
                     ("دفع فعلي" if ar else "Actual payments", str(_int(pm.get("actual_payments")))),
                     ("عملاء متكررون" if ar else "Repeat customers", str(_int(pm.get("repeat_customers")))),
                     (L["pm_concern"], pm.get("top_concern", "-")),
-                    (L["decision"], pm.get("verdict", "-")),
+                    (L["decision"], (p.get("_proof_presentation") or {}).get("text", "-")),
                 ]
             )
         )

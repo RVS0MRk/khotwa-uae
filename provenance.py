@@ -49,25 +49,40 @@ def sources(inputs=None, plan=None):
 
 
 def seal(plan, ledger):
-    """Receipt covers only model/application-owned text, not mutable Proof/forms."""
+    """Authenticate published prose and baseline assessment, not mutable Proof/forms."""
     from material_claims import prose_items
     hashes = sorted({f"{len(fragment)}:{digest(fragment)[:32]}" for _, value in prose_items(plan)
                      for fragment in [value, *re.split(r"(?<=[.!?؟])\s+", value)] if fragment})
-    payload = {"version": 2, "strings": hashes, "ledger_hash": digest(ledger)}
+    from scoring import normalize_scores
+
+    payload = {"version": 3, "strings": hashes, "ledger_hash": digest(ledger),
+               "canonical_id": plan.get("_canonical_id"),
+               "assessment": normalize_scores(plan["opportunity_score"]) if isinstance(plan.get("opportunity_score"), dict) else None,
+               "decision": deepcopy(plan.get("decision_engine"))}
     signature = hmac.new(_SIGNING_KEY, digest(payload).encode(), hashlib.sha256).hexdigest()
     plan["_content_receipt"] = {**payload, "signature": signature}
     plan["_provenance"] = ledger
     return plan
 
 
-def receipt_strings(plan):
+def verified_receipt(plan):
     receipt = plan.get("_content_receipt")
-    if not isinstance(receipt, dict) or receipt.get("version") != 2:
-        return {}
-    payload = {k: receipt.get(k) for k in ("version", "strings", "ledger_hash")}
+    if not isinstance(receipt, dict) or receipt.get("version") not in (2, 3):
+        return None
+    keys = ("version", "strings", "ledger_hash")
+    if receipt["version"] == 3:
+        keys += ("canonical_id", "assessment", "decision")
+        if receipt.get("canonical_id") != plan.get("_canonical_id"):
+            return None
+    payload = {k: receipt.get(k) for k in keys}
     expected = hmac.new(_SIGNING_KEY, digest(payload).encode(), hashlib.sha256).hexdigest()
     if not isinstance(receipt.get("signature"), str) or not hmac.compare_digest(expected, receipt["signature"]):
-        return {}
+        return None
     if payload["ledger_hash"] != digest(plan.get("_provenance")):
-        return set()
-    return set(payload["strings"]) if isinstance(payload["strings"], list) else set()
+        return None
+    return payload
+
+
+def receipt_strings(plan):
+    payload = verified_receipt(plan)
+    return set(payload["strings"]) if payload and isinstance(payload.get("strings"), list) else set()

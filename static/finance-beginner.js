@@ -146,13 +146,11 @@ function setupFinanceAdvanced() {
   const panel = document.getElementById("investment-panel-2");
   const details = uiNode("details", "finance-methods");
   details.id = "finance-advanced";
-  details.append(
-    uiNode(
-      "summary",
-      "",
-      uiText("Advanced / How we calculate", "متقدم / طريقة الحساب"),
-    ),
-  );
+  const summary = uiNode("summary");
+  summary.dataset.en = "Advanced / How we calculate";
+  summary.dataset.ar = "متقدم / طريقة الحساب";
+  summary.textContent = uiText(summary.dataset.en, summary.dataset.ar);
+  details.append(summary);
   for (const id of ["cogs-basis"]) {
     const node = document.getElementById(id),
       label = document.querySelector('label[for="' + id + '"]');
@@ -166,6 +164,9 @@ function setupFinanceAdvanced() {
       "يحافظ وضع التدفق المنفصل على توقيت الدفع. يفترض الوضع البسيط تحصيل المبيعات وسداد المتكررة في الشهر نفسه.",
     ),
   );
+  cashNote.dataset.en = "The separate cash-in/out method preserves payment timing. Simple mode assumes all sales and recurring expenses are collected/paid in the same month.";
+  cashNote.dataset.ar = "يحافظ وضع التدفق المنفصل على توقيت الدفع. يفترض الوضع البسيط تحصيل المبيعات وسداد المتكررة في الشهر نفسه.";
+  cashNote.id = "finance-cash-timing-note";
   details.append(cashNote);
   panel.append(details);
 }
@@ -194,14 +195,11 @@ function compactFinanceMethods() {
   const note = basis.querySelector("small");
   if (note) {
     const details = uiNode("details", "finance-methods");
-    details.append(
-      uiNode(
-        "summary",
-        "",
-        uiText("How we calculate / assumptions", "طريقة الحساب والافتراضات"),
-      ),
-      note,
-    );
+    const summary = uiNode("summary");
+    summary.dataset.en = "How we calculate / assumptions";
+    summary.dataset.ar = "طريقة الحساب والافتراضات";
+    summary.textContent = uiText(summary.dataset.en, summary.dataset.ar);
+    details.append(summary, note);
     basis.append(details);
   }
   basis.querySelectorAll(".finance-warning").forEach((n) => {

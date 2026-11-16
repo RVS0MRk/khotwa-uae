@@ -35,7 +35,13 @@ def fake_groq(system, user, **kwargs):
 
         arabic = "Write ALL text values in Arabic" in system
         name = "rich_plan_ar" if arabic else "rich_plan_alt_en" if "coding" in user.lower() else "rich_plan_en"
-        return (Path(__file__).parent / "tests/fixtures" / f"{name}.json").read_text(encoding="utf-8")
+        text = (Path(__file__).parent / "tests/fixtures" / f"{name}.json").read_text(encoding="utf-8")
+        if fixture == "consistent-assessment" and arabic:
+            raw = json.loads(text)
+            for key in ("local_fit", "clear_customer", "low_starting_cost", "easy_first_step", "growth_potential"):
+                raw["opportunity_score"][key]["reason"] = "قد تلائم الفكرة شريحة موظفي المكاتب؛ اختبر ملاءمتها قبل الإنفاق."
+            return json.dumps(raw, ensure_ascii=False)
+        return text
     if "Suggest exactly three" in system:
         ar = "Write all field values except category in Arabic" in system
         names = (
