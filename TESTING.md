@@ -230,3 +230,32 @@ ideas plus ten Advisor questions, no more than 40 actual provider attempts,
 key configuration without printing it. Do not run it just to satisfy mock tests.
 See `docs/V22_4_REVIEW.md` for the manual content-review procedure and explicit
 NOT VERIFIED live/deployment limitations.
+
+## V2.2.5 verification
+
+`test_v225.py` adds 13 methods to the unchanged 162-method baseline. Independent
+fixtures cover wrong classifier labels across model fields, all three AI routes,
+signed exports, local EN/AR denials, safe personalized descriptions, legacy
+receipt policy upgrades, missing/repeated translations, all 16 Founder export
+states, four mixed Investment exports and short/long pagination. Synthetic
+transport remains mocked; no local credential file is read by the test bootstrap.
+
+```powershell
+Remove-Item Env:GROQ_API_KEY -ErrorAction SilentlyContinue
+python -m unittest discover -v
+node test_browser.cjs
+node test_redesign.cjs
+node test_v2.cjs
+node test_v21.cjs
+$env:KHOTWA_REVIEW_DIR = 'outputs/v225-run-1'; node test_v22.cjs
+$env:KHOTWA_REVIEW_DIR = 'outputs/v225-run-2'; node test_v22.cjs
+$env:KHOTWA_REVIEW_DIR = 'outputs/v225-run-3'; node test_v22.cjs
+```
+
+The V2.2 suite retains its existing checks and calls `tests/v225_browser.cjs` for
+substantive EN→AR→EN and AR→EN→AR comparisons, refresh, canonical identity,
+self-reported Proof/finance persistence, mixed-language PDF glyphs and adversarial
+Pitch/Advisor rendering. The complete evidence archive contains the additional
+mock-browser export matrix, every rendered PDF page, independent arithmetic/CSV
+oracles, classifier probes and isolated pinned-environment installation evidence.
+See `docs/V22_5_REVIEW.md` for executed counts, exact logs and verification limits.

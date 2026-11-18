@@ -11,7 +11,8 @@ from reportlab.lib.enums import TA_RIGHT, TA_LEFT
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle, Spacer, PageBreak
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, PageBreak, KeepTogether
+from pdf_text import Paragraph, register_arabic_font
 from finance import analyze, calculate
 from content_safety import export_plan
 from disclosures import AI_DISCLOSURE, PROOF_DISCLOSURE, TRANSLATION_NOTICE
@@ -44,22 +45,21 @@ LABELS = {
 
 def text_style(lang):
     ar = lang == "ar"
-    if ar and "KhotwaAmiri" not in pdfmetrics.getRegisteredFontNames():
-        pdfmetrics.registerFont(TTFont("KhotwaAmiri", str(Path(__file__).parent / "fonts/Amiri-Regular.ttf")))
+    register_arabic_font()
     style = ParagraphStyle(
         "investment",
-        fontName="KhotwaAmiri" if ar else "Helvetica",
+        fontName="Amiri" if ar else "Helvetica",
         fontSize=10,
         leading=14,
         textColor=colors.HexColor("#18372f"),
         alignment=TA_RIGHT if ar else TA_LEFT,
-        spaceAfter=4,
+        spaceAfter=4, allowWidows=0, allowOrphans=0,
     )
 
     def tx(value):
         text = str(value) if value not in (None, "") else ("لم يُقدّم بعد" if ar else "Not yet provided")
         text = text.replace("−", "-").replace("×", "x").replace("÷", "/")
-        return escape(get_display(arabic_reshaper.reshape(text)) if ar else text)
+        return escape(text)
 
     return style, tx
 
@@ -177,19 +177,15 @@ def finance_flowables(inputs, lang="en"):
                 "تكلفة البضاعة المختارة جزءاً من المتغيرة تتجاوزها. حُجب مجمل الربح والهامش حتى التصحيح.",
             ),
         )
-    out.append(Spacer(1, 12))
-    out.extend(
-        Paragraph(tx(sentence.strip() + "."), style)
-        for pair in explanations
-        for sentence in pair[1 if ar else 0].split(".")
-        if sentence.strip()
-    )
-    return out
+    notes = ParagraphStyle("finance-explanations", parent=style, fontSize=9, leading=12, spaceAfter=0)
+    out.append(Spacer(1, 8))
+    out.append(Paragraph("<br/>".join(tx(pair[1 if ar else 0]) for pair in explanations), notes))
+    return [KeepTogether(out)]
 
 
 def build_investment_report(payload, lang="en"):
     result = analyze(payload.get("finance", {}))
-    p = export_plan(payload.get("plan", {}))
+    p = export_plan(dict(payload.get("plan", {}), _export_lang=lang))
     notes = payload.get("notes", {})
     style, tx = text_style(lang)
     ar = lang == "ar"
@@ -204,25 +200,7 @@ def build_investment_report(payload, lang="en"):
     if p.get("_source_lang") and p["_source_lang"] != lang and p.get("_localization_status") == "fallback":
         messages.append(TRANSLATION_NOTICE[lang])
     for message in messages:
-        if not ar:
-            output.append(Paragraph(tx(message), note))
-            continue
-        # Wrap the fixed Arabic notice in logical order before bidi shaping.
-        # Shaping an entire multi-line paragraph first reverses line order.
-        line = []
-        line_style = ParagraphStyle("evidence-note-line", parent=note, spaceAfter=0)
-        for word in message.split():
-            candidate = " ".join(line + [word])
-            shaped = get_display(arabic_reshaper.reshape(candidate))
-            # The document has 50pt margins plus 6pt frame padding per side;
-            # allow a small rounding margin so Paragraph never rewraps a line.
-            if line and pdfmetrics.stringWidth(shaped, note.fontName, note.fontSize) > A4[0] - 116:
-                output.append(Paragraph(tx(" ".join(line)), line_style))
-                line = []
-            line.append(word)
-        if line:
-            output.append(Paragraph(tx(" ".join(line)), line_style))
-        output.append(Spacer(1, 6))
+        output.append(Paragraph(tx(message), note))
     state = p.get("state") or {}
     overview = p.get("idea_overview") or {}
     fields = [
@@ -315,7 +293,7 @@ def build_investment_report(payload, lang="en"):
     )
 
     def page(canvas, document):
-        canvas.setFont("KhotwaAmiri" if ar else "Helvetica", 9)
+        canvas.setFont("Amiri" if ar else "Helvetica", 9)
         canvas.setFillColor(colors.HexColor("#556760"))
         footer = "خطوة | افتراضات المستخدم | AED" if ar else "Khotwa | User assumptions | AED"
         if ar:

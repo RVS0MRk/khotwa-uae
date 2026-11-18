@@ -126,6 +126,9 @@ def _arabic_matching_copy(text):
         # Accusative tanween leaves an alef after diacritic removal.
         if word.endswith("ا") and _ACHIEVED.fullmatch(word[:-1]):
             return word[:-1]
+        # Construct-state masculine plural drops the final noon (موظفو المكتب).
+        if word.endswith("و") and _BUSINESS_OBJECT.fullmatch(word + "ن"):
+            return word + "ن"
         return word
 
     return re.sub(r"[\u0621-\u064a]+", normalize, text)
@@ -216,8 +219,11 @@ def _outcome_guarded(clause, start=0):
 
 
 def _unsupported_outcome(sentence):
+    from publication_policy import negated_clause
     text = _claim_text(sentence)
     for clause in _CLAUSE_BOUNDARY.split(text):
+        if negated_clause(clause):
+            continue
         # A question mark belongs to this sentence only, never a previous one.
         if clause.rstrip().endswith(("?", "؟")) or _directive_guarded(clause):
             continue
@@ -287,6 +293,9 @@ def _qualified_claim(text, match):
     # Existing precise patterns use the same guards, scoped to this clause.
     # A condition or question in a neighbouring clause cannot exempt a fact.
     local = prefix + _CLAUSE_BOUNDARY.split(text[match.start() :])[0]
+    from publication_policy import negated_clause
+    if negated_clause(local):
+        return True
     if _outcome_guarded(local, len(prefix)):
         return True
     if re.search(

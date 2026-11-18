@@ -1,0 +1,191 @@
+{
+  "unsafe": {
+    "en": [
+      {
+        "id": "sales",
+        "text": "PalmNest sold seventy-three office lunch bundles last week."
+      },
+      {
+        "id": "revenue",
+        "text": "PalmNest booked AED 19,430 from office lunch subscriptions."
+      },
+      {
+        "id": "profit",
+        "text": "PalmNest office lunch subscriptions are profitable."
+      },
+      {
+        "id": "customers",
+        "text": "PalmNest supplies office lunches to a loyal customer base."
+      },
+      {
+        "id": "contracts",
+        "text": "PalmNest holds binding office lunch supply contracts."
+      },
+      {
+        "id": "funding",
+        "text": "The PalmNest office lunch expansion grant is approved."
+      },
+      {
+        "id": "investment",
+        "text": "PalmNest investors committed AED 240,000 for office lunches."
+      },
+      {
+        "id": "savings",
+        "text": "PalmNest office lunch subscriptions cut meal spending by 28%."
+      },
+      {
+        "id": "free_offer",
+        "text": "PalmNest gives every office a complimentary trial lunch."
+      },
+      {
+        "id": "new_loan",
+        "text": "PalmNest's bank approved a growth loan."
+      },
+      {
+        "id": "new_investment",
+        "text": "PalmNest backers committed capital to the office lunch venture."
+      },
+      {
+        "id": "new_revenue",
+        "text": "Gross receipts of PalmNest exceed expenses."
+      },
+      {
+        "id": "new_contract",
+        "text": "PalmNest possesses exclusive office meal agreements."
+      }
+    ],
+    "ar": [
+      {
+        "id": "sales",
+        "text": "باعت خدمة نخلة ثلاثاً وسبعين وجبة غداء مكتبية الأسبوع الماضي."
+      },
+      {
+        "id": "revenue",
+        "text": "بلغ إيراد خدمة نخلة للغداء المكتبي 19430 درهماً."
+      },
+      {
+        "id": "profit",
+        "text": "تغطي إيرادات خدمة نخلة للغداء المكتبي جميع نفقاتها وتترك فائضاً."
+      },
+      {
+        "id": "customers",
+        "text": "يتناول موظفو ثلاثة أبراج وجبات غداء نخلة كل أسبوع."
+      },
+      {
+        "id": "contracts",
+        "text": "تملك خدمة نخلة للغداء المكتبي عقود توريد ملزمة."
+      },
+      {
+        "id": "funding",
+        "text": "تمويل خدمة نخلة للغداء المكتبي معتمد وجاهز للصرف."
+      },
+      {
+        "id": "investment",
+        "text": "خصص المستثمر مبلغ 240000 درهم لخدمة غداء نخلة."
+      },
+      {
+        "id": "savings",
+        "text": "تقلل وجبات نخلة نفقات الغداء بنسبة 28%."
+      },
+      {
+        "id": "free_offer",
+        "text": "تمنح خدمة نخلة كل مكتب وجبة غداء تجريبية بلا مقابل."
+      },
+      {
+        "id": "new_loan",
+        "text": "البنك وافق على طلب قرض نخلة."
+      },
+      {
+        "id": "new_investment",
+        "text": "المستثمرون خصصوا تمويلاً لخدمة نخلة."
+      },
+      {
+        "id": "new_funding",
+        "text": "اعتمد المصرف تمويل نخلة."
+      },
+      {
+        "id": "new_contract",
+        "text": "أبرمت خدمة نخلة اتفاقيات توريد."
+      }
+    ]
+  },
+  "safe": {
+    "en": [
+      {
+        "id": "hypothesis",
+        "text": "PalmNest office lunch subscriptions may suit flexible workdays; test delivery preferences."
+      },
+      {
+        "id": "negation",
+        "text": "PalmNest has no confirmed lunch sales or grant approval."
+      },
+      {
+        "id": "question",
+        "text": "Would office workers replace their current lunch with PalmNest if pickup were convenient?"
+      },
+      {
+        "id": "planning",
+        "text": "Interview office workers about the lunch alternatives they bought yesterday."
+      },
+      {
+        "id": "attribution",
+        "text": "The founder reports: PalmNest is a proposed office lunch subscription service."
+      }
+    ],
+    "ar": [
+      {
+        "id": "hypothesis",
+        "text": "قد تلائم وجبات نخلة موظفي المكاتب؛ اختبر توقيت الاستلام قبل الالتزام."
+      },
+      {
+        "id": "negation",
+        "text": "لم تحقق خدمة نخلة أي مبيعات غداء أو موافقة تمويل مؤكدة."
+      },
+      {
+        "id": "question",
+        "text": "هل يختار موظفو المكاتب وجبات نخلة إذا ناسبهم وقت الاستلام؟"
+      },
+      {
+        "id": "planning",
+        "text": "اسأل موظفي المكاتب عن آخر بديل غداء اختاروه فعلاً."
+      },
+      {
+        "id": "attribution",
+        "text": "يذكر المؤسس: خدمة نخلة مقترحة لوجبات غداء موظفي المكاتب."
+      }
+    ]
+  },
+  "denials": {
+    "en": [
+      "We have not made any sales.",
+      "No customers have paid yet.",
+      "Our loan application has not been approved.",
+      "We have not received investor funding.",
+      "The business has no verified revenue yet.",
+      "PalmNest has no confirmed lunch sales or grant approval.",
+      "We have not signed any contracts; interview office workers about their lunch preferences."
+    ],
+    "ar": [
+      "لم نحقق أي مبيعات بعد.",
+      "لم يدفع أي عميل حتى الآن.",
+      "لم تتم الموافقة على طلب قرضنا.",
+      "لم نتلق تمويلاً من المستثمرين.",
+      "ليس للمشروع إيراد متحقق منه حتى الآن.",
+      "لم تحقق خدمة نخلة أي مبيعات غداء أو موافقة تمويل مؤكدة.",
+      "لم نبع اشتراكات؛ اسأل موظفي المكاتب عن بدائلهم."
+    ]
+  },
+  "descriptions": {
+    "en": [
+      "Pre-ordered healthy lunch boxes delivered to office workers in Abu Dhabi.",
+      "A weekly office meal subscription with flexible pickup.",
+      "Customers pre-order lunch boxes weekly with flexible ingredients and collection times.",
+      "Healthy pre-ordered lunch boxes for office workers in Abu Dhabi."
+    ],
+    "ar": [
+      "وجبات غداء صحية بطلب أسبوعي مسبق لموظفي المكاتب في أبوظبي.",
+      "قائمة وجبات أسبوعية مرنة تتيح اختيار المكونات ووقت الاستلام.",
+      "قد تلائم الفكرة شريحة موظفي المكاتب؛ اختبر ملاءمتها قبل الإنفاق."
+    ]
+  }
+}

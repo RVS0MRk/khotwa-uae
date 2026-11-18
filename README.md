@@ -143,3 +143,11 @@ Configure the optional private `KHOTWA_CONTENT_SIGNING_KEY` environment variable
 Language switching preserves one canonical assessment and original personalized content when translation is missing, with a visible notice. Robotics category suggestions and visible quick-finance validation are corrected. See [V22_4_REVIEW.md](docs/V22_4_REVIEW.md) for the seven-ticket matrix, test evidence, data contract and remaining safety limitations. V2.2.4 live Groq quality is **NOT VERIFIED**; the explicitly opt-in `python scripts/live_v224.py --confirm-live` procedure is bounded to 40 provider attempts and stops on failure. It is separate from all mock tests.
 
 The final consistency correction is documented in [V224_CONSISTENCY_REVIEW.md](docs/V224_CONSISTENCY_REVIEW.md), including the Proof/dashboard/Founder PDF contract, native Arabic finance controls, exact test results and remaining limitations.
+
+## V2.2.5 corrections
+
+Founder and Investment PDFs share logical line wrapping, Arabic shaping and mixed-script font runs. English report layout can retain readable Arabic business content when translation is unavailable. Repeated catch-all translations cannot replace distinct personalized source fields. Financial explanations stay with their results table.
+
+Publication checks now apply deterministic clause-level rules independently of the semantic classifier's label. Local denials and conditional research remain useful planning content; a model label cannot authenticate achieved business outcomes. Version 3 receipts sign the publication-policy version as well as the original assessment. Earlier valid receipts still verify cryptographically, but their text is rechecked under the current publication policy before export. User assumptions, calculated projections and self-reported Proof counts retain their separate source paths; none becomes independent external evidence.
+
+See [V22_5_REVIEW.md](docs/V22_5_REVIEW.md) for the six-ticket implementation, exact verification and limits. These bounded, mock-tested checks are not a guarantee of live-model factual accuracy. Production quotas, financial formulas and deployment settings are unchanged.

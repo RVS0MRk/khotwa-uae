@@ -1106,10 +1106,18 @@ def _apply_plan_language(plan, bilingual, lang):
         source = {}
     idea = (plan.get("state") or {}).get("idea") or ""
     fallback_used = False
+    # A repeated catch-all sentence for distinct source fields is a placeholder,
+    # not a trustworthy translation. Preserve the signed, specific source copy.
+    candidate_sources = {}
+    for key, path in _BILINGUAL_PATHS.items():
+        candidate = source.get(key)
+        if isinstance(candidate, str) and candidate.strip():
+            candidate_sources.setdefault(candidate.strip(), set()).add(str(_plan_path(plan, path) or ""))
     for key, path in _BILINGUAL_PATHS.items():
         original = _plan_path(plan, path)
         candidate = source.get(key)
-        if isinstance(candidate, str) and candidate.strip() and len(candidate) <= 1200:
+        if (isinstance(candidate, str) and candidate.strip() and len(candidate) <= 1200
+                and len(candidate_sources.get(candidate.strip(), set())) == 1):
             candidate = safe_text(candidate, lang)
             same_numbers = sorted(re.findall(r"\d+(?:[.,]\d+)*", candidate.replace(idea, ""))) == sorted(
                 re.findall(r"\d+(?:[.,]\d+)*", str(original or "").replace(idea, ""))

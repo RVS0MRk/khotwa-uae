@@ -54,11 +54,13 @@ def seal(plan, ledger):
     hashes = sorted({f"{len(fragment)}:{digest(fragment)[:32]}" for _, value in prose_items(plan)
                      for fragment in [value, *re.split(r"(?<=[.!?؟])\s+", value)] if fragment})
     from scoring import normalize_scores
+    from publication_policy import POLICY_VERSION
 
     payload = {"version": 3, "strings": hashes, "ledger_hash": digest(ledger),
                "canonical_id": plan.get("_canonical_id"),
                "assessment": normalize_scores(plan["opportunity_score"]) if isinstance(plan.get("opportunity_score"), dict) else None,
-               "decision": deepcopy(plan.get("decision_engine"))}
+               "decision": deepcopy(plan.get("decision_engine")),
+               "publication_policy": POLICY_VERSION}
     signature = hmac.new(_SIGNING_KEY, digest(payload).encode(), hashlib.sha256).hexdigest()
     plan["_content_receipt"] = {**payload, "signature": signature}
     plan["_provenance"] = ledger
@@ -72,6 +74,8 @@ def verified_receipt(plan):
     keys = ("version", "strings", "ledger_hash")
     if receipt["version"] == 3:
         keys += ("canonical_id", "assessment", "decision")
+        if "publication_policy" in receipt:
+            keys += ("publication_policy",)
         if receipt.get("canonical_id") != plan.get("_canonical_id"):
             return None
     payload = {k: receipt.get(k) for k in keys}

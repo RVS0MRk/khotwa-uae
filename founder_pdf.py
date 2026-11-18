@@ -350,6 +350,8 @@ def build_pdf(p, lang="en"):
     )
     from reportlab.lib.enums import TA_LEFT, TA_RIGHT
 
+    from pdf_text import Paragraph
+
     localized = _localize_pdf_plan(p, lang)
     localized["_export_lang"] = lang
     p = export_plan(localized)
@@ -360,57 +362,6 @@ def build_pdf(p, lang="en"):
     BASE = "Amiri" if (ar and font_ok) else "Helvetica"
     BOLD = "Amiri" if (ar and font_ok) else "Helvetica-Bold"
     align = TA_RIGHT if ar else TA_LEFT
-
-    if ar:
-        # ReportLab without optional rlbidi wraps already-reversed paragraphs
-        # from the wrong end. Wrap logical words first, then shape each line.
-        from reportlab.pdfbase.pdfmetrics import stringWidth
-
-        BaseParagraph = Paragraph
-
-        class ArabicParagraph(BaseParagraph):
-            def __init__(self, text, style, bulletText=None, frags=None, **kwargs):
-                super().__init__(text, style, bulletText=bulletText, frags=frags, **kwargs)
-                self.logical_frags = deepcopy(self.frags) if frags is None else None
-
-            def wrap(self, availWidth, availHeight):
-                if self.logical_frags is not None:
-                    lines, words, line_style = [], [], None
-
-                    def flush():
-                        nonlocal words, line_style
-                        if words:
-                            f = line_style
-                            color = f.textColor.hexval().replace("0x", "#")
-                            visual = escape(shape_ar(" ".join(words)))
-                            lines.append(
-                                f'<font name="{f.fontName}" size="{f.fontSize}" color="{color}">{visual}</font>'
-                            )
-                        else:
-                            lines.append("")
-                        words, line_style = [], None
-
-                    usable = max(
-                        1, availWidth - self.style.leftIndent - self.style.rightIndent - abs(self.style.firstLineIndent)
-                    )
-                    for fragment in self.logical_frags:
-                        if getattr(fragment, "lineBreak", False):
-                            flush()
-                            continue
-                        for word in getattr(fragment, "text", "").split():
-                            candidate = " ".join(words + [word])
-                            size = max(fragment.fontSize, line_style.fontSize if line_style else fragment.fontSize)
-                            if words and stringWidth(shape_ar(candidate), fragment.fontName, size) > usable:
-                                flush()
-                            if line_style is None:
-                                line_style = fragment
-                            words.append(word)
-                    if words:
-                        flush()
-                    BaseParagraph.__init__(self, "<br/>".join(lines), self.style)
-                return super().wrap(availWidth, availHeight)
-
-        Paragraph = ArabicParagraph
 
     fixed_labels = {
         "USER INPUT": "إدخال المستخدم",

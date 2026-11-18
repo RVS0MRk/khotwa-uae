@@ -21,6 +21,17 @@ def fake_groq(system, user, **kwargs):
     from flask import request, has_request_context
     from pathlib import Path
     fixture = request.headers.get("X-Khotwa-Test-Fixture", "") if has_request_context() else ""
+    if fixture == "v225-claims":
+        ar = "Reply in Arabic." in system or "Write ALL text values in Arabic" in system or "Write all field values except category in Arabic" in system
+        bad = "تملك خدمة نخلة للغداء المكتبي عقود توريد ملزمة." if ar else "PalmNest holds binding office lunch supply contracts."
+        if "Founder Advisor" in system:
+            return json.dumps({"title":bad,"summary":bad,"points":[{"title":bad,"text":bad}],"next_action":bad,"caution":""},ensure_ascii=False)
+        if "Suggest exactly three" in system:
+            return json.dumps({"ideas":[dict(name=bad,fit=bad,customer=bad,first_test=bad,assumption=bad,category="Food & Catering")for _ in range(3)]},ensure_ascii=False)
+        raw = json.loads((Path(__file__).parent / "tests/fixtures" / ("rich_plan_ar.json" if ar else "rich_plan_en.json")).read_text(encoding="utf-8"))
+        raw["summary"] = bad
+        raw["pitches"] = {key:bad for key in raw["pitches"]}
+        return json.dumps(raw,ensure_ascii=False)
     if fixture == "ar-advisor" and "Founder Advisor" in system:
         return json.dumps({"title":"تحديث دليل الأدلة","summary":"لم أتمكن من إعداد إجابة موثوقة الآن.","points":[{"title":"سجّل الردود","text":"أدخل القيم في proof_mode_recorded_evidence_only لتتبع إجمالي الردود."}],"next_action":"اسأل عشرة مالكي سيارات في دبي.","caution":""},ensure_ascii=False)
     if fixture in ("live-lunch", "live-lunch-ar", "live-packaging", "adverse-lunch") and "Founder Advisor" not in system and "Suggest exactly three" not in system:
@@ -36,10 +47,16 @@ def fake_groq(system, user, **kwargs):
         arabic = "Write ALL text values in Arabic" in system
         name = "rich_plan_ar" if arabic else "rich_plan_alt_en" if "coding" in user.lower() else "rich_plan_en"
         text = (Path(__file__).parent / "tests/fixtures" / f"{name}.json").read_text(encoding="utf-8")
-        if fixture == "consistent-assessment" and arabic:
+        if fixture in ("consistent-assessment", "v225-no-translation") and arabic:
             raw = json.loads(text)
             for key in ("local_fit", "clear_customer", "low_starting_cost", "easy_first_step", "growth_potential"):
                 raw["opportunity_score"][key]["reason"] = "قد تلائم الفكرة شريحة موظفي المكاتب؛ اختبر ملاءمتها قبل الإنفاق."
+            if fixture == "v225-no-translation":
+                raw.pop("bilingual_text", None)
+            return json.dumps(raw, ensure_ascii=False)
+        if fixture == "v225-no-translation":
+            raw = json.loads(text)
+            raw.pop("bilingual_text", None)
             return json.dumps(raw, ensure_ascii=False)
         return text
     if "Suggest exactly three" in system:

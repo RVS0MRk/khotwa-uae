@@ -102,6 +102,9 @@ def speech_act(text, kind, path="", context_words=None):
     """Independent positive policy; a verifier's 'safe' label is insufficient."""
     if not isinstance(kind, str) or kind not in {"planning", "hypothesis", "negation", "noun_phrase", "user_attributed"}:
         return False
+    from publication_policy import ungrounded_assertion, negated_clause
+    if ungrounded_assertion(text):
+        return False
     if not text or offending(text) or _INTERNAL.search(text):
         return False
     prospective = bool(re.search(r"\b(?:would|should|target|goal|testing|explor(?:es|ing)|welcome)\b|هدف|كمؤشر|للاختبار|\bNone\b", text, re.I))
@@ -111,7 +114,7 @@ def speech_act(text, kind, path="", context_words=None):
     if re.search(r"\d\s*(?:%|٪|percent|بالمئة|بالمائة)", text, re.I) and not numerical_question:
         return False
     offer_text = re.sub(r"\bfree\s+(?:waitlist|reservation|sign.up|interest form)\b|قائمة انتظار مجاني[ةه]|حجز بلا دفع|بلا دفع|دون دفع", "", text, flags=re.I)
-    negated = kind == "negation" and re.search(r"\b(?:not|no|never|none)\b|(?:^|\s)(?:لا|لم|لن|ليس|ليست)\b", text, re.I)
+    negated = all(negated_clause(c) for c in re.split(r"(?<=[.!?؟])\s+", text) if c)
     if re.search(r"\bfree\b|\b(?:guarantee|refund|discount)\w*\b|مجان[يةا]|ضمان استرجاع|خصم|نضمن|\b(?:zero|no) (?:upfront |initial )?(?:cost|charge|fee)|دون تكلفة|بدون تكلفة", offer_text, re.I) and not negated and not numerical_question:
         return False
     if re.search(r"\d+\s*(?:hours?|days?|ساعة|ساعات|يوماً|يوم).*?(?:deliver|service|توصيل|خدمة)|(?:deliver|توصيل).*?\d+\s*(?:hours?|ساعة|ساعات)", text, re.I) and not _QUESTION.search(text):
@@ -187,6 +190,14 @@ def verify_model(raw, inputs, lang, api_key, logger=None):
             continue
         if speech_act(text, kind, item["path"], context_words):
             approved.setdefault(item["path"], []).append(text)
+        elif isinstance(kind, str) and kind in {"planning", "hypothesis", "negation", "noun_phrase"}:
+            from content_safety import _CLAUSE_BOUNDARY
+            parts = re.split(_CLAUSE_BOUNDARY.pattern, text, flags=re.I)
+            if len(parts) > 1:
+                for part in parts:
+                    part = part.strip()
+                    if part and speech_act(part, kind, item["path"], context_words):
+                        approved.setdefault(item["path"], []).append(part if part.endswith((".", "?", "؟", "!")) else part.rstrip(";؛") + ".")
     for path, _ in collected:
         _set(clean, path, " ".join(approved.get(path, [])))
     if isinstance(clean, dict):
@@ -212,10 +223,14 @@ def protect_export(plan):
     """Recheck receipts per field; user records never become external proof."""
     clean = deepcopy(plan)
     allowed = receipt_strings(plan)
+    from publication_policy import POLICY_VERSION, ungrounded_assertion
+    receipt = verified_receipt(plan)
+    current_policy = receipt and receipt.get("publication_policy") == POLICY_VERSION
     lang = plan.get("_export_lang", plan.get("_content_lang", plan.get("_lang", "en")))
     lengths = sorted({int(token.split(":",1)[0]) for token in allowed}, reverse=True)
     def authenticated(value):
-        return f"{len(value)}:{digest(value)[:32]}" in allowed
+        return (f"{len(value)}:{digest(value)[:32]}" in allowed
+                and (current_policy or not ungrounded_assertion(value)))
     def recover(fragment):
         if authenticated(fragment):
             return fragment
@@ -233,8 +248,13 @@ def protect_export(plan):
     # Authenticate the original assessment, then deterministically derive its
     # one mutable dimension and evidence text from bounded SELF-REPORTS.
     from scoring import proof_counts, proof_evidence_text, assessment_from_proof
-    receipt = verified_receipt(plan)
     baseline = receipt.get("assessment") if receipt and receipt["version"] == 3 else None
+    if baseline and not current_policy:
+        baseline = deepcopy(baseline)
+        from scoring import DIMENSIONS
+        for key in DIMENSIONS:
+            if ungrounded_assertion(str((baseline.get(key) or {}).get("reason", ""))):
+                baseline[key] = {}
     counts = proof_counts(plan.get("proof_summary"))
     if isinstance(plan.get("opportunity_score"), dict):
         clean["opportunity_score"] = assessment_from_proof(baseline, counts, lang)
