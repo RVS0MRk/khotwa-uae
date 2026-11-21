@@ -340,6 +340,9 @@ def _unsupported_evidence(sentence):
 
 def offending(sentence):
     """Match assertions/actions, never mere topics, prices or percentages."""
+    from publication_policy import ungrounded_assertion
+    if ungrounded_assertion(sentence):
+        return True
     if re.search(
         r'"[^"\n]+"\s*:|^(?:\{|\[)|ignore (?:all|previous) instructions|'
         r"\b(?:return|output|respond with|format as|use)\s+(?:only\s+)?(?:json|markdown|html)\b",
@@ -401,8 +404,8 @@ def safe_text(value, lang="en", fallback="", minimum=12):
 def filter_sentences(value):
     """The shared safety boundary, without imposing a language on proper names."""
     text = markup(value)
-    sentences = re.split(r"(?<=[.!?؟])\s+|(?<=[.!?؟])(?=[A-Z])", text)
-    kept = [s.strip() for s in sentences if s.strip() and not offending(s)]
+    from publication_policy import sentences
+    kept = [s for s in sentences(text) if not offending(s)]
     return " ".join(kept)
 
 
@@ -420,7 +423,7 @@ def export_plan(plan):
 
             return deepcopy(value)
         if path in (("state", "idea"), ("readiness_report", "idea")) or (
-            len(path) == 1 and path[0].startswith("_") and path[0] != "_alternate_plan"
+            path and path[-1].startswith("_") and path[-1] != "_alternate_plan"
         ):
             from copy import deepcopy
 

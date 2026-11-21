@@ -10,6 +10,7 @@ import json
 import re
 from content_safety import markup, offending
 from provenance import sources, digest, receipt_strings, verified_receipt
+from publication_policy import words, sentences, publication_scope
 
 MAX_ITEMS = 160
 MAX_CHARS = 26000
@@ -17,7 +18,7 @@ _ENUMS = {"category", "source", "status", "level", "risk_level", "currency", "un
 _USER = {"proof_summary", "_financial_inputs"}
 _QUESTION = re.compile(r"^(?:what|how|which|where|when|why|would|could|can|do|does|is|are|هل|كيف|ما|ماذا|أي|متى|أين|لماذا)\b", re.I)
 _ACTION = re.compile(r"^(?:ask|interview|test|compare|record|review|check|verify|define|identify|describe|map|draft|create|collect|contact|approach|write|prepare|research|list|summari[sz]e|analyse|analyze|decide|avoid|do not|never|use|share|send|track|note|confirm|select|choose|document|explore|find|plan|إجراء|إعداد|تقييم|التحقق|حساب|صياغة|متابعة|تحديد|دراسة|ابدأ|أدخل|اسأل|قابل|اختبر|قارن|سجل|سجّل|راجع|تحقق|حدد|حدّد|اكتب|أنشئ|اجمع|تواصل|ابحث|صف|خطط|حلل|حلّل|تجنب|لا|عرّف|ارسم|جهز|جهّز|أجر|أجرِ|اعرض|رتب|رتّب)(?:\b|\s)", re.I)
-_QUALIFIED = re.compile(r"\b(?:may|might|could|can|needs?|requires?|depends?|potential|proposed|hypothes[ie]s|assumption|unknown|unverified|unproven|unconfirmed|until|not|no|never|if|unless|needs?.{0,35}(?:test|check|verify))\b|\b\w+n['’]t\b|(?:^|\s)(?:قد|ربما|يمكن|محتمل|مقترح|افتراض|فرضية|لم|لن|ليس|ليست|لا|إذا|حتى|غير مثبت|غير مؤكد|تتيح|تسمح|يعتمد|تعتمد|تحتاج\b)", re.I)
+_QUALIFIED = words(r"may|might|could|potential|proposed|hypothes[ie]s|assum\w*|unknown|unverified|unproven|unconfirmed|if|unless|قد|ربما|يمكن|محتمل[ةه]?|مقترح[ةه]?|افتراض[\u0621-\u064a]*|فرضية|غير\s+مثبت|غير\s+مؤكد")
 _INTERNAL = re.compile(r"\b(?:proof[\W_]*mode[\W_]*recorded[\W_]*evidence[\W_]*only|user[\W_]*budget[\W_]*aed[\W_]*user[\W_]*input|financial[\W_]*calculations[\W_]*user[\W_]*assumptions|assistant[\W_]*signature|bilingual[\W_]*text|plan[\W_]*context)\b", re.I)
 _FIRST_PERSON = re.compile(r"\b(?:we|our|I|my|has|have|had|was|were|already|yesterday)\b|(?:^|\s)(?:نحن|لدينا|حققنا|حصلنا|وصلت|بلغت|أصبح|أصبحت|تم|كانت|كان)(?:\s|$)", re.I)
 _STOP = {"the","and","for","with","from","this","that","your","our","are","into","في","من","إلى","الى","مع","هذا","هذه","على"}
@@ -99,55 +100,22 @@ classify = semantic_classify
 
 
 def speech_act(text, kind, path="", context_words=None):
-    """Independent positive policy; a verifier's 'safe' label is insufficient."""
-    if not isinstance(kind, str) or kind not in {"planning", "hypothesis", "negation", "noun_phrase", "user_attributed"}:
+    """A model label never grants evidence or exempts a finite predicate.
+
+    Deterministic, material-risk checks also run when classification fails.
+    This preserves ordinary descriptions/constraints without approving an
+    achievement, offer or malformed blob merely because a provider timed out.
+    """
+    if not isinstance(text, str) or not text or not re.search(r"[^\W\d_]{2,}", text):
         return False
-    from publication_policy import ungrounded_assertion, negated_clause
-    if ungrounded_assertion(text):
+    if any(len(word) > 160 for word in text.split()):
         return False
-    if not text or offending(text) or _INTERNAL.search(text):
+    if isinstance(kind, str) and kind in {"achievement", "promise", "instruction"}:
         return False
-    prospective = bool(re.search(r"\b(?:would|should|target|goal|testing|explor(?:es|ing)|welcome)\b|هدف|كمؤشر|للاختبار|\bNone\b", text, re.I))
-    # Numerical benefits are not grounded by a model saying 'hypothesis'. They
-    # belong in deterministic financial projections, never invented ad copy.
-    numerical_question = bool(_QUESTION.search(text) or re.search(r"\b(?:hypothesis|hypothetical|would|if)\b|فرضية|إذا", text, re.I))
-    if re.search(r"\d\s*(?:%|٪|percent|بالمئة|بالمائة)", text, re.I) and not numerical_question:
-        return False
-    offer_text = re.sub(r"\bfree\s+(?:waitlist|reservation|sign.up|interest form)\b|قائمة انتظار مجاني[ةه]|حجز بلا دفع|بلا دفع|دون دفع", "", text, flags=re.I)
-    negated = all(negated_clause(c) for c in re.split(r"(?<=[.!?؟])\s+", text) if c)
-    if re.search(r"\bfree\b|\b(?:guarantee|refund|discount)\w*\b|مجان[يةا]|ضمان استرجاع|خصم|نضمن|\b(?:zero|no) (?:upfront |initial )?(?:cost|charge|fee)|دون تكلفة|بدون تكلفة", offer_text, re.I) and not negated and not numerical_question:
-        return False
-    if re.search(r"\d+\s*(?:hours?|days?|ساعة|ساعات|يوماً|يوم).*?(?:deliver|service|توصيل|خدمة)|(?:deliver|توصيل).*?\d+\s*(?:hours?|ساعة|ساعات)", text, re.I) and not _QUESTION.search(text):
-        return False
-    sentences = [s.strip() for s in re.split(r"(?<=[.!?؟])\s+|;|؛|\bbut\b|لكن", text) if s.strip()]
-    for sentence in sentences:
-        local_prospective = bool(re.search(r"\b(?:would|should|target|goal|testing|explor(?:es|ing)|welcome|None)\b|هدف|كمؤشر|للاختبار", sentence, re.I))
-        if _QUESTION.search(sentence) or _ACTION.search(sentence) or _QUALIFIED.search(sentence) or local_prospective or re.search(r"\b(?:plausible|untested)\b|^نختبر\s",sentence,re.I):
-            continue
-        if kind == "noun_phrase" and len(sentence.split()) <= 35 and not _FIRST_PERSON.search(sentence):
-            nominal_task = path.endswith(".action") and (len(sentence.split()) == 1 or (len(sentence.split()) <= 3 and sentence.lower().split()[-1].strip(".") in {"step", "task", "check"}))
-            label = path.rsplit(".", 1)[-1] in {"title", "name", "focus", "location", "target_customer", "target_user", "business_name_suggestion"} or nominal_task
-            # A noun-phrase verdict alone cannot authorize arbitrary factual
-            # prose. Descriptions must connect to actual input vocabulary;
-            # Transitive past predicates are not non-asserting descriptions;
-            # passive service descriptions ("lunch boxes delivered daily") are.
-            if re.search(r"\b\S+\s+(?<![\w-])[a-z]+ed\s+(?:a|an|the|our|their|its|my|his|her|\d+)\b", sentence, re.I):
-                return False
-            if not label:
-                words = topic_words(sentence)
-                overlap = words.intersection(context_words or set())
-                minimum = 1 if path.startswith("opportunity_score.") else 2
-                if len(overlap) < minimum or len(overlap)/max(1,len(words)) < .2:
-                    return False
-            # Noun phrases may describe a concept/segment, not numerical traction.
-            segment_range = re.search(r"\d+\s*[-–]\s*\d+\s*(?:seats|years|employees|مقعد|سنة|موظف)", sentence, re.I) and re.search(r"target_customer|target_user|customer_personas.*name", path)
-            if re.search(r"\d", sentence) and not segment_range and not re.search(r"time_needed|timeline|\.day|\.focus", path):
-                return False
-            continue
-        return False
-    return bool(sentences)
+    return not (offending(text) or _INTERNAL.search(text))
 
 
+@publication_scope
 def verify_model(raw, inputs, lang, api_key, logger=None):
     """Per-string classification + source/grammar policy, not a blanket verdict."""
     clean = deepcopy(raw)
@@ -157,7 +125,7 @@ def verify_model(raw, inputs, lang, api_key, logger=None):
     selected, bindings, by_text, chars = [], [], {}, 0
     for path, value in collected:
         value = markup(public_terms(value, lang))
-        for sentence in re.split(r"(?<=[.!?؟])\s+", value):
+        for sentence in sentences(value):
             if not sentence:
                 continue
             if sentence not in by_text and len(selected) < MAX_ITEMS and chars + len(sentence) <= MAX_CHARS:
@@ -175,12 +143,15 @@ def verify_model(raw, inputs, lang, api_key, logger=None):
             from groq_client import log_failure
             log_failure(logger, "/content-verification", exc)
         verdicts, status = {}, "fallback"
-    approved = {}
+    approved, tainted_scores = {}, set()
     context_words = set().union(*(topic_words(value) for value in inputs.values() if isinstance(value,str)))
     for item in bindings:
         kind = verdicts.get(item["id"], "unknown")
         text = item["text"]
         if kind == "user_attributed":
+            if re.fullmatch(r"opportunity_score\.\w+\.reason", item["path"]) and offending(text):
+                tainted_scores.add(item["path"].split(".")[1])
+                continue
             for value in inputs.values():
                 if isinstance(value, str) and len(value.split()) >= 4 and value in text:
                     approved.setdefault(item["path"], []).append(
@@ -190,16 +161,14 @@ def verify_model(raw, inputs, lang, api_key, logger=None):
             continue
         if speech_act(text, kind, item["path"], context_words):
             approved.setdefault(item["path"], []).append(text)
-        elif isinstance(kind, str) and kind in {"planning", "hypothesis", "negation", "noun_phrase"}:
-            from content_safety import _CLAUSE_BOUNDARY
-            parts = re.split(_CLAUSE_BOUNDARY.pattern, text, flags=re.I)
-            if len(parts) > 1:
-                for part in parts:
-                    part = part.strip()
-                    if part and speech_act(part, kind, item["path"], context_words):
-                        approved.setdefault(item["path"], []).append(part if part.endswith((".", "?", "؟", "!")) else part.rstrip(";؛") + ".")
+        elif re.fullmatch(r"opportunity_score\.\w+\.reason", item["path"]):
+            tainted_scores.add(item["path"].split(".")[1])
     for path, _ in collected:
         _set(clean, path, " ".join(approved.get(path, [])))
+    # A surviving safe sentence cannot rescue a numeric assessment originally
+    # justified by a rejected claim. Leave aggregation to unchanged scoring.py.
+    for dimension in tainted_scores:
+        clean["opportunity_score"][dimension].update(score=None, reason="")
     if isinstance(clean, dict):
         for i, step in enumerate(clean.get("steps", []) or []):
             original = (raw.get("steps") or [])[i]
@@ -219,6 +188,7 @@ def offline_text(text, lang, path=""):
     return text if speech_act(text, "planning", path) else ""
 
 
+@publication_scope
 def protect_export(plan):
     """Recheck receipts per field; user records never become external proof."""
     clean = deepcopy(plan)
@@ -229,8 +199,7 @@ def protect_export(plan):
     lang = plan.get("_export_lang", plan.get("_content_lang", plan.get("_lang", "en")))
     lengths = sorted({int(token.split(":",1)[0]) for token in allowed}, reverse=True)
     def authenticated(value):
-        return (f"{len(value)}:{digest(value)[:32]}" in allowed
-                and (current_policy or not ungrounded_assertion(value)))
+        return f"{len(value)}:{digest(value)[:32]}" in allowed and not ungrounded_assertion(value)
     def recover(fragment):
         if authenticated(fragment):
             return fragment
@@ -249,12 +218,14 @@ def protect_export(plan):
     # one mutable dimension and evidence text from bounded SELF-REPORTS.
     from scoring import proof_counts, proof_evidence_text, assessment_from_proof
     baseline = receipt.get("assessment") if receipt and receipt["version"] == 3 else None
-    if baseline and not current_policy:
+    tainted_receipt = False
+    if baseline:
         baseline = deepcopy(baseline)
         from scoring import DIMENSIONS
         for key in DIMENSIONS:
             if ungrounded_assertion(str((baseline.get(key) or {}).get("reason", ""))):
                 baseline[key] = {}
+                tainted_receipt = True
     counts = proof_counts(plan.get("proof_summary"))
     if isinstance(plan.get("opportunity_score"), dict):
         clean["opportunity_score"] = assessment_from_proof(baseline, counts, lang)
@@ -280,8 +251,13 @@ def protect_export(plan):
         )
     elif receipt and receipt["version"] == 3 and isinstance(receipt.get("decision"), dict):
         clean["decision_engine"] = deepcopy(receipt["decision"])
+        for key, value in list(clean["decision_engine"].items()):
+            if isinstance(value, str) and key != "risk_level":
+                clean["decision_engine"][key] = recover(value)
     if counts is None:
         clean["proof_summary"] = {}
+    from input_options import sanitize_export_display
+    sanitize_export_display(clean)
     # State's display aliases must not bypass the narrative gate.
     state = clean.get("state")
     if isinstance(state, dict):
@@ -296,4 +272,9 @@ def protect_export(plan):
                        (plan.get("_provenance", {}).get("entries", {}) if isinstance(plan.get("_provenance"), dict) else {}).items()
                        if key.startswith("user.") and isinstance(entry, dict)}
     clean["_current_sources"] = sources(original_inputs, clean)
+    if tainted_receipt:
+        # The input receipt remains byte-identical and was verified above.
+        # Do not carry its rejected raw reason into a renderable export view,
+        # and never edit/re-sign the signed payload to manufacture a clean one.
+        clean.pop("_content_receipt", None)
     return clean

@@ -27,7 +27,7 @@ def register_arabic_font():
             pdfmetrics.registerFontFamily("Amiri", normal="Amiri", bold="Amiri", italic="Amiri", boldItalic="Amiri")
 
 
-def _visual_runs(parts):
+def _visual_runs(parts, base_level=None):
     """Bidi reorders characters AND their style ownership, not whole strings.
 
     Shape within each style span (our markup never cuts an Arabic word), then
@@ -42,7 +42,7 @@ def _visual_runs(parts):
     if not text:
         return []
     storage = bidi.get_empty_storage()
-    level = bidi.get_base_level(text)
+    level = bidi.get_base_level(text) if base_level is None else base_level
     storage.update(base_level=level, base_dir=("L", "R")[level])
     bidi.get_embedding_levels(text, storage, False, False)
     for char, owner in zip(storage["chars"], owners):
@@ -96,18 +96,30 @@ class Paragraph(BaseParagraph):
         register_arabic_font()
         usable = max(1, availWidth - self.style.leftIndent - self.style.rightIndent - abs(self.style.firstLineIndent) - 2)
         lines, current = [], []
+        # Hard breaks (e.g. an English label followed by Arabic prose) begin
+        # their own logical segment. Soft wraps always inherit that segment's
+        # first strong character, even when a line begins with a Latin brand.
+        segments = [""]
+        for fragment in self._logical:
+            if getattr(fragment, "lineBreak", False):
+                segments.append("")
+            else:
+                segments[-1] += getattr(fragment, "text", "")
+        levels = [bidi.get_base_level(text.translate(_CONTROLS)) for text in segments]
+        segment = 0
 
         def flush():
             nonlocal current
             lines.append("".join(
                 f'<font name="{font}" size="{size}" color="{color.replace("0x", "#")}">{escape(value)}</font>'
-                for (font, size, color), value in _visual_runs(current)
+                for (font, size, color), value in _visual_runs(current, levels[segment])
             ))
             current = []
 
         for fragment in self._logical:
             if getattr(fragment, "lineBreak", False):
                 flush()
+                segment += 1
                 continue
             # Keep whitespace ownership and style boundaries, without inserting
             # spaces between fragments that were adjacent in the original XML.

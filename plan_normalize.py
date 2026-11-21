@@ -5,6 +5,7 @@ from html import unescape
 from copy import deepcopy
 from scoring import normalize_scores
 from content_safety import safe_text, MISSING
+from publication_policy import publication_scope
 from plan_utils import _int, _money, _sync_path_costs, _format_money, _target_customer
 
 
@@ -983,6 +984,7 @@ def _template_plan(plan, inputs, lang):
     return plan
 
 
+@publication_scope
 def _normalize_plan(plan, inputs, lang):
     from plan_content import normalize_plan
 

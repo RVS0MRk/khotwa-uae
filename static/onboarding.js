@@ -14,7 +14,7 @@ function arabicCategoryPattern(words) {
   // Unicode boundaries avoid matching فن inside فندق or صحة inside an unrelated
   // word. Common article/conjunction prefixes still match natural Arabic.
   return new RegExp(
-    `(?:^|[^\\p{L}\\p{N}])(?:وال|ال|و)?(?:${words})(?=$|[^\\p{L}\\p{N}])`,
+    `(?:^|[^\\p{L}\\p{N}])(?:وال|بال|لل|ال|و|ل|ب)?(?:${words})(?=$|[^\\p{L}\\p{N}])`,
     "u",
   );
 }
@@ -50,11 +50,22 @@ function detectBusinessCategory(idea) {
   // Prefer the earliest explicit primary activity over a product/topic word.
   // A workshop is education only in a learning context, not a repair shop.
   const intents = [
-    ["Education & Tutoring", /\b(?:teach\w*|tutor\w*|classes?|courses?|training)\b|\bworkshops?\b(?=.{0,65}\b(?:children|kids|students|robotics|coding|learning)\b)|(?:تعليم|تدريس|دروس|دورات)|(?:ورش|ورشة)(?=.{0,65}(?:روبوت|اطفال|طلاب|تعليم))/iu],
-    ["Retail & Trading", /\b(?:sell\w*|retail|trading|shops?|stores?)\b|(?:بيع|متجر|متاجر|تجارة)/iu],
-    ["Technology & Digital", /\b(?:develop\w*|build\w*)\b(?=.{0,50}\b(?:software|apps?|platform)\b)|\bsoftware\b|(?:تطوير|برمجة)(?=.{0,50}(?:برمجيات|تطبيق|نظام|روبوت))/iu],
-  ].map(([category, pattern]) => ({ category, index: normalized.search(pattern) })).filter(x => x.index >= 0).sort((a,b) => a.index-b.index);
-  if (intents.length) return intents[0].category;
+    ["Education & Tutoring", /\b(?:teach\w*|tutor\w*|classes?|courses?|training)\b|\bworkshops?\b(?=.{0,65}\b(?:children|kids|students|robotics|coding|learning)\b)/iu, arabicCategoryPattern("تعليم|تدريس|دروس|دورات|(?:ورش|ورشة)(?=.{0,65}(?:روبوت|اطفال|طلاب|تعليم))")],
+    ["Retail & Trading", /\b(?:sell\w*|retail|trading|shops?|stores?)\b/iu, arabicCategoryPattern("بيع|متجر|متاجر|تجارة")],
+    ["Technology & Digital", /\b(?:develop\w*|build\w*)\b(?=.{0,50}\b(?:software|apps?|platform)\b)|\bsoftware\b/iu, arabicCategoryPattern("(?:تطوير|برمجة)(?=.{0,50}(?:برمجيات|تطبيق|نظام|روبوت))")],
+  ].flatMap(([category, english, arabic]) => [english, arabic].map(pattern => ({ category, index: normalized.search(pattern) }))).filter(x => x.index >= 0).sort((a,b) => a.index-b.index);
+  if (intents.length) {
+    const first = intents[0].category;
+    // A generic selling verb does not change the underlying food/service
+    // activity. Explicit education/development intent retains its precedence.
+    if (first === "Retail & Trading") {
+      const food = CATEGORY_WORDS[0][1].test(normalized) || ARABIC_CATEGORY_WORDS[0][1].test(normalized);
+      const service = /\b(?:wash(?:ing)?|clean(?:ing)?|repair(?:ing)?|maintenance)\b(?!\s+(?:kits?|parts?|equipment)\b)/i.test(normalized) || arabicCategoryPattern("غسيل|غسل|تنظيف|صيانة|اصلاح").test(normalized);
+      if (food) return "Food & Catering";
+      if (service) return "Services & Maintenance";
+    }
+    return first;
+  }
   // Use the same ordered category precedence in either language. Food context
   // wins over a healthy adjective; children alone never implies Education.
   return (

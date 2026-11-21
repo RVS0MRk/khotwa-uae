@@ -21,6 +21,34 @@ def fake_groq(system, user, **kwargs):
     from flask import request, has_request_context
     from pathlib import Path
     fixture = request.headers.get("X-Khotwa-Test-Fixture", "") if has_request_context() else ""
+    if fixture.startswith("v226-"):
+        ar = "Reply in Arabic." in system or "Write ALL text values in Arabic" in system or "Write all field values except category in Arabic" in system
+        if fixture == "v226-claims":
+            cases = json.loads((Path(__file__).parent / "tests/fixtures/v226_cases.json").read_text(encoding="utf-8"))
+            bad = cases["independent_unsafe"]["ar" if ar else "en"][27]
+            if "Founder Advisor" in system:
+                return json.dumps(dict(title=bad,summary=bad,points=[dict(title=bad,text=bad)],next_action=bad,caution=""),ensure_ascii=False)
+            raw = json.loads((Path(__file__).parent / "tests/fixtures" / ("rich_plan_ar.json" if ar else "rich_plan_en.json")).read_text(encoding="utf-8"))
+            raw["summary"] = bad
+            raw["pitches"] = {key:bad for key in raw["pitches"]}
+            return json.dumps(raw,ensure_ascii=False)
+        if "Founder Advisor" not in system and "Suggest exactly three" not in system:
+            name = "v224_live_lunch_ar" if ar else "v226_rich_lunch"
+            raw = json.loads((Path(__file__).parent / "tests/fixtures" / (name + ".json")).read_text(encoding="utf-8"))
+            raw.pop("bilingual_text",None)
+            if fixture == "v226-tainted-score":
+                raw["opportunity_score"]["local_fit"]["reason"] = "Founder works nearby. HarborLoop received the operating permit yesterday."
+            if fixture == "v226-mixed":
+                raw = json.loads((Path(__file__).parent / "tests/fixtures" / ("rich_plan_ar.json" if ar else "rich_plan_en.json")).read_text(encoding="utf-8"))
+                raw.pop("bilingual_text",None)
+                raw["summary"] = (
+                    "هل يدفع مديرو أسطول Deliveroo مبلغ AED 1,250 شهرياً لاختبار خدمة خطوة المقترحة (مع Careem)؟ نحتاج إلى مقارنة الافتراض مع البديل الحالي ومقابلة مديرين قبل أي التزام، مع فحص خيارات QuickLane وCityFleet ومواعيد العمل المناسبة."
+                    if ar else "Would Deliveroo managers pay AED 1,250 monthly to test خطوة with Careem? Compare the proposed approach with دراجتي and the current alternative (including dispatch timing), and interview coordinators before any commitment to a commercial trial."
+                )
+                if ar:
+                    for dimension in ("local_fit","clear_customer","low_starting_cost","easy_first_step","growth_potential"):
+                        raw["opportunity_score"][dimension]["reason"] = "قد تلائم الفكرة شريحة موظفي المكاتب؛ اختبر ملاءمتها قبل الإنفاق."
+            return json.dumps(raw,ensure_ascii=False)
     if fixture == "v225-claims":
         ar = "Reply in Arabic." in system or "Write ALL text values in Arabic" in system or "Write all field values except category in Arabic" in system
         bad = "تملك خدمة نخلة للغداء المكتبي عقود توريد ملزمة." if ar else "PalmNest holds binding office lunch supply contracts."

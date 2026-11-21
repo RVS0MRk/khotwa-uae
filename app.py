@@ -71,55 +71,7 @@ app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 31536000
 os.environ.setdefault("MPLCONFIGDIR", os.path.join(tempfile.gettempdir(), "startsmart-matplotlib"))
 
 _PUBLIC_ENDPOINTS = {"/ask", "/discover", "/generate", "/pdf", "/finance", "/investment/pdf"}
-_REGIONS = {
-    "UAE-wide",
-    "Abu Dhabi",
-    "Al Ain",
-    "Dubai",
-    "Sharjah",
-    "Ajman",
-    "Ras Al Khaimah",
-    "Fujairah",
-    "Umm Al Quwain",
-    "Other UAE",
-}
-_CONTEXTS = {
-    "Not sure",
-    "Online",
-    "Local service",
-    "Local service or digital",
-    "Retail",
-    "Food & beverage",
-    "Tourism",
-    "B2B",
-    "Campus",
-    "Residential",
-    "Rural",
-    "Other",
-}
-_CATEGORIES = {
-    "Food & Catering",
-    "Agriculture & Farming",
-    "Retail & Trading",
-    "Tourism & Hospitality",
-    "Services & Maintenance",
-    "Technology & Digital",
-    "Handicrafts & Arts",
-    "Health & Wellness",
-    "Education & Tutoring",
-    "Services",
-    "Other",
-}
-_USER_TYPES = {
-    "",
-    "students",
-    "families",
-    "tourists",
-    "professionals",
-    "small_businesses",
-    "residents",
-    "online_customers",
-}
+from input_options import REGIONS as _REGIONS, CONTEXTS as _CONTEXTS, CATEGORIES as _CATEGORIES, USER_TYPES as _USER_TYPES
 _request_times = {}
 _request_lock = Lock()
 _pdf_lock = Lock()
