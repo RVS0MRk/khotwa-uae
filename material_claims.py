@@ -10,14 +10,14 @@ import json
 import re
 from content_safety import markup, offending
 from provenance import sources, digest, receipt_strings, verified_receipt
-from publication_policy import words, sentences, publication_scope
+from publication_policy import words, sentences, publication_scope, form_matches
 
 MAX_ITEMS = 160
 MAX_CHARS = 26000
 _ENUMS = {"category", "source", "status", "level", "risk_level", "currency", "unit"}
 _USER = {"proof_summary", "_financial_inputs"}
 _QUESTION = re.compile(r"^(?:what|how|which|where|when|why|would|could|can|do|does|is|are|هل|كيف|ما|ماذا|أي|متى|أين|لماذا)\b", re.I)
-_ACTION = re.compile(r"^(?:ask|interview|test|compare|record|review|check|verify|define|identify|describe|map|draft|create|collect|contact|approach|write|prepare|research|list|summari[sz]e|analyse|analyze|decide|avoid|do not|never|use|share|send|track|note|confirm|select|choose|document|explore|find|plan|إجراء|إعداد|تقييم|التحقق|حساب|صياغة|متابعة|تحديد|دراسة|ابدأ|أدخل|اسأل|قابل|اختبر|قارن|سجل|سجّل|راجع|تحقق|حدد|حدّد|اكتب|أنشئ|اجمع|تواصل|ابحث|صف|خطط|حلل|حلّل|تجنب|لا|عرّف|ارسم|جهز|جهّز|أجر|أجرِ|اعرض|رتب|رتّب)(?:\b|\s)", re.I)
+_ACTION = re.compile(r"^(?:message|provide|conduct|capture|estimate|leverage|gather|outline|explain|meet|present|ask|interview|test|compare|record|review|check|verify|define|identify|describe|map|draft|create|collect|contact|approach|write|prepare|research|list|summari[sz]e|analyse|analyze|decide|avoid|do not|never|use|share|send|track|note|confirm|select|choose|document|explore|find|plan|إجراء|إعداد|تقييم|التحقق|حساب|صياغة|متابعة|تحديد|دراسة|ابدأ|أدخل|اسأل|قابل|اختبر|قارن|سجل|سجّل|راجع|تحقق|حدد|حدّد|اكتب|أنشئ|اجمع|تواصل|ابحث|صف|خطط|حلل|حلّل|تجنب|لا|عرّف|ارسم|جهز|جهّز|أجر|أجرِ|اعرض|رتب|رتّب)(?:\b|\s)", re.I)
 _QUALIFIED = words(r"may|might|could|potential|proposed|hypothes[ie]s|assum\w*|unknown|unverified|unproven|unconfirmed|if|unless|قد|ربما|يمكن|محتمل[ةه]?|مقترح[ةه]?|افتراض[\u0621-\u064a]*|فرضية|غير\s+مثبت|غير\s+مؤكد")
 _INTERNAL = re.compile(r"\b(?:proof[\W_]*mode[\W_]*recorded[\W_]*evidence[\W_]*only|user[\W_]*budget[\W_]*aed[\W_]*user[\W_]*input|financial[\W_]*calculations[\W_]*user[\W_]*assumptions|assistant[\W_]*signature|bilingual[\W_]*text|plan[\W_]*context)\b", re.I)
 _FIRST_PERSON = re.compile(r"\b(?:we|our|I|my|has|have|had|was|were|already|yesterday)\b|(?:^|\s)(?:نحن|لدينا|حققنا|حصلنا|وصلت|بلغت|أصبح|أصبحت|تم|كانت|كان)(?:\s|$)", re.I)
@@ -112,7 +112,7 @@ def speech_act(text, kind, path="", context_words=None):
         return False
     if isinstance(kind, str) and kind in {"achievement", "promise", "instruction"}:
         return False
-    return not (offending(text) or _INTERNAL.search(text))
+    return not (offending(text) or _INTERNAL.search(text)) and form_matches(text, kind, path)
 
 
 @publication_scope
@@ -136,7 +136,12 @@ def verify_model(raw, inputs, lang, api_key, logger=None):
                 bindings.append({"id":by_text[sentence],"path":path,"text":sentence})
     try:
         verdicts = classify(selected, api_key) if selected else {}
-        status = "checked"
+        if not isinstance(verdicts, dict):
+            raise ValueError('Invalid content verification map')
+        valid = {'planning','hypothesis','negation','noun_phrase','user_attributed','achievement','promise','instruction'}
+        usable = {key:kind for key,kind in verdicts.items() if type(key) is int and key in range(len(selected)) and isinstance(kind,str) and kind in valid}
+        status = "checked" if len(usable) == len(selected) else "fallback"
+        verdicts = usable
     except Exception as exc:
         # No provider body, key, prompt or founder text enters logs.
         if logger:

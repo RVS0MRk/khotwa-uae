@@ -9,7 +9,7 @@ import re
 from contextvars import ContextVar
 from functools import wraps
 
-POLICY_VERSION = "v226-1"
+POLICY_VERSION = "v227-1"
 _CACHE = ContextVar('publication_checks', default=None)
 
 
@@ -34,7 +34,7 @@ def words(pattern):
 
 _AUX = words(r"is|are|was|were|be|been|has|have|had|does|do|did")
 _NEGATIVE = words(r"not|never|no|none|nobody|لم|ليس|ليست|لا|غير")
-_HEDGE = words(r"may|might|could|would|likely|possible|potential|proposed|planned|suggested|"
+_HEDGE = words(r"can|may|might|could|would|likely|possible|potential|proposed|planned|suggested|"
                r"potentially|plans?\s+to|aims?\s+to|intends?\s+to|hopes?\s+to|"
                r"(?:our|my|the)\s+(?:plan|goal|aim|intention)\s+(?:is|was)\s+to|"
                r"نهدف|نسعي|نخطط|نقترح|هدفنا|"
@@ -71,8 +71,8 @@ _PEOPLE = words(r"customers?|clients?|users?|members?|subscribers?|buyers?|rider
 _CURRENCY = words(r"aed|usd|dirhams?|dollars?|درهم(?:ا)?|دراهم|دولار(?:ا)?")
 _CONSTRAINT = words(r"needs?|requires?|depends?\s+on|limited|limits?|constraints?|capacity|"
                     r"adds?\s+(?:\w+\s+){0,2}cost|costly|expensive|difficult|unclear|"
-                    r"تحتاج|يحتاج|تتطلب|يتطلب|تضيف\s+تكلف[ةه]|محدود[ةه]?|صعب[ةه]?|"
-                    r"يصعب|تكلف[ةه]|تكاليف|قدرة|القدرة|طاقة|الطاقة")
+                    r"[يتن]حتاج|تتطلب|يتطلب|تضيف\s+تكلف[ةه]|محدود[ةه]?|صعب[ةه]?|"
+                    r"يصعب|(?:[وف])?(?:تكلف[ةه]|تكاليف)|قدرة|القدرة|طاقة|الطاقة")
 _CURRENT = words(r"already|now|currently|yesterday|ago|so\s+far|last|loyal|regular|"
                  r"بالفعل|الان|حاليا|امس|الماضي|الماضية|منذ|دائم(?:ا|ة|ين)?|فعلي[ةا]?")
 _STATE = words(r"profitable|cash.positive|proven|validated|approved|granted|full|filled|"
@@ -82,6 +82,12 @@ _IRREGULAR = words(r"became|began|bought|brought|built|came|chose|did|drove|fell
                    r"gave|got|grew|held|kept|led|left|lost|made|met|paid|ran|rose|said|sold|"
                    r"sent|set|spent|stood|took|went|won|was|were|had|"
                    r"كان|كانت|اصبح|اصبحت|صار|صارت|بات|باتت|ظل|ظلت")
+# General irregular English inflection, used for form validation, not a new
+# commercial noun/outcome vocabulary or a change to the noun-phrase backstop.
+_FORM_IRREGULAR = words(_IRREGULAR.pattern + r"|broke|broken|chosen|driven|fallen|flown|forgot|forgotten|"
+                        r"froze|frozen|given|gone|grown|known|lent|lit|ridden|rung|risen|seen|"
+                        r"shone|shown|slept|spoken|stolen|sworn|swum|taught|thought|thrown|"
+                        r"understood|woken|written")
 
 
 def normalize(text):
@@ -90,14 +96,142 @@ def normalize(text):
 
 
 def clauses(text):
-    """Analysis only: never publish these clause tails as sentences."""
+    """Split predications, preserving coordinated noun/argument lists.
+
+    Boundaries are for analysis only; publication still uses full original
+    sentences. A conjunction before a new verb/subject differs from one joining
+    costs or the objects of a single denial.
+    """
     value = normalize(text)
-    value = re.sub(
-        r"\s+[وف](?=(?:ال|لدي|لدينا|لديهم|نحن|هم|هو|هي|لم|لن|لا|قد|سوف)\b|"
-        r"ال[\u0621-\u064a]+|[يتن][\u0621-\u064a]{2,}\b|[\u0621-\u064a]{2,}(?<!ا)(?:ت|نا|وا)\b)",
-        ";", value,
-    )
-    return [s.strip() for s in re.split(r"(?<=[.!?؟])\s+|[;؛:،]|,(?!\d)|\b(?:but|however|because|although|and|ولكن|لكن)\b", value) if s.strip()]
+    # Arabic conjunctions attach to the next token. Inspect the entire tail,
+    # rather than interpreting every ت/ن prefix as a verb (e.g. a cost noun).
+    def attached(match):
+        tail = value[match.end():]
+        token = tail.split()[0].strip('.,؛،:!?؟')
+        from content_safety import _ACHIEVED
+        starts_clause = (token.startswith(('ال','لدي','عند','نحن','هم','هو','هي','لم','لن','لا','قد','سوف','ي','ت','ن')) or
+                         token.endswith(('ت','نا','وا')) and not token.endswith('ات') or _ACHIEVED.match(tail))
+        return ';' if starts_clause and not token.endswith('ات') and _new_predication(tail) else match.group()
+    value = re.sub(r"\s+([وف])(?=[\u0621-\u064a])", attached, value)
+    result = []
+    for segment in re.split(r"(?<=[.!?؟])\s+|[;؛:]|\b(?:but|however|because|although|ولكن|لكن)\b", value):
+        start = 0
+        for boundary in re.finditer(r",(?!\d)|،|\b(?:and|or)\b", segment):
+            tail = segment[boundary.end():].lstrip()
+            # Oxford commas do not create a new clause before the final noun.
+            tail = re.sub(r"^(?:and|or)\s+", "", tail)
+            if _new_predication(tail):
+                result.append(segment[start:boundary.start()].strip())
+                start = boundary.end()
+        result.append(segment[start:].strip())
+    return [part for part in result if part]
+
+
+def _form_predicates(value, strict=False):
+    """Conservative finite-verb candidates, without noun-to-verb inference.
+
+    The material backstop retains its V226 subject/domain checks. Form checks
+    must not mistake a material subject's following noun for a bare verb.
+    """
+    positions = [m.start() for m in _AUX.finditer(value)]
+    positions += [m.start() for m in _FORM_IRREGULAR.finditer(value)]
+    if strict:
+        # A bare triliteral preceding a definite subject is a possible Arabic
+        # VSO assertion; a positive nominal predicate also has no overt copula.
+        # Ambiguous labels use the existing fallback during an outage.
+        if re.match(r'^[\u0621-\u064a]{3}\s+ال[\u0621-\u064a]+\s+',value):
+            positions.append(0)
+        positions += [m.start() for m in _STATE.finditer(value)]
+    for match in re.finditer(r"\b[a-z][a-z-]*(?:ed|s)\b|(?<!\w)[\u0621-\u064a]{3,}(?!\w)", value):
+        token = match.group()
+        if _RESULT.fullmatch(token) or _COST.fullmatch(token) or _PEOPLE.fullmatch(token) or _CURRENCY.fullmatch(token) or _HEDGE.fullmatch(token):
+            continue
+        if token.isascii():
+            if token.endswith('ss'):
+                continue  # An English -ss stem does not take a bare -s ending.
+            tail = value[match.end():].strip()
+            if match.start() and not token.startswith('pre-') and (strict or token.endswith('ed') or not re.match(r"^(?:of|for|in|on|at|to|by|with|from|about|through|via|without|before|after|under|over|near)\b", tail)):
+                positions.append(match.start())
+        elif not token.startswith('ال') and not token.endswith('ات') and (strict and token.startswith('ا') or token.startswith(('است','ي','ت','ن')) or
+                token.endswith(('ت','وا','نا')) and not token.endswith(('ات','ية'))):
+            positions.append(match.start())
+    return sorted(set(positions))
+
+
+def _new_predication(value):
+    value = value.strip()
+    if not value:
+        return False
+    if _research(value):
+        return True
+    # Coordinated passive participles share their earlier modal/auxiliary;
+    # a relative clause belongs to its noun, not a new independent subject.
+    first = value.split()[0].strip('.,')
+    relative = re.search(r'\b(?:that|which|who|whose)\b',value)
+    auxiliary = _AUX.search(value)
+    if relative and auxiliary and relative.start() < auxiliary.start():
+        return False
+    if first.isascii() and first.endswith('ed') and not auxiliary:
+        return False
+    if _form_predicates(value):
+        return True
+    # Arabic nominal predicates need no copula: a definite subject followed by
+    # an indefinite participle/adjective is distinct from a definite modifier.
+    if _STATE.search(value) or re.match(r"^(?:ال[\u0621-\u064a]+\s+)+م(?!ن\b|ع\b)[\u0621-\u064a]{2,}\b", value):
+        return True
+    return bool(re.match(r"^(?:لدي|عند)(?:نا|ها|هم|ه|كم)?\b", value))
+
+
+def planning_clause(value):
+    return _research(value)
+
+
+def hypothesis_clause(value):
+    # Negated epistemic states (unknown whether, unverified, ...) qualify the
+    # proposition they introduce, even if their own copula precedes the marker.
+    if _UNCERTAIN.search(value) and negated_clause(value):
+        return True
+    positions = _form_predicates(value)
+    for pattern in (_HEDGE, _CONDITION):
+        for marker in pattern.finditer(value):
+            earlier = [p for p in positions if p < marker.start()]
+            if not earlier:
+                return True
+            # Present-tense plural subjects precede a modal without becoming
+            # predicates ('office workers may ...'). A prior auxiliary/past
+            # predicate cannot borrow this later modal.
+            modal = words(r'can|may|might|could|would|قد|ربما|يمكن').fullmatch(marker.group())
+            if modal and not any(_AUX.match(value,p) or _IRREGULAR.match(value,p) or
+                                 re.match(r'[a-z-]+ed\b',value[p:]) or re.match(r'[\u0621-\u064a]',value[p:]) for p in earlier):
+                return True
+            if re.search(r'\b(?:is|are|was|were)\s+$',value[:marker.start()]) and all(_AUX.match(value,p) for p in earlier):
+                return True
+    return False
+
+
+def form_matches(text, kind, path=""):
+    parts = clauses(text)
+    if not parts:
+        return False
+    if kind == 'planning':
+        return all(planning_clause(p) for p in parts)
+    if kind == 'hypothesis':
+        return all(planning_clause(p) or hypothesis_clause(p) or not _form_predicates(p) and not _STATE.search(p) for p in parts) and any(hypothesis_clause(p) for p in parts)
+    if kind == 'negation':
+        return all(negated_clause(p) and not _negative_promise(p) for p in parts)
+    if kind == 'noun_phrase':
+        return True  # Explicit residual risk: unchanged V226 material backstop.
+    # Missing/invalid/unavailable classification: no declarative default.
+    if all(planning_clause(p) or hypothesis_clause(p) or negated_clause(p) for p in parts):
+        return True
+    labels = {'title','name','business_name_suggestion','target_customer','location','focus'}
+    value = normalize(text)
+    finite = _form_predicates(value, strict=True)
+    tokens = value.strip(' .').split()
+    # An adjective + plural noun is a label, not third-person conjugation.
+    if len(tokens)==2 and tokens[0].isascii() and tokens[0].endswith(('al','ive','ary','ous')) and tokens[1].endswith('s'):
+        finite = [p for p in finite if value[p:].strip(' .') != tokens[1]]
+    return path.rsplit('.',1)[-1] in labels and len(text.split()) <= 12 and not finite
 
 
 def sentences(text):
@@ -139,6 +273,8 @@ def negated_clause(clause):
     value = normalize(clause)
     if _negative_promise(value) or re.search(r"\bnot\s+only\b|ليس\s+فقط", value):
         return False
+    if re.search(r'\b(?:no|not)\s+(?:more|less|fewer)\s+than\b',value):
+        return False  # A comparative bound is not denial of the predicate.
     uncertainty = _UNCERTAIN.search(value)
     if uncertainty:
         before, after = value[:uncertainty.start()], value[uncertainty.end():].strip(" .")
@@ -156,7 +292,7 @@ def negated_clause(clause):
     if _ASSERTIVE_SUBJECT.search(value[negative.end():]) and not re.search(
             r"(?<!\w)(?:نفترض|ندعي|نؤكد|نعد|دليل)(?!\w)|\b(?:assume|claim|promise|evidence)\b", value):
         return False
-    if re.search(r"\bif\b|(?<!\w)ان(?!\w)", value[:negative.start()]):
+    if _CONDITION.search(value[:negative.start()]) or re.search(r"(?<!\w)ان(?!\w)",value[:negative.start()]):
         return False  # A refund 'if not satisfied' is not a denial of refund.
     if re.search(r"\b(?:no|zero)\s+(?:[a-z-]+\s+){0,4}(?:costs?|fees?|charges?)\b", value):
         return False
@@ -176,6 +312,8 @@ def negated_clause(clause):
 
 
 def _qualified(value, predicate):
+    if words(r'can|يمكن').search(value) and hypothesis_clause(value):
+        return True
     for match in list(_HEDGE.finditer(value)) + list(_CONDITION.finditer(value)):
         if match.start() <= predicate:
             return True
