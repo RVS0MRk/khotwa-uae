@@ -9,7 +9,7 @@ import re
 from contextvars import ContextVar
 from functools import wraps
 
-POLICY_VERSION = "v227-1"
+POLICY_VERSION = "v228-final-1"
 _CACHE = ContextVar('publication_checks', default=None)
 
 
@@ -42,13 +42,15 @@ _HEDGE = words(r"can|may|might|could|would|likely|possible|potential|proposed|pl
                r"(?:ال)?افتراض[\u0621-\u064a]*|فرضية|(?:ال)?متوقع[ةه]?")
 _CONDITION = words(r"if|unless|whether|اذا|لو")
 _UNCERTAIN = words(r"unknown|unverified|unproven|unconfirmed|untested|uncertain|"
-                   r"غير\s+(?:معروف|معروفة|معلوم|معلومة|مثبت|مثبتة|مؤكد|مؤكدة)")
+                   r"غير\s+(?:معروف|معروفة|معلوم|معلومة|مثبت|مثبتة|مؤكد|مؤكدة)|"
+                   r"لا\s+(?:نعرف|نعلم)\s+(?:ان\s+كان|ما\s+اذا)")
 _FUNCTION = words(r"a|an|the|of|for|in|on|at|to|by|with|from|about|through|via|and|or|"
                   r"their|your|our|its|this|that|some|any|all|every|no|في|من|عن|الي|علي|مع|لدي|بين")
 _PREPOSITION = re.compile(r"^(?:of|for|in|on|at|to|by|with|from|about|through|via)\b", re.I)
 _QUANTITY = words(r"\d[\d,.]*|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|"
                   r"twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred\w*|thousand\w*|"
                   r"million\w*|dozen\w*|half|third|quarter|percent|percentage|"
+                  r"doubl\w*|tripl\w*|quadrupl\w*|halv\w*|twice|thrice|ضاعف|"
                   r"واحد|واحدة|اثنان|اثنين|ثلاث[ةا]?|اربع[ةا]?|خمس[ةا]?|ست[ةا]?|سبع[ةا]?|ثمان[يةا]*|"
                   r"تسع[ةا]?|عشر[ةا]?|عشرين|ثلاثين|اربعين|خمسين|ستين|سبعين|ثمانين|تسعين|"
                   r"عشرون|ثلاثون|اربعون|خمسون|ستون|سبعون|ثمانون|تسعون|مئة|مئتي|مائة|الف|الاف|نصف|ثلث|ربع|بالمئة|بالمائة")
@@ -152,7 +154,7 @@ def _form_predicates(value, strict=False):
             tail = value[match.end():].strip()
             if match.start() and not token.startswith('pre-') and (strict or token.endswith('ed') or not re.match(r"^(?:of|for|in|on|at|to|by|with|from|about|through|via|without|before|after|under|over|near)\b", tail)):
                 positions.append(match.start())
-        elif not token.startswith('ال') and not token.endswith('ات') and (strict and token.startswith('ا') or token.startswith(('است','ي','ت','ن')) or
+        elif not token.startswith('ال') and not token.endswith('ات') and (strict and token.startswith('ا') or token.startswith(('است','ي','ت','ن')) or re.match(r'س[يتن][\u0621-\u064a]{2,}',token) or
                 token.endswith(('ت','وا','نا')) and not token.endswith(('ات','ية'))):
             positions.append(match.start())
     return sorted(set(positions))
@@ -173,7 +175,21 @@ def _new_predication(value):
         return False
     if first.isascii() and first.endswith('ed') and not auxiliary:
         return False
-    if _form_predicates(value):
+    if first.isascii() and not auxiliary and not _FORM_IRREGULAR.search(value):
+        # Object lists may include plurals anywhere. Only an early finite
+        # candidate after a subject can establish another English clause.
+        subject = re.sub(r'^(?:the|our|your|their|this)\s+', '', value)
+        chunks = subject.split()
+        if len(chunks) < 2 or not re.fullmatch(r'[a-z-]+(?:s|ed)', chunks[1], re.I):
+            return False
+    # Coordinated noun lists have no new subject/copula. Plural -s endings or
+    # Arabic ن/ت prefixes alone do not make 'sizes and patterns' predicates.
+    positions = _form_predicates(value)
+    tokens = value.split()
+    nominal_tail = (len(tokens) <= 3 and not _AUX.search(value) and not _FORM_IRREGULAR.search(value)
+                    and not _STATE.search(value) and not re.search(r"\b(?:we|our|it|they|the|this)\b", value)
+                    and not re.match(r"^(?:ال\S+\s+)?(?:[وف]?[ينت]\S+|لدي|عند)", value))
+    if positions and not nominal_tail:
         return True
     # Arabic nominal predicates need no copula: a definite subject followed by
     # an indefinite participle/adjective is distinct from a definite modifier.
@@ -219,19 +235,25 @@ def form_matches(text, kind, path=""):
         return all(planning_clause(p) or hypothesis_clause(p) or not _form_predicates(p) and not _STATE.search(p) for p in parts) and any(hypothesis_clause(p) for p in parts)
     if kind == 'negation':
         return all(negated_clause(p) and not _negative_promise(p) for p in parts)
+    label = path.rsplit('.',1)[-1] in {'title','name','business_name_suggestion','target_customer','location','focus'}
     if kind == 'noun_phrase':
-        return True  # Explicit residual risk: unchanged V226 material backstop.
+        # A noun verdict can misdescribe an otherwise valid instruction or
+        # question in an Advisor heading. It must still pass its own grammar
+        # and material-risk checks, rather than losing the complete sentence.
+        if all(planning_clause(p) or hypothesis_clause(p) or negated_clause(p) for p in parts):
+            return True
+        if not label:
+            return True  # Residual semantic risk outside bounded name fields.
+        from speech_forms import name_shape
+        strict = path.rsplit('.',1)[-1] not in {'target_customer','location','focus'}
+        return name_shape(text, normalize(text), _form_predicates(normalize(text), strict=strict))
     # Missing/invalid/unavailable classification: no declarative default.
     if all(planning_clause(p) or hypothesis_clause(p) or negated_clause(p) for p in parts):
         return True
-    labels = {'title','name','business_name_suggestion','target_customer','location','focus'}
     value = normalize(text)
     finite = _form_predicates(value, strict=True)
-    tokens = value.strip(' .').split()
-    # An adjective + plural noun is a label, not third-person conjugation.
-    if len(tokens)==2 and tokens[0].isascii() and tokens[0].endswith(('al','ive','ary','ous')) and tokens[1].endswith('s'):
-        finite = [p for p in finite if value[p:].strip(' .') != tokens[1]]
-    return path.rsplit('.',1)[-1] in labels and len(text.split()) <= 12 and not finite
+    from speech_forms import name_shape
+    return label and name_shape(text, value, finite)
 
 
 def sentences(text):
@@ -248,6 +270,10 @@ def _negative_promise(value):
     if re.match(r"^ابدا\s+ب[\u0621-\u064a]+", value):
         # Normalization makes ابدأ (start!) and أبدا (ever) identical. The
         # initial imperative plus a prepositional object is not an adverb.
+        return False
+    # A bounded second-person prohibition in an interview/before verification
+    # is an instruction to avoid transacting, not a promise of zero costs.
+    if re.match(r'^لا\s+ت(?:جمع|قبل|طلب|دفع)\b', value) and re.search(r'(?<!\w)(?:قبل|حتي|في\s+المقابلة)(?!\w)', value):
         return False
     negative = re.search(r"\b(?:will|shall|would)\s+(?:never|always|not)\b|"
                          r"\b(?:no\b.{0,65}|nobody\b.{0,40})(?:will|shall)\b|"
@@ -325,10 +351,25 @@ def _research(value):
     from material_claims import _ACTION, _QUESTION
     from content_safety import _ASSERTIVE_SUBJECT
     action = re.match(_ACTION.pattern.translate(str.maketrans("أإآٱى", "ااااي")), value, re.I)
+    if not action:
+        # Existing command roots can take conjunctions and object clitics;
+        # اسألهم and واسألهم are the same instruction, not new vocabulary.
+        first, _, rest = value.partition(' ')
+        candidates = [first, first[1:]] if first.startswith(('و','ف')) else [first]
+        for candidate in candidates:
+            roots = [candidate] + [candidate[:-len(s)] for s in ('هم','ها','كم','نا','ه','ك') if candidate.endswith(s) and len(candidate)-len(s)>=2]
+            if any(re.match(_ACTION.pattern.translate(str.maketrans("أإآٱى", "ااااي")), root+' '+rest, re.I) for root in roots):
+                action = True
+                break
+    if not action:
+        from speech_forms import command_shape
+        action = command_shape(value) and not _FORM_IRREGULAR.match(value)
     question = (_QUESTION.search(value) or re.match(r"^(?:whether|ما\s+اذا)\b", value) or
                 re.match(r"^[وف]?(?:هل|كيف|ما|ماذا|اي|متي|اين|لماذا)(?!\w)", value))
     if value.rstrip(' .').endswith(("?", "؟")) or question:
         return True
+    if _inferred_benefit_promise(value):
+        return False
     if not action:
         return False
     first = value.split()[0].strip('.,:')
@@ -340,7 +381,30 @@ def _research(value):
     return not re.search(r"\b(?:we|our\s+\w+|it)\s+(?:has|have|earned|received|is|was)\b", value)
 
 
+def _inferred_benefit_promise(value):
+    """Do not turn a quantified marketing promise into generic research.
+
+    This uses recipient, quantity, recurrence and financial-object structure,
+    not a new business-domain or marketing-verb vocabulary. Explicit planning
+    assumptions/conditions remain distinguishable from unqualified promises.
+    """
+    from material_claims import _ACTION
+    from speech_forms import command_shape
+    if not command_shape(value) or re.match(_ACTION.pattern.translate(str.maketrans("أإآٱى", "ااااي")), value, re.I):
+        return False
+    if _HEDGE.search(value) or _CONDITION.search(value):
+        return False
+    recipient = words(r'you|your').search(value)
+    financial = _RESULT.search(value) or _COST.search(value)
+    offer = re.search(r'\b(?:free|complimentary|refund\w*|discount\w*|guarantee\w*)\b', value)
+    recurrence = re.search(r'\b(?:every|each|per)\b|\b(?:daily|weekly|monthly|yearly)\b',value)
+    return bool(financial and (offer or recipient and _QUANTITY.search(value)) or
+                _CURRENCY.search(value) and _QUANTITY.search(value) and recurrence)
+
+
 def _promise(value):
+    if _inferred_benefit_promise(value):
+        return True
     if _negative_promise(value):
         return True
     if negated_clause(value):
@@ -386,6 +450,7 @@ def _promise(value):
 def _finite(value):
     """Candidate predicates; a plural noun/currency token is not a verb."""
     positions = [m.start() for m in _AUX.finditer(value)] + [m.start() for m in _IRREGULAR.finditer(value)]
+    positions += [m.start() for m in words(r'will|shall').finditer(value)]
     for match in re.finditer(r"\b[a-z][a-z-]*(?:ed|s)\b", value):
         token = match.group()
         before, after = value[:match.start()], value[match.end():].strip()
@@ -405,7 +470,7 @@ def _finite(value):
         word = match.group()
         if word.startswith('ال') or _RESULT.fullmatch(word) or _PEOPLE.fullmatch(word):
             continue
-        if (word.startswith(('است','ان','ات')) or word.startswith(('ي','ت','ن'))
+        if (word.startswith(('است','ان','ات')) or word.startswith(('ي','ت','ن')) or re.match(r'س[يتن][\u0621-\u064a]{2,}',word)
                 or word.endswith(('ت','وا','نا')) and not word.endswith(('ات','ية'))):
             positions.append(match.start())
     return sorted(set(positions))

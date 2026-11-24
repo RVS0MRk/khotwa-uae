@@ -1,0 +1,17 @@
+/* Loaded exclusively by the separate, loopback-only rehearsal entry point. */
+body[data-demo="true"] { --demo-offset: 66px; }
+.demo-banner {
+  position: sticky; top: 0; z-index: 1000;
+  min-height: var(--demo-offset); box-sizing: border-box;
+  padding: 12px 22px; background: #fff0d1; color: #4b2703;
+  border-bottom: 2px solid #986419; text-align: center;
+  font-size: 14px; line-height: 1.45; font-weight: 650;
+}
+body[data-demo="true"].has-plan header { top: var(--demo-offset); }
+.demo-banner .demo-ar { display: none; }
+html[lang="ar"] .demo-banner .demo-en { display: none; }
+html[lang="ar"] .demo-banner .demo-ar { display: inline; }
+@media (max-width: 600px) {
+  body[data-demo="true"] { --demo-offset: 88px; }
+  .demo-banner { padding: 10px 14px; font-size: 13px; }
+}

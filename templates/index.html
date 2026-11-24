@@ -10,11 +10,13 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='tokens.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='startsmart.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='investment.css') }}">
+{% if demo_mode %}<link rel="stylesheet" href="{{ url_for('static', filename='demo.css') }}">{% endif %}
 {% for script in ['translations.js','formatting.js','request-status.js','privacy.js','scoring.js','onboarding.js','app.js','dashboard-polish.js','chart-loader.js','proof.js','startsmart.js','investment.js','investment-details.js','finance-beginner.js','finance-analysis.js','funding-routes.js','funding-directory.js','investment-workspace.js','workspace.js','events.js','bootstrap.js'] %}
 <script defer src="{{ url_for('static', filename=script) }}"></script>
 {% endfor %}
 </head>
-<body id="body" data-chart-src="{{ url_for('static', filename='vendor/chart.umd.min.js') }}" data-qr-src="{{ url_for('static', filename='vendor/qrcode.min.js') }}" data-funding-src="{{ url_for('static', filename='funding.json') }}">
+<body id="body"{% if demo_mode %} class="demo-mode" data-demo="true"{% endif %} data-chart-src="{{ url_for('static', filename='vendor/chart.umd.min.js') }}" data-qr-src="{{ url_for('static', filename='vendor/qrcode.min.js') }}" data-funding-src="{{ url_for('static', filename='funding.json') }}">
+{% if demo_mode %}<div class="demo-banner" role="status"><span class="demo-en">OFFLINE REHEARSAL · SIMULATED DATA · Not live AI or customer research. Fictional Satr café-design scenario.</span><span class="demo-ar" lang="ar" dir="rtl">تدريب دون إنترنت · بيانات محاكاة · ليست ذكاء اصطناعيا حيا أو أبحاث عملاء. سيناريو سطر الخيالي لتصميم قوائم المقاهي.</span></div>{% endif %}
 <a class="skip-link" href="#main">Skip to content / انتقل إلى المحتوى</a>
 {% include 'partials/landing.html' %}
 <main id="main">

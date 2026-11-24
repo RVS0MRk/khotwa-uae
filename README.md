@@ -151,3 +151,12 @@ Founder and Investment PDFs share logical line wrapping, Arabic shaping and mixe
 Publication checks now apply deterministic clause-level rules independently of the semantic classifier's label. Local denials and conditional research remain useful planning content; a model label cannot authenticate achieved business outcomes. Version 3 receipts sign the publication-policy version as well as the original assessment. Earlier valid receipts still verify cryptographically, but their text is rechecked under the current publication policy before export. User assumptions, calculated projections and self-reported Proof counts retain their separate source paths; none becomes independent external evidence.
 
 See [V22_5_REVIEW.md](docs/V22_5_REVIEW.md) for the six-ticket implementation, exact verification and limits. These bounded, mock-tested checks are not a guarantee of live-model factual accuracy. Production quotas, financial formulas and deployment settings are unchanged.
+
+## Final academic baseline
+
+Khotwa V2.2.8 Academic Final freezes the bounded language corrections and adds a
+separate, visibly simulated offline rehearsal. See [final setup and rehearsal
+instructions](docs/FINAL_BASELINE.md). Production remains `app:app`; the offline
+adapter is never the Render entry point. No live AI or deployed-version approval
+is implied by mock test results. The final handover archives identify the frozen
+commit and remaining academic/customer-research requirements.

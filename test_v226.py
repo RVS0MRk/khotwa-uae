@@ -151,9 +151,11 @@ class V226Tests(unittest.TestCase):
             kwargs = {'side_effect':verdict} if isinstance(verdict,Exception) else {'return_value':verdict}
             with patch.object(gate,'classify',**kwargs):
                 clean, meta = gate.verify_model(raw,{},'en','synthetic')
-                for key in ('summary','first_step_today'):
-                    self.assertEqual(clean[key],raw[key])
-                self.assertEqual(clean['idea_overview']['solution'],raw['idea_overview']['solution'])
+                # Approved outage contract: this identical, unhedged noun-only
+                # description in two fields is not an authenticated assertion.
+                self.assertEqual(clean['summary'],'')
+                self.assertEqual(clean['first_step_today'],raw['first_step_today'])
+                self.assertEqual(clean['idea_overview']['solution'],'')
                 for bad in CASES['independent_unsafe']['en']:
                     result, _ = gate.verify_model({'summary':bad},{},'en','synthetic')
                     self.assertEqual(result['summary'],'')
