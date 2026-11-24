@@ -1,0 +1,3 @@
+-r requirements.txt
+# Public demonstration PDF labels; production app algorithms are unchanged.
+pypdf==7.0.0

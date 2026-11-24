@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Khotwa — Restricted live AI access</title><link rel="icon" href="{{ url_for('static',filename='favicon.svg') }}"><link rel="stylesheet" href="{{ url_for('static',filename='tokens.css') }}"><link rel="stylesheet" href="{{ url_for('static',filename='startsmart.css') }}"></head>
+<body><main><section class="card">
+<h1>Khotwa · خطوة</h1><h2>Restricted live AI / وصول مقيد للذكاء الاصطناعي الحي</h2>
+<p>The public website uses a clearly labeled, fixed academic demonstration. Private access is required to send requests to Groq. Model output is planning guidance, not verified evidence; the documented material-claim limitation remains.</p>
+<p lang="ar" dir="rtl">يعرض الموقع العام محاكاة أكاديمية ثابتة وموسومة بوضوح. يتطلب إرسال الطلبات إلى Groq وصولا خاصا. مخرجات النموذج إرشاد للتخطيط وليست أدلة متحققة، وما زال قيد سلامة الادعاءات الموثق قائما.</p>
+{% if unavailable %}<p role="status">Live AI is not configured. The public demonstration remains available. / الذكاء الاصطناعي الحي غير مهيأ؛ العرض العام متاح.</p>{% else %}
+<form method="post" action="/live"><label for="access-token">Private access token / رمز الوصول الخاص</label><input id="access-token" name="access_token" type="password" maxlength="512" autocomplete="off" required><button class="btn btn-primary" type="submit">Open live workspace / افتح مساحة العمل الحية</button></form>
+{% endif %}
+{% if error %}<p role="alert">{{ error }}</p>{% endif %}
+<p>Never enter the Groq API key here. Sessions expire after one hour. Do not enter confidential or personal customer data.</p>
+<p lang="ar" dir="rtl">لا تدخل مفتاح Groq هنا. تنتهي الجلسة بعد ساعة. لا تدخل معلومات سرية أو تفاصيل شخصية للعملاء.</p>
+<a class="btn btn-light" href="/">Public academic demo / العرض الأكاديمي العام</a>
+</section></main></body></html>

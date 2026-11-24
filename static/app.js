@@ -5,7 +5,11 @@ let lang = "en",
 let chatHistory = [];
 let planVariants = { en: null, ar: null },
   selectedIdeaSource = "user_input";
-const SESSION_KEY = "khotwa-business-session-v1";
+const SESSION_KEY = document.body.dataset.live === "true"
+  ? "khotwa-private-live-session-v1"
+  : document.body.dataset.publicDemo === "true"
+    ? "khotwa-public-demo-session-v1"
+    : "khotwa-business-session-v1";
 let restoringSession = false;
 function saveSession() {
   if (restoringSession) return;

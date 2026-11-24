@@ -3,10 +3,10 @@
 function setupPrivacy() {
   const demo = document.body.dataset.demo === "true";
   const en = demo ?
-    "Offline rehearsal: responses are fixed, simulated data. Nothing is sent to Groq. Recovery stays in this tab’s session storage; use New idea to clear it. Avoid personal information." :
+    "Academic demonstration: responses are fixed, simulated Satr data. Nothing is sent to Groq in this mode. Recovery stays in this tab’s session storage; use New idea to clear it. Avoid personal information." :
     "Your idea and answers are sent to Groq to generate guidance. Don’t enter personal or confidential information. Recovery is kept in this tab’s session storage; use New idea to clear it. Closing the tab normally clears it, but browsers can restore sessions.";
   const ar = demo ?
-    "تدريب دون إنترنت: الإجابات ثابتة ومحاكاة ولا تُرسل بيانات إلى Groq. تُحفظ الاستعادة في جلسة علامة التبويب؛ استخدم فكرة جديدة لمسحها. تجنب المعلومات الشخصية." :
+    "عرض أكاديمي: الإجابات ثابتة ومحاكاة لسطر ولا تُرسل بيانات إلى Groq في هذا الوضع. تُحفظ الاستعادة في جلسة علامة التبويب؛ استخدم فكرة جديدة لمسحها. تجنب المعلومات الشخصية." :
     "تُرسل فكرتك وإجاباتك إلى Groq لإعداد الإرشاد. لا تدخل معلومات شخصية أو سرية. تُحفظ الاستعادة في جلسة علامة التبويب؛ استخدم فكرة جديدة لمسحها. الإغلاق يمسحها عادةً لكن المتصفح قد يستعيد الجلسة.";
   for (const id of ["genBtn", "discover-btn", "chat-foot"]) {
     const notice = uiNode("p", "privacy-notice");
@@ -33,6 +33,10 @@ function setupPrivacy() {
   if (demo) {
     details.dataset.en = "This separate local rehearsal uses fictional Satr data and blocks provider requests. Plans and PDFs are processed in local server memory; exports are visibly labeled. Browser session recovery, anonymous reply cookies and temporary request counters still work. Do not enter genuine customer details. WhatsApp links leave this local application if opened.";
     details.dataset.ar = "يستخدم هذا التدريب المحلي المنفصل بيانات سطر الخيالية ويحجب طلبات المزود. تُعالج الخطط والتقارير في ذاكرة الخادم المحلي وتُوسم التقارير بوضوح. تعمل استعادة الجلسة وملفات ارتباط الردود المجهولة وعدادات الطلبات المؤقتة. لا تدخل تفاصيل عملاء حقيقيين. تفتح روابط WhatsApp خارج التطبيق المحلي.";
+  }
+  if (document.body.dataset.publicDemo === "true") {
+    details.dataset.en = "This public academic mode returns fixed fictional Satr examples. It does not send your inputs to Groq. Private live access is separate. Proof entries are self-reported and are not independently authenticated. Plans and PDFs are processed in server memory; safe recovery stays in this tab. Do not enter confidential customer details. WhatsApp links leave this website.";
+    details.dataset.ar = "يعرض هذا الوضع الأكاديمي العام أمثلة سطر الخيالية الثابتة ولا يرسل مدخلاتك إلى Groq. الوصول الحي الخاص منفصل. ملاحظات الإثبات ذاتية الإبلاغ ولا تُتحقق منها جهة مستقلة. تُعالج الخطط والتقارير في ذاكرة الخادم وتُحفظ الاستعادة الآمنة في علامة التبويب. لا تدخل تفاصيل سرية للعملاء. تفتح روابط WhatsApp خارج الموقع.";
   }
   const close = uiNode("button", "btn btn-light");
   close.type = "button";
