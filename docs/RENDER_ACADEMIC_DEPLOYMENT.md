@@ -93,7 +93,12 @@ Before this deployment, the working public deployment was
 `49f50e86b9e24799bcf51e2f260a57cf64e09936` on `main`.
 
 In Render, open this service's Deploys, select that successful deployment and
-choose Rollback. Confirm its health and URL. Restore branch `main`, build
+choose Rollback if the button is available. Free services may retain only the
+immediately preceding rollback image. If the older image is unavailable, first
+restore its settings below and manually deploy the exact `49f50e86b9e24799bcf51e2f260a57cf64e09936`
+commit from preserved `main`; verify its health and restrictions before use.
+For the most recent protected deployment, use its retained rollback image instead.
+Confirm health and the public URL. The original settings are branch `main`, build
 `pip install -r requirements.txt`, start `gunicorn app:app`, and the prior empty
 health path only if needed for subsequent rebuilds. Keep auto deploy off.
 Rolling back an image does not itself restore environment/settings; retain the
